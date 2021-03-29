@@ -1,0 +1,10 @@
+name: LoquaInteractable
+main: net.punchtree.loquainteractable.LoquaInteractablePlugin
+version: 0.0
+api-version: 1.16
+author: Cxom
+depend: [PersistentMetadata]
+
+commands:
+    metadatawand:
+        alias: mw
