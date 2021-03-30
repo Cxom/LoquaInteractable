@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
+import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 
 public class LoquaInteractablePlugin extends JavaPlugin {
 
@@ -17,10 +18,18 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		
+		registerEvents();
+		setCommandExecutors();
+	}
+	
+	private void registerEvents() {
 		Bukkit.getPluginManager().registerEvents(new SendResourcePackOnJoin(), this);
 		// TODO per player instances for data accumulation?
 		Bukkit.getPluginManager().registerEvents(new MetadataWand(), this);
-		
+		Bukkit.getPluginManager().registerEvents(MetadataEditingSessionManager.getInstance(), this);
+	}
+	
+	private void setCommandExecutors() {
 		getCommand("metadatawand").setExecutor(new MetadataWandCommand());
 	}
 	

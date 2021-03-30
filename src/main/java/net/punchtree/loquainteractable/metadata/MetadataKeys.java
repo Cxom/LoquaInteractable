@@ -4,15 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.bukkit.metadata.MetadataValue;
-
 public class MetadataKeys {
 
 	// This is a single instance wrapper of the list of metadata keys we're using
 	
-	private static Map<String, Function<MetadataValue, Object>> metadataKeys = new HashMap<>();
+	private static Map<String, Function<Object, Object>> metadataKeys = new HashMap<>();
 	
-	public static void registerKey(String metadataKey, Function<MetadataValue, Object> deserializeFunction) {
+	public static void registerKey(String metadataKey, Function<Object, Object> deserializeFunction) {
 		if (metadataKeys.containsKey(metadataKey) ) {
 			throw new IllegalArgumentException("Trying to register a metadata key that is already registered ("+metadataKey+")! Try using something else!");
 		}
@@ -23,7 +21,7 @@ public class MetadataKeys {
 		metadataKeys.remove(metadataKey);
 	}
 	
-	public static Iterable<Map.Entry<String, Function<MetadataValue, Object>>> keys() {
+	public static Iterable<Map.Entry<String, Function<Object, Object>>> keys() {
 		return metadataKeys.entrySet();
 	}
 	

@@ -1,6 +1,6 @@
 package net.punchtree.loquainteractable.metadata;
 
-import javax.annotation.Nonnull;
+import java.util.Map;
 
 import org.bukkit.block.Block;
 
@@ -28,13 +28,14 @@ public class MetadataApi {
 		PersistentMetadata.setMetadata(block, key, value);
 	}
 	
-//	public static <T> T getMetadata(Block block) {	
-//		
-//	}
+	public static Map<String, Object> getMetadata(Block block) {	
+		return PersistentMetadata.getAllMetadata(block);
+	}
 	
-	@SuppressWarnings("unchecked")
-	public static <T> T getMetadata(Block block, String key) {
-		return (T) block.getMetadata(key);
+//	@SuppressWarnings("unchecked")
+	public static Object getMetadata(Block block, String key) {
+		//return (T) block.getMetadata(key);
+		return PersistentMetadata.getMetadata(block, key);
 	}
 
 	public static void removeMetadata(Block block, String key) {
