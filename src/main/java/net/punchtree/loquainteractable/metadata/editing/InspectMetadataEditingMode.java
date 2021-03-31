@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -42,6 +43,7 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onRightClickAir(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
 		player.sendMessage("Inspect: Right Click Air");
+		// TODO Chat serialization to delete metadata entries
 	}
 
 	@Override
@@ -52,16 +54,12 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 		for (Map.Entry<String, Function<Object, Object>> keyEntry: MetadataKeys.keys()) {
 			String metadataKey = keyEntry.getKey();
 			Function<Object, Object> deserializeFunction = keyEntry.getValue();
-			if (block.hasMetadata(metadataKey)) {
+			Object metadataValue = MetadataApi.getMetadata(block, metadataKey);
+			if (metadataValue != null) {
 				hasAnyMetadata = true;
 				event.getPlayer().sendMessage(
 						ChatColor.GREEN + metadataKey + ": " 
-					  + ChatColor.GRAY + deserializeFunction.apply(MetadataApi.getMetadata(block, metadataKey)).toString()
-						
-//						block.getMetadata(metadataKey).stream()
-//																		 .map(deserializeFunction)
-//																		 .map(Object::toString)
-//																		 .collect(Collectors.joining("\n| | | |"))
+					  + ChatColor.GRAY + deserializeFunction.apply(metadataValue).toString()
 				);
 			}
 		}
@@ -73,6 +71,15 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onLeftClickBlock(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
 		player.sendMessage("Inspect: Left Click Block");
+		Map<String, Object> allMetadata = MetadataApi.getMetadata(event.getClickedBlock());
+		if (allMetadata.isEmpty()) {
+			event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "No metadata.");
+			return;
+		}
+		event.getPlayer().sendMessage(allMetadata.entrySet().stream()
+															.map(entry -> ChatColor.GREEN + entry.getKey() + ": " 
+																		+ ChatColor.GRAY + entry.getValue().toString())
+															.collect(Collectors.joining("\n")));
 	}
 
 	@Override
@@ -88,6 +95,11 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onLeaveEditingMode(Player player, MetadataEditingSession session) {
 		player.sendMessage("Inspect: Leave Inspect Editing Mode");
+	}
+
+	@Override
+	public void displayStatus(Player player, MetadataEditingSession session) {
+		// Nothing to display
 	}
 
 }

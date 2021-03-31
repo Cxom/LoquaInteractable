@@ -1,15 +1,11 @@
 package net.punchtree.loquainteractable.metadata.editing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.punchtree.loquainteractable.lighting.LightSwitchMetadataEditingMode;
-import net.punchtree.loquainteractable.metadata.MetadataApi;
-import net.punchtree.loquainteractable.metadata.MetadataKeys;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 
@@ -47,7 +41,7 @@ public class MetadataWand implements Listener {
 	private static final Action OPEN_EDIT_MODE_MENU_ACTION = Action.LEFT_CLICK_AIR;
 	private static final Action APPLY_EDIT_MODE_ACTION = Action.LEFT_CLICK_BLOCK;
 	
-	private static Set<MetadataEditingMode> editingModes = new HashSet<>();
+	private static List<MetadataEditingMode> editingModes = new ArrayList<>();
 	static {
 		editingModes.add(new InspectMetadataEditingMode());
 		editingModes.add(new LightSwitchMetadataEditingMode());
@@ -83,54 +77,12 @@ public class MetadataWand implements Listener {
 //			onEdit(event);
 //		}
 	}
-
-	private void onInspectAllRaw(PlayerInteractEvent event) {
-		event.setCancelled(true);
-		Map<String, Object> allMetadata = MetadataApi.getMetadata(event.getClickedBlock());
-		if (allMetadata.isEmpty()) {
-			event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "No metadata.");
-			return;
-		}
-		event.getPlayer().sendMessage(allMetadata.entrySet().stream()
-															.map(entry -> ChatColor.GREEN + entry.getKey() + ": " 
-																		+ ChatColor.GRAY + entry.getValue().toString())
-															.collect(Collectors.joining("\n")));
-	}
-	
-	private void onInspect(PlayerInteractEvent event) {
-		event.setCancelled(true);
-		Block block = event.getClickedBlock();
-		boolean hasAnyMetadata = false;
-		for (Map.Entry<String, Function<Object, Object>> keyEntry: MetadataKeys.keys()) {
-			String metadataKey = keyEntry.getKey();
-			Function<Object, Object> deserializeFunction = keyEntry.getValue();
-			if (block.hasMetadata(metadataKey)) {
-				hasAnyMetadata = true;
-				event.getPlayer().sendMessage(
-						ChatColor.GREEN + metadataKey + ": " 
-					  + ChatColor.GRAY + deserializeFunction.apply(MetadataApi.getMetadata(block, metadataKey)).toString()
-						
-//						block.getMetadata(metadataKey).stream()
-//																		 .map(deserializeFunction)
-//																		 .map(Object::toString)
-//																		 .collect(Collectors.joining("\n| | | |"))
-				);
-			}
-		}
-		if (!hasAnyMetadata) {
-			event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "No metadata.");
-		}
-	}
 	
 	private void onOpenEditModeMenu(Player player) {
 		if (editModeMenu == null) {
 			editModeMenu = new MetadataEditingModeMenu(editingModes);
 		}
 		editModeMenu.showTo(player);
-	}
-	
-	private void onEdit(PlayerInteractEvent event) {
-		
 	}
 	
 }

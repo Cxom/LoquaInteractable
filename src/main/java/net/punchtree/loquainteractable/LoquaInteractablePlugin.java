@@ -3,6 +3,7 @@ package net.punchtree.loquainteractable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
@@ -27,6 +28,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		// TODO per player instances for data accumulation?
 		Bukkit.getPluginManager().registerEvents(new MetadataWand(), this);
 		Bukkit.getPluginManager().registerEvents(MetadataEditingSessionManager.getInstance(), this);
+		
 	}
 	
 	private void setCommandExecutors() {

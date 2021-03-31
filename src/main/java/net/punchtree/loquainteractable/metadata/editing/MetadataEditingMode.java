@@ -53,5 +53,7 @@ public interface MetadataEditingMode {
 
 	void onEnterEditingMode(Player player, MetadataEditingSession session);
 	void onLeaveEditingMode(Player player, MetadataEditingSession session);
+
+	void displayStatus(Player player, MetadataEditingSession session);
 	
 }
