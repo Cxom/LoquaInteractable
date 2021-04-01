@@ -127,6 +127,7 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	}
 	
 	private void highlightBlock(Block block, BlockHighlight bh) {
+//		bh.modelHighlightBorder(block);
 		new BukkitRunnable() {
 			int i = 0;
 			public void run() {

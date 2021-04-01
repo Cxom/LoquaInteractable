@@ -29,6 +29,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new MetadataWand(), this);
 		Bukkit.getPluginManager().registerEvents(MetadataEditingSessionManager.getInstance(), this);
 		
+		// Just for testing
+		Bukkit.getPluginManager().registerEvents(new ArmorStandUtilsTesting(), this);
 	}
 	
 	private void setCommandExecutors() {

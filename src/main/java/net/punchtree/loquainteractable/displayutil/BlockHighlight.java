@@ -1,5 +1,8 @@
 package net.punchtree.loquainteractable.displayutil;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -7,10 +10,28 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
 public class BlockHighlight {
 
+	private static Set<Entity> spawnedArmorStands = new HashSet<>();
+	
+	public BlockHighlight modelHighlightBorder(Block block) {
+//		ArmorStandUtils.spawnArmorStand(location, lit)
+		ArmorStand highlight = ArmorStandUtils.spawnArmorStand(block.getLocation(), true);
+		new BukkitRunnable() {
+			public void run() {
+				highlight.remove();
+			}
+		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 20);
+		return this;
+	}
+	
 	private enum ParticleType {
 		REDSTONE,
 		NORMAL
