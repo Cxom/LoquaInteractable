@@ -3,6 +3,7 @@ package net.punchtree.loquainteractable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow;
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.displayutil.ColoredScoreboardTeams;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
@@ -27,6 +28,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	private void registerEvents() {
 		Bukkit.getPluginManager().registerEvents(new SendResourcePackOnJoin(), this);
+		Bukkit.getPluginManager().registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		// TODO per player instances for data accumulation?
 		Bukkit.getPluginManager().registerEvents(new MetadataWand(), this);
 		Bukkit.getPluginManager().registerEvents(MetadataEditingSessionManager.getInstance(), this);

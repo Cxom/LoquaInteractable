@@ -14,6 +14,9 @@ import org.bukkit.util.Vector;
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
+import static net.punchtree.loquainteractable.displayutil.PrintingObjectUtils.formatEulerAngle;
+import static net.punchtree.loquainteractable.displayutil.PrintingObjectUtils.formatLocation;
+
 public class ArmorStandUtils {
 	
 	private static final Color PINK = Color.fromRGB(255, 107, 250);
@@ -24,14 +27,16 @@ public class ArmorStandUtils {
 	// Consumer<ArmorStand> doBeforeSpawn
 	public static ArmorStand spawnArmorStand(Location location, boolean lit, Team coloredTeam, ItemStack highlightItem) {
 		ArmorStand newstand = location.getWorld().spawn(
-				location.clone().add(LEFT_HAND_OFFSET), 
+				location.clone().add(RIGHT_HAND_OFFSET), 
 				ArmorStand.class,
 				stand -> {
 					stand.setGravity(false);
 					stand.setArms(true);
 					resetPose(stand);
-					stand.setItem(EquipmentSlot.OFF_HAND, highlightItem);
+					stand.setItem(EquipmentSlot.HAND, highlightItem);
 					stand.addScoreboardTag("loqinttemp");
+					// TODO use entity metadata for glowing?
+					stand.addScoreboardTag("loqinttempglowing");
 					// Make sure to do this and not setInvisible(true) in order to set the NBT tag
 					stand.setVisible(false);
 					stand.setInvulnerable(true);
@@ -75,14 +80,6 @@ public class ArmorStandUtils {
 		inspector.sendMessage(ChatColor.GREEN + "LeftLegPose: " + formatEulerAngle(stand.getRightLegPose()));
 		inspector.sendMessage(ChatColor.GREEN + "Pose: " + stand.getPose());
 		inspector.sendMessage(ChatColor.RED + "Location: " + formatLocation(stand.getLocation()));
-	}
-	
-	public static String formatEulerAngle(EulerAngle euler) {
-		return String.format("[%.5f, %.5f, %.5f]", euler.getX(), euler.getY(), euler.getZ());
-	}
-	
-	public static String formatLocation(Location loc) {
-		return String.format("%s[%.5f %.5f %.5f]", loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ());
 	}
 	
 }

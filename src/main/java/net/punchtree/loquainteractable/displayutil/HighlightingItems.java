@@ -23,4 +23,12 @@ public class HighlightingItems {
 		BLOCK_HIGHLIGHT_CROSS_MODEL.setItemMeta(lm);
 	}
 	
+	public static final ItemStack OPEN_SIGN = new ItemStack(Material.LEATHER_HELMET);
+	static {
+		LeatherArmorMeta lm = (LeatherArmorMeta) OPEN_SIGN.getItemMeta();
+		lm.setColor(Color.fromRGB(255, 255, 255));
+		lm.setCustomModelData(400);
+		OPEN_SIGN.setItemMeta(lm);
+	}
+	
 }
