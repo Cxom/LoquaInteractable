@@ -36,7 +36,7 @@ public class ModelBlockHighlight {
 	private BukkitTask pruningTask;
 	
 	private ItemStack highlightItem = HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL;
-	private Team coloredTeam = ColoredScoreboardTeams.PINK_TEAM;
+	private Team coloredTeam = ColoredScoreboardTeams.LIGHT_PURPLE_TEAM;
 	
 	public ModelBlockHighlight() {
 		

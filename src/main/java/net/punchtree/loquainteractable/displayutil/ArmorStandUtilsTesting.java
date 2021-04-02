@@ -37,7 +37,7 @@ public class ArmorStandUtilsTesting implements Listener {
 			}
 			ArmorStandUtils.spawnArmorStand(event.getClickedBlock().getLocation(),
 					event.getPlayer().isSneaking(),
-					ColoredScoreboardTeams.PINK_TEAM,
+					ColoredScoreboardTeams.WHITE_TEAM,
 					HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
 		}
 	}

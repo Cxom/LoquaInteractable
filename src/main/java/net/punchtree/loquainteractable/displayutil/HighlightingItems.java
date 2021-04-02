@@ -31,4 +31,12 @@ public class HighlightingItems {
 		OPEN_SIGN.setItemMeta(lm);
 	}
 	
+	public static final ItemStack DIRECTIONAL_INDICATOR = new ItemStack(Material.LEATHER_HELMET);
+	static {
+		LeatherArmorMeta lm = (LeatherArmorMeta) DIRECTIONAL_INDICATOR.getItemMeta();
+		lm.setColor(Color.fromRGB(255, 255, 255));
+		lm.setCustomModelData(500);
+		DIRECTIONAL_INDICATOR.setItemMeta(lm);
+	}
+	
 }

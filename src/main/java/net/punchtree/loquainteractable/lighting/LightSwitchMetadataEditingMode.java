@@ -88,7 +88,7 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 		} else {
 			lights.add(block);
 			modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
-			modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.PINK_TEAM);
+			modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.LIGHT_PURPLE_TEAM);
 			modelBlockHighlighting.highlightIndefinitely(block);
 		}
 //		highlightSelectedLights();

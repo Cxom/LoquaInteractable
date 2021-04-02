@@ -79,6 +79,7 @@ public class ArmorStandUtils {
 		inspector.sendMessage(ChatColor.GREEN + "LeftLegPose: " + formatEulerAngle(stand.getLeftLegPose()));
 		inspector.sendMessage(ChatColor.GREEN + "LeftLegPose: " + formatEulerAngle(stand.getRightLegPose()));
 		inspector.sendMessage(ChatColor.GREEN + "Pose: " + stand.getPose());
+		inspector.sendMessage(ChatColor.DARK_AQUA + "ScoreboardTags: " + stand.getScoreboardTags());
 		inspector.sendMessage(ChatColor.RED + "Location: " + formatLocation(stand.getLocation()));
 	}
 	
