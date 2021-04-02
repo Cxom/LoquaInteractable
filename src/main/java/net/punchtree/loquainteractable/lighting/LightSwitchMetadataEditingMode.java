@@ -1,25 +1,16 @@
 package net.punchtree.loquainteractable.lighting;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
-import net.punchtree.loquainteractable.LoquaInteractablePlugin;
-import net.punchtree.loquainteractable.displayutil.ColoredScoreboardTeams;
-import net.punchtree.loquainteractable.displayutil.HighlightingItems;
-import net.punchtree.loquainteractable.displayutil.ModelBlockHighlight;
+import net.punchtree.loquainteractable.displayutil.BlockSelection;
 import net.punchtree.loquainteractable.metadata.editing.MetadataEditingMode;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
 
@@ -31,25 +22,16 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 																			   "the list to the switch");
 	private final ItemStack MENU_ITEM = generateDefaultNameAndDescriptionMenuItem(Material.SEA_LANTERN);
 	
-	private List<Block> lights = new ArrayList<>();
-	
-	private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();
+//	private List<Block> lights = new ArrayList<>();
+	BlockSelection lightsSelection = new BlockSelection();
 	
 	@Override
 	public void displayStatus(Player player, MetadataEditingSession session) {
-//		highlightSelectedLights();
-		if (lights.isEmpty()) {
+		if (lightsSelection.getSelection().isEmpty()) {
 			player.sendMessage(ChatColor.DARK_GRAY + "No lights selected.");
 			return;
 		}
-		int columns = 2;
-		String blocksList = IntStream.range(0, (lights.size() + columns - 1) / columns)
-				 .mapToObj(i -> lights.subList(i * columns, Math.min(columns * (i + 1), lights.size())))
-				 .map(sublist -> sublist.stream()
-						 				.map(b -> String.format("%s[%4d %3d %4d]", b.getWorld().getName(), b.getX(), b.getY(), b.getZ()))
-						 				.collect(Collectors.joining("          ")))
-				 .collect(Collectors.joining("\n"));
-		player.sendMessage(blocksList);
+		player.sendMessage(lightsSelection.getBlocksList(2));
 	}
 
 	@Override
@@ -81,16 +63,7 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onRightClickBlock(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
 		Block block = event.getClickedBlock();
-		if (lights.contains(block)) {
-			lights.remove(block);
-			modelBlockHighlighting.removeHighlight(block);
-			highlightRemovedBlock(block);
-		} else {
-			lights.add(block);
-			modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
-			modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.LIGHT_PURPLE_TEAM);
-			modelBlockHighlighting.highlightIndefinitely(block);
-		}
+		lightsSelection.toggleSelectBlock(block);
 //		highlightSelectedLights();
 		
 //		String blocksList = lights.stream()
@@ -117,10 +90,10 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onLeaveEditingMode(Player player, MetadataEditingSession session) {
 		player.sendMessage("LightSwitch: Leave Editing Mode");
-		modelBlockHighlighting.cleanupDisable();
+		lightsSelection.cleanupDisable();
 	}
 	
-	private void highlightRemovedBlock(Block block) {
+//	private void highlightRemovedBlock(Block block) {
 //		BlockHighlight bh = new BlockHighlight();
 //		bh.diagonalForward = true;
 //		bh.diagonalCross = true;
@@ -128,31 +101,13 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 //		bh.setRedstoneParticleColor(Color.RED)
 //		  .setParticleSize(0.5f);
 //		highlightBlock(block, bh);
-		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_CROSS_MODEL);
-		modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.RED_TEAM);
-		ArmorStand highlight = modelBlockHighlighting.highlightIndefinitely(block);
-		ItemStack highlightItem = highlight.getItem(EquipmentSlot.OFF_HAND); 
-		new BukkitRunnable() {
-			public void run() {
-				highlight.setItem(EquipmentSlot.OFF_HAND, null); 
-			}
-		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 5);
-		new BukkitRunnable() {
-			public void run() {
-				highlight.setItem(EquipmentSlot.OFF_HAND, highlightItem); 
-			}
-		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 10);
-		new BukkitRunnable() {
-			public void run() {
-				highlight.setItem(EquipmentSlot.OFF_HAND, null); 
-			}
-		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 15);
+		
 //		new BukkitRunnable() {
 //			public void run() {
 //				highlight.setInvisible(true);
 //			}
 //		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 30);
-	}
+//	}
 	
 //	private void highlightSelectedLights() {
 //		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
