@@ -26,5 +26,10 @@ public class MetadataEditingSession {
 		this.editingMode = editingMode;
 		editingMode.onEnterEditingMode(player, this);
 	}
+	
+	public void cleanupDisable() {
+		editingMode.onLeaveEditingMode(player, this);
+		this.editingMode = null;
+	}
 
 }

@@ -35,8 +35,10 @@ public class ArmorStandUtilsTesting implements Listener {
 			if (event.getHand() != EquipmentSlot.HAND) {
 				return;
 			}
-			ArmorStandUtils.spawnArmorStand(event.getClickedBlock().getLocation(), 
-					event.getPlayer().isSneaking());
+			ArmorStandUtils.spawnArmorStand(event.getClickedBlock().getLocation(),
+					event.getPlayer().isSneaking(),
+					ColoredScoreboardTeams.PINK_TEAM,
+					HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
 		}
 	}
 	

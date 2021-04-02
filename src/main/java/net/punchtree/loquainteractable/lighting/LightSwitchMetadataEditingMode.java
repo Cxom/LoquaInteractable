@@ -6,17 +6,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
-import net.punchtree.loquainteractable.displayutil.BlockHighlight;
+import net.punchtree.loquainteractable.displayutil.ColoredScoreboardTeams;
+import net.punchtree.loquainteractable.displayutil.HighlightingItems;
+import net.punchtree.loquainteractable.displayutil.ModelBlockHighlight;
 import net.punchtree.loquainteractable.metadata.editing.MetadataEditingMode;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
 
@@ -30,9 +33,11 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	
 	private List<Block> lights = new ArrayList<>();
 	
+	private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();
+	
 	@Override
 	public void displayStatus(Player player, MetadataEditingSession session) {
-		highlightSelectedLights();
+//		highlightSelectedLights();
 		if (lights.isEmpty()) {
 			player.sendMessage(ChatColor.DARK_GRAY + "No lights selected.");
 			return;
@@ -67,9 +72,10 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 //		player.sendMessage("LightSwitch: Right Click Air");
 		if (player.isSneaking()) {
 			displayStatus(player, session);
-		} else {
-			highlightSelectedLights();
 		}
+//		else {
+//			highlightSelectedLights();
+//		}
 	}
 
 	@Override
@@ -77,11 +83,15 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 		Block block = event.getClickedBlock();
 		if (lights.contains(block)) {
 			lights.remove(block);
+			modelBlockHighlighting.removeHighlight(block);
 			highlightRemovedBlock(block);
 		} else {
 			lights.add(block);
+			modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
+			modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.PINK_TEAM);
+			modelBlockHighlighting.highlightIndefinitely(block);
 		}
-		highlightSelectedLights();
+//		highlightSelectedLights();
 		
 //		String blocksList = lights.stream()
 //	 			  .map(b -> String.format("%s:%d,%d,%d", b.getWorld().getName(), b.getX(), b.getY(), b.getZ()))
@@ -101,46 +111,73 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 
 	@Override
 	public void onEnterEditingMode(Player player, MetadataEditingSession session) {
-		player.sendMessage("LightSwitch: Enter Inspect Editing Mode");
+		player.sendMessage("LightSwitch: Enter Editing Mode");
 	}
 
 	@Override
 	public void onLeaveEditingMode(Player player, MetadataEditingSession session) {
-		player.sendMessage("LightSwitch: Leave Inspect Editing Mode");
+		player.sendMessage("LightSwitch: Leave Editing Mode");
+		modelBlockHighlighting.cleanupDisable();
 	}
 	
 	private void highlightRemovedBlock(Block block) {
-		BlockHighlight bh = new BlockHighlight();
-		bh.diagonalForward = true;
-		bh.diagonalCross = true;
-		bh.steps = 10;
-		bh.setRedstoneParticleColor(Color.RED)
-		  .setParticleSize(0.5f);
-		highlightBlock(block, bh);
-	}
-	
-	private void highlightSelectedLights() {
-		for (Block light : lights) {
-			highlightBlock(light, new BlockHighlight().setRedstoneParticleColor(Color.fromRGB(255, 107, 250))
-													  .setParticleSize(0.75f));
-		}
-	}
-	
-	private void highlightBlock(Block block, BlockHighlight bh) {
-//		bh.modelHighlightBorder(block);
+//		BlockHighlight bh = new BlockHighlight();
+//		bh.diagonalForward = true;
+//		bh.diagonalCross = true;
+//		bh.steps = 10;
+//		bh.setRedstoneParticleColor(Color.RED)
+//		  .setParticleSize(0.5f);
+//		highlightBlock(block, bh);
+		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_CROSS_MODEL);
+		modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.RED_TEAM);
+		ArmorStand highlight = modelBlockHighlighting.highlightIndefinitely(block);
+		ItemStack highlightItem = highlight.getItem(EquipmentSlot.OFF_HAND); 
 		new BukkitRunnable() {
-			int i = 0;
 			public void run() {
-				if (i >= 4) {
-					this.cancel();
-				}
-				++i;
-				bh.particleHighlight(block);
+				highlight.setItem(EquipmentSlot.OFF_HAND, null); 
 			}
-		}.runTaskTimerAsynchronously(LoquaInteractablePlugin.getInstance(), 0, 2);
-//		new BlockHighlight().setRedstoneParticleColor(color)
-//							.setParticleSize(0.75f)
-//						    .particleHighlight(block);
+		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 5);
+		new BukkitRunnable() {
+			public void run() {
+				highlight.setItem(EquipmentSlot.OFF_HAND, highlightItem); 
+			}
+		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 10);
+		new BukkitRunnable() {
+			public void run() {
+				highlight.setItem(EquipmentSlot.OFF_HAND, null); 
+			}
+		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 15);
+//		new BukkitRunnable() {
+//			public void run() {
+//				highlight.setInvisible(true);
+//			}
+//		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 30);
 	}
+	
+//	private void highlightSelectedLights() {
+//		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
+//		
+//		//		for (Block light : lights) {
+////			highlightBlock(light, new BlockHighlight().setRedstoneParticleColor(Color.fromRGB(255, 107, 250))
+////													  .setParticleSize(0.75f));
+////		}
+//	}
+//	
+//	private void highlightBlock(Block block, BlockHighlight bh) {
+////		bh.modelHighlightBorder(block);
+//		new BukkitRunnable() {
+//			int i = 0;
+//			public void run() {
+//				if (i >= 4) {
+//					this.cancel();
+//				}
+//				++i;
+//				bh.particleHighlight(block);
+//			}
+//		}.runTaskTimerAsynchronously(LoquaInteractablePlugin.getInstance(), 0, 2);
+////		new BlockHighlight().setRedstoneParticleColor(color)
+////							.setParticleSize(0.75f)
+////						    .particleHighlight(block);
+//	}
 	
 }
