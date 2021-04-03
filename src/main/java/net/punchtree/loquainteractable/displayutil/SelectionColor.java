@@ -200,6 +200,11 @@ public class SelectionColor extends Color {
 		public org.bukkit.Color getBukkitColor(){
 			return org.bukkit.Color.fromRGB(this.getRed(), this.getGreen(), this.getBlue());
 		}
+		
+		@Override
+		public String toString() {
+			return chatColor + "";
+		}
 	
 }
 

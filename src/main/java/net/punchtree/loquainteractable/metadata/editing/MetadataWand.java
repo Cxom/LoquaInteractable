@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.punchtree.loquainteractable.lighting.LightSwitchMetadataEditingMode;
+import net.punchtree.loquainteractable.lighting.ToggleMetadataEditingMode;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 
@@ -45,6 +46,7 @@ public class MetadataWand implements Listener {
 	static {
 		editingModes.add(new InspectMetadataEditingMode());
 		editingModes.add(new LightSwitchMetadataEditingMode());
+		editingModes.add(new ToggleMetadataEditingMode());
 	}
 	
 	public static void addEditingMode(MetadataEditingMode editingMode) {

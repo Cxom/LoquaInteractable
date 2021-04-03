@@ -1,6 +1,8 @@
 package net.punchtree.loquainteractable.displayutil;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.EulerAngle;
 
@@ -16,6 +18,10 @@ public class PrintingObjectUtils {
 	
 	public static String formatBlock(Block block) {
 		return String.format("%s:%d,%d,%d", block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+	}
+	
+	public static String formatMaterial(Material material) {
+		return WordUtils.capitalize(material.name().replace('_', ' '));
 	}
 	
 }
