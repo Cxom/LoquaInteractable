@@ -30,7 +30,9 @@ public class MetadataEditingSessionManager implements Listener {
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event) {
 		MetadataEditingSession session = sessions.remove(event.getPlayer());
-		session.cleanupDisable();
+		if (session != null) {			
+			session.cleanupDisable();
+		}
 	}
 
 	public static void cleanupSessions() {
