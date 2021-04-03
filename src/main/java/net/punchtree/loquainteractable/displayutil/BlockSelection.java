@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.EquipmentSlot;
@@ -17,9 +19,20 @@ import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
 public class BlockSelection {
 
-	private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();
+	private static final SelectionColor DESELECT_COLOR = new SelectionColor(Color.RED);
 	
+	private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();	
 	private Set<Block> selectedBlocks = new HashSet<>();
+	
+	private SelectionColor selectionColor = new SelectionColor(255, 85, 255, ChatColor.LIGHT_PURPLE);
+			
+	public BlockSelection() {
+		
+	}
+	
+	public BlockSelection(SelectionColor selectionColor) {
+		this.selectionColor = selectionColor;
+	}
 	
 	public Set<Block> getSelection() {
 		return selectedBlocks;
@@ -46,8 +59,7 @@ public class BlockSelection {
 	
 	public void selectBlock(Block block) {
 		if (selectedBlocks.add(block)) {			
-			modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
-			modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.LIGHT_PURPLE_TEAM);
+			modelBlockHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, selectionColor);
 			modelBlockHighlighting.highlightIndefinitely(block);
 		}
 	}
@@ -72,8 +84,7 @@ public class BlockSelection {
 	
 	private void showDeselectAnimation(Block block) {
 		modelBlockHighlighting.removeHighlight(block);
-		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_CROSS_MODEL);
-		modelBlockHighlighting.setColoredTeam(ColoredScoreboardTeams.RED_TEAM);
+		modelBlockHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_CROSS_MODEL, DESELECT_COLOR);
 		ArmorStand highlight = modelBlockHighlighting.highlightIndefinitely(block);
 		ItemStack highlightItem = highlight.getItem(EquipmentSlot.HAND); 
 		new BukkitRunnable() {

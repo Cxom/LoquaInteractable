@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
@@ -53,6 +54,15 @@ public class ModelBlockHighlight {
 				pruningTask = new PruningRunnable().runTaskLater(LoquaInteractablePlugin.getInstance(), timerDelay);
 			}
 		}
+	}
+	
+	public ModelBlockHighlight setColoredItem(ItemStack highlightItem, SelectionColor scolor) {
+		this.highlightItem = highlightItem.clone();
+		LeatherArmorMeta lm = (LeatherArmorMeta) this.highlightItem.getItemMeta();
+		lm.setColor(scolor.getBukkitColor());
+		this.highlightItem.setItemMeta(lm);
+		this.coloredTeam = scolor.getGlowingTeam();
+		return this;
 	}
 	
 	public ModelBlockHighlight setHighlightItem(ItemStack highlightItem) {

@@ -23,7 +23,7 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	private final ItemStack MENU_ITEM = generateDefaultNameAndDescriptionMenuItem(Material.SEA_LANTERN);
 	
 //	private List<Block> lights = new ArrayList<>();
-	BlockSelection lightsSelection = new BlockSelection();
+	private BlockSelection lightsSelection = new BlockSelection();
 	
 	@Override
 	public void displayStatus(Player player, MetadataEditingSession session) {
@@ -51,25 +51,14 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 
 	@Override
 	public void onRightClickAir(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
-//		player.sendMessage("LightSwitch: Right Click Air");
 		if (player.isSneaking()) {
 			displayStatus(player, session);
 		}
-//		else {
-//			highlightSelectedLights();
-//		}
 	}
 
 	@Override
 	public void onRightClickBlock(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
-		Block block = event.getClickedBlock();
-		lightsSelection.toggleSelectBlock(block);
-//		highlightSelectedLights();
-		
-//		String blocksList = lights.stream()
-//	 			  .map(b -> String.format("%s:%d,%d,%d", b.getWorld().getName(), b.getX(), b.getY(), b.getZ()))
-//	 			  .collect(Collectors.joining("\n"));
-		
+		lightsSelection.toggleSelectBlock(event.getClickedBlock());
 	}
 
 	@Override
@@ -92,47 +81,5 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 		player.sendMessage("LightSwitch: Leave Editing Mode");
 		lightsSelection.cleanupDisable();
 	}
-	
-//	private void highlightRemovedBlock(Block block) {
-//		BlockHighlight bh = new BlockHighlight();
-//		bh.diagonalForward = true;
-//		bh.diagonalCross = true;
-//		bh.steps = 10;
-//		bh.setRedstoneParticleColor(Color.RED)
-//		  .setParticleSize(0.5f);
-//		highlightBlock(block, bh);
-		
-//		new BukkitRunnable() {
-//			public void run() {
-//				highlight.setInvisible(true);
-//			}
-//		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 30);
-//	}
-	
-//	private void highlightSelectedLights() {
-//		modelBlockHighlighting.setHighlightItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
-//		
-//		//		for (Block light : lights) {
-////			highlightBlock(light, new BlockHighlight().setRedstoneParticleColor(Color.fromRGB(255, 107, 250))
-////													  .setParticleSize(0.75f));
-////		}
-//	}
-//	
-//	private void highlightBlock(Block block, BlockHighlight bh) {
-////		bh.modelHighlightBorder(block);
-//		new BukkitRunnable() {
-//			int i = 0;
-//			public void run() {
-//				if (i >= 4) {
-//					this.cancel();
-//				}
-//				++i;
-//				bh.particleHighlight(block);
-//			}
-//		}.runTaskTimerAsynchronously(LoquaInteractablePlugin.getInstance(), 0, 2);
-////		new BlockHighlight().setRedstoneParticleColor(color)
-////							.setParticleSize(0.75f)
-////						    .particleHighlight(block);
-//	}
 	
 }

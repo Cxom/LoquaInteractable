@@ -21,17 +21,6 @@ public class BlockHighlight {
 
 	private static Set<Entity> spawnedArmorStands = new HashSet<>();
 	
-//	public BlockHighlight modelHighlightBorder(Block block) {
-////		ArmorStandUtils.spawnArmorStand(location, lit)
-//		ArmorStand highlight = ArmorStandUtils.spawnArmorStand(block.getLocation(), true);
-//		new BukkitRunnable() {
-//			public void run() {
-//				highlight.remove();
-//			}
-//		}.runTaskLater(LoquaInteractablePlugin.getInstance(), 20);
-//		return this;
-//	}
-	
 	private enum ParticleType {
 		REDSTONE,
 		NORMAL
