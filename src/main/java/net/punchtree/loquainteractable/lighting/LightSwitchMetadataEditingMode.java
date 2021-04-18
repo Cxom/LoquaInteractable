@@ -23,6 +23,7 @@ public class LightSwitchMetadataEditingMode implements MetadataEditingMode {
 	private final ItemStack MENU_ITEM = generateDefaultNameAndDescriptionMenuItem(Material.SEA_LANTERN);
 	
 //	private List<Block> lights = new ArrayList<>();
+	private BlockSelection lightswitchSelection = new BlockSelection();
 	private BlockSelection lightsSelection = new BlockSelection();
 	
 	@Override

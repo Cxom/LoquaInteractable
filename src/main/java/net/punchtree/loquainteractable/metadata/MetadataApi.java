@@ -41,6 +41,10 @@ public class MetadataApi {
 	public static void removeMetadata(Block block, String key) {
 		PersistentMetadata.removeMetadata(block, key);
 	}
+
+	public static Map<Block, Map<String, Object>> getMetadataInRadius(Block center, int radius) {
+		return PersistentMetadata.getMetadataInRadius(center, radius);
+	}
 	
 	
 }

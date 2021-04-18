@@ -142,6 +142,7 @@ public class ModelBlockHighlight {
 		if (pruningTask != null) {			
 			pruningTask.cancel();
 		}
+		pruningTask = null;
 		for(HighlightInstance highlight : highlightUntil.values()) {
 			highlight.entity.remove();
 		}

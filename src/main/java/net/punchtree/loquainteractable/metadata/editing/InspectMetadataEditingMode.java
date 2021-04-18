@@ -1,18 +1,24 @@
 package net.punchtree.loquainteractable.metadata.editing;
 
+import static net.punchtree.loquainteractable.displayutil.PrintingObjectUtils.formatBlock;
+
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import net.md_5.bungee.api.ChatColor;
+import net.punchtree.loquainteractable.displayutil.HighlightingItems;
+import net.punchtree.loquainteractable.displayutil.ModelBlockHighlight;
+import net.punchtree.loquainteractable.displayutil.SelectionColor;
 import net.punchtree.loquainteractable.metadata.MetadataApi;
 import net.punchtree.loquainteractable.metadata.MetadataKeys;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
@@ -24,6 +30,16 @@ import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingS
  *
  */
 public class InspectMetadataEditingMode implements MetadataEditingMode {	
+	
+	private int confirmCount = 0;
+	private long lastConfirm = System.currentTimeMillis();
+	private static final long MAX_CONFIRM_DELAY_MILLIS = 400;
+	
+	private ModelBlockHighlight radiusHighlighting = new ModelBlockHighlight();
+	
+	public InspectMetadataEditingMode() {
+		radiusHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, SelectionColor.CONCRETE_LIME);
+	}
 	
 	@Override
 	public ItemStack getMenuItem() {
@@ -42,8 +58,29 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 
 	@Override
 	public void onRightClickAir(PlayerInteractEvent event, Player player, MetadataEditingSession session) {
-		player.sendMessage("Inspect: Right Click Air");
-		// TODO Chat serialization to delete metadata entries
+		player.sendMessage("Inspect: Right Click Air: " + (System.currentTimeMillis() - lastConfirm));
+		if ((System.currentTimeMillis() - lastConfirm) > MAX_CONFIRM_DELAY_MILLIS) {
+			confirmCount = 1;
+			lastConfirm = System.currentTimeMillis();
+		} else {
+			++confirmCount;
+			lastConfirm = System.currentTimeMillis();
+		}
+		if (confirmCount == 3) {
+			confirmCount = 0;
+			highlightCurrentChunk(player);
+		}
+	}
+	
+	private void highlightCurrentChunk(Player player) {
+		final int RADIUS = 8;
+		Block center = player.getLocation().getBlock();
+		player.sendMessage(ChatColor.of(Color.ORANGE) + "Radius of " + RADIUS + " around " + formatBlock(center));
+		radiusHighlighting.cleanupDisable();
+		Map<Block, Map<String, Object>> radiusMetadata = MetadataApi.getMetadataInRadius(center, RADIUS);
+		for (Block block : radiusMetadata.keySet()) {
+			radiusHighlighting.highlightIndefinitely(block);
+		}
 	}
 
 	@Override
@@ -95,6 +132,7 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 	@Override
 	public void onLeaveEditingMode(Player player, MetadataEditingSession session) {
 		player.sendMessage("Inspect: Leave Inspect Editing Mode");
+		radiusHighlighting.cleanupDisable();
 	}
 
 	@Override
