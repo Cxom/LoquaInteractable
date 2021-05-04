@@ -3,9 +3,12 @@ package net.punchtree.loquainteractable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.punchtree.loquainteractable.commands.CustomModelDataCommands;
+import net.punchtree.loquainteractable.commands.testing.CircleGameTesting;
 import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow;
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.displayutil.ColoredScoreboardTeams;
+import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
@@ -39,6 +42,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	private void setCommandExecutors() {
 		getCommand("metadatawand").setExecutor(new MetadataWandCommand());
+		getCommand("invtest").setExecutor(new InventoryMenuTesting());
+		getCommand("cmd").setExecutor(new CustomModelDataCommands());
+		getCommand("circlegame").setExecutor(new CircleGameTesting());
 	}
 	
 	@Override

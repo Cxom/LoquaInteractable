@@ -7,4 +7,7 @@ depend: [PersistentMetadata]
 
 commands:
     metadatawand:
-        alias: mw
+        aliases: [mw]
+    invtest:
+    cmd:
+    circlegame:
