@@ -1,12 +1,13 @@
 package net.punchtree.loquainteractable.gui.hud;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import io.netty.util.internal.ThreadLocalRandom;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
 public class CircleGame {

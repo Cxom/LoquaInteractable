@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.ChatColor;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
@@ -25,7 +26,7 @@ public class InteractListening {
 		ItemFrame frame = (ItemFrame) event.getRightClicked();
 		PersistentDataContainer container = frame.getPersistentDataContainer();
 		
-		NamespacedKey key = new NamespacedKey(LoquaInteractablePlugin.getInstance(), "lightswitch");
+		NamespacedKey key = new NamespacedKey(JavaPlugin.getPlugin(LoquaInteractablePlugin.class), "lightswitch");
 		
 		if (!container.has(key, PersistentDataType.INTEGER_ARRAY)) return;
 		

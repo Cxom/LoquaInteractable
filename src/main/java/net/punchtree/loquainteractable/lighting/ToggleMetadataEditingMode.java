@@ -16,10 +16,11 @@ import net.md_5.bungee.api.ChatColor;
 import net.punchtree.loquainteractable.displayutil.BlockSelection;
 import net.punchtree.loquainteractable.displayutil.HighlightingItems;
 import net.punchtree.loquainteractable.displayutil.ModelBlockHighlight;
-import net.punchtree.loquainteractable.displayutil.SelectionColor;
 import net.punchtree.loquainteractable.metadata.MetadataApi;
 import net.punchtree.loquainteractable.metadata.editing.MetadataEditingMode;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
+import net.punchtree.util.color.MaterialColors;
+import net.punchtree.util.color.PunchTreeColor;
 
 public class ToggleMetadataEditingMode implements MetadataEditingMode {
 	
@@ -28,11 +29,11 @@ public class ToggleMetadataEditingMode implements MetadataEditingMode {
 	
 	private final ItemStack MENU_ITEM = generateDefaultNameAndDescriptionMenuItem(Material.DAYLIGHT_DETECTOR);
 	
-	private BlockSelection togglingBlocksSelection = new BlockSelection(SelectionColor.CONCRETE_LIGHT_BLUE);
+	private BlockSelection togglingBlocksSelection = new BlockSelection(MaterialColors.CONCRETE_LIGHT_BLUE);
 	
-	private static final SelectionColor PRIMARY_COLOR = SelectionColor.DARK_PURPLE;
-	private static final SelectionColor SECONDARY_COLOR = SelectionColor.LIGHT_PURPLE;
-	private static final SelectionColor TO_CONFIRM_COLOR = SelectionColor.CONCRETE_ORANGE;
+	private static final PunchTreeColor PRIMARY_COLOR = PunchTreeColor.DARK_PURPLE;
+	private static final PunchTreeColor SECONDARY_COLOR = PunchTreeColor.LIGHT_PURPLE;
+	private static final PunchTreeColor TO_CONFIRM_COLOR = MaterialColors.CONCRETE_ORANGE;
 
 	private class ToggleSelectionIndicator {
 		private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();

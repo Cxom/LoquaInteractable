@@ -1,6 +1,6 @@
 name: LoquaInteractable
 main: net.punchtree.loquainteractable.LoquaInteractablePlugin
-version: 0.0
+version: Indev-1.0
 api-version: 1.16
 author: Cxom
 depend: [PersistentMetadata]
@@ -11,3 +11,6 @@ commands:
     invtest:
     cmd:
     circlegame:
+    toast:
+    getnbt:
+    verifyplayerinputsmap:

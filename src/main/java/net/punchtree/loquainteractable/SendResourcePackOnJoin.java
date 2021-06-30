@@ -8,7 +8,7 @@ public class SendResourcePackOnJoin implements Listener {
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		event.getPlayer().setResourcePack("http://punchtree.net/resources/gtacraft-dev-rpack.zip", "59A6357BFF92284DCA452DE08C1BC6EDD9D92A1F");
+		event.getPlayer().setResourcePack("http://punchtree.net/resources/gtacraft-dev-rpack.zip", "862A45916C12037EAEE8AB9F26173FDE9632DCDA");
 	}
 	
 }

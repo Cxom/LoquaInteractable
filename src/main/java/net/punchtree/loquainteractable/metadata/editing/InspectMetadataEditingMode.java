@@ -18,10 +18,10 @@ import org.bukkit.inventory.ItemStack;
 import net.md_5.bungee.api.ChatColor;
 import net.punchtree.loquainteractable.displayutil.HighlightingItems;
 import net.punchtree.loquainteractable.displayutil.ModelBlockHighlight;
-import net.punchtree.loquainteractable.displayutil.SelectionColor;
 import net.punchtree.loquainteractable.metadata.MetadataApi;
 import net.punchtree.loquainteractable.metadata.MetadataKeys;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
+import net.punchtree.util.color.MaterialColors;
 
 /**
  * This is the default editing mode.
@@ -38,7 +38,7 @@ public class InspectMetadataEditingMode implements MetadataEditingMode {
 	private ModelBlockHighlight radiusHighlighting = new ModelBlockHighlight();
 	
 	public InspectMetadataEditingMode() {
-		radiusHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, SelectionColor.CONCRETE_LIME);
+		radiusHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, MaterialColors.CONCRETE_LIME);
 	}
 	
 	@Override

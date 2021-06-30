@@ -16,22 +16,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
+import net.punchtree.util.color.PunchTreeColor;
 
 public class BlockSelection {
 
-	private static final SelectionColor DESELECT_COLOR = new SelectionColor(Color.RED);
-	
+	private static final PunchTreeColor DESELECT_COLOR = new PunchTreeColor(Color.RED);
+
 	private ModelBlockHighlight modelBlockHighlighting = new ModelBlockHighlight();	
 	private Set<Block> selectedBlocks = new HashSet<>();
 	
-	private SelectionColor selectionColor = new SelectionColor(255, 85, 255, ChatColor.LIGHT_PURPLE);
+	private PunchTreeColor PunchTreeColor = new PunchTreeColor(255, 85, 255, ChatColor.LIGHT_PURPLE);
 			
 	public BlockSelection() {
 		
 	}
 	
-	public BlockSelection(SelectionColor selectionColor) {
-		this.selectionColor = selectionColor;
+	public BlockSelection(PunchTreeColor PunchTreeColor) {
+		this.PunchTreeColor = PunchTreeColor;
 	}
 	
 	public Set<Block> getSelection() {
@@ -59,7 +60,7 @@ public class BlockSelection {
 	
 	public void selectBlock(Block block) {
 		if (selectedBlocks.add(block)) {			
-			modelBlockHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, selectionColor);
+			modelBlockHighlighting.setColoredItem(HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL, PunchTreeColor);
 			modelBlockHighlighting.highlightIndefinitely(block);
 		}
 	}

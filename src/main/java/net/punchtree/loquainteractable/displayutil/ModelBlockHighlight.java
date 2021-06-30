@@ -15,6 +15,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
+import net.punchtree.util.color.ColoredScoreboardTeams;
+import net.punchtree.util.color.PunchTreeColor;
 
 public class ModelBlockHighlight {
 
@@ -56,7 +58,7 @@ public class ModelBlockHighlight {
 		}
 	}
 	
-	public ModelBlockHighlight setColoredItem(ItemStack highlightItem, SelectionColor scolor) {
+	public ModelBlockHighlight setColoredItem(ItemStack highlightItem, PunchTreeColor scolor) {
 		this.highlightItem = highlightItem.clone();
 		LeatherArmorMeta lm = (LeatherArmorMeta) this.highlightItem.getItemMeta();
 		lm.setColor(scolor.getBukkitColor());

@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.commands;
+package net.punchtree.loquainteractable.commands.item;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
