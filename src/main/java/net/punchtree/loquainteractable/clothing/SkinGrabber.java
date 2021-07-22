@@ -2,15 +2,15 @@ package net.punchtree.loquainteractable.clothing;
 
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
+import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.network.PlayerConnection;
 
 public class SkinGrabber {
 
@@ -18,17 +18,17 @@ public class SkinGrabber {
 		CraftPlayer craftPlayer = (CraftPlayer) player;
 		EntityPlayer playerHandle = craftPlayer.getHandle();
 		GameProfile profile = playerHandle.getProfile();
-		PlayerConnection connection = playerHandle.playerConnection;
+		PlayerConnection connection = playerHandle.b;
 		
 		connection.sendPacket(new PacketPlayOutPlayerInfo(
-				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, 
+				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, 
 				playerHandle));
 		
 		profile.getProperties().removeAll("textures");
 		profile.getProperties().put("textures", getSkin());
 		
 		connection.sendPacket(new PacketPlayOutPlayerInfo(
-				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, 
+				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, 
 				playerHandle));
 		
 	}

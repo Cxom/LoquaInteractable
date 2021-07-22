@@ -4,12 +4,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 import net.punchtree.loquainteractable.gui.hud.advancements.CustomAdvancement;
 

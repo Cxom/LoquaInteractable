@@ -1,9 +1,9 @@
 name: LoquaInteractable
 main: net.punchtree.loquainteractable.LoquaInteractablePlugin
 version: Indev-1.0
-api-version: 1.16
+api-version: 1.17
 author: Cxom
-depend: [PersistentMetadata]
+depend: [PersistentMetadata, PunchTree-Util]
 
 commands:
     metadatawand:

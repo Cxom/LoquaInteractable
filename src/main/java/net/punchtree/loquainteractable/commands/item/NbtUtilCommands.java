@@ -3,12 +3,12 @@ package net.punchtree.loquainteractable.commands.item;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.chat.IChatBaseComponent;
 
 public class NbtUtilCommands implements CommandExecutor {
 
@@ -28,11 +28,10 @@ public class NbtUtilCommands implements CommandExecutor {
 	
 	
 	public String getItemNbtString(ItemStack item) {
-		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		if (!nmsItem.hasTag()) return "{}";
 		NBTTagCompound tag = nmsItem.getTag();
-		IChatBaseComponent component = tag.getNbtPrettyComponent();
-		return component.getString();
+		return tag.asString();
 	}
 	
 //	public String getStringForCompound(NBTTagCompound tag) {
