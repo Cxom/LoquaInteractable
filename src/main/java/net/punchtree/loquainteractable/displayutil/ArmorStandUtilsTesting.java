@@ -10,6 +10,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.punchtree.util.color.ColoredScoreboardTeams;
 
@@ -29,18 +31,28 @@ public class ArmorStandUtilsTesting implements Listener {
 		}
 	}
 	
+	private static final ItemStack ROAD_TEST_BLOCK = new ItemStack(Material.NETHERITE_SCRAP);
+	static {
+		ItemMeta im = ROAD_TEST_BLOCK.getItemMeta();
+		im.setCustomModelData(200);
+		ROAD_TEST_BLOCK.setItemMeta(im);
+	}
+	
 	@EventHandler
 	public void onPlayerStaticPlace(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK 
-				&& event.getPlayer().getInventory().getItemInMainHand().getType() == Material.WARPED_FUNGUS) {
+				&& (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.WARPED_FUNGUS
+						|| event.getPlayer().getInventory().getItemInMainHand().getType() == Material.NETHERITE_INGOT)) {
 			event.setCancelled(true);
 			if (event.getHand() != EquipmentSlot.HAND) {
 				return;
 			}
+			Material type = event.getPlayer().getInventory().getItemInMainHand().getType();
 			ArmorStandUtils.spawnArmorStand(event.getClickedBlock().getLocation(),
 					event.getPlayer().isSneaking(),
 					ColoredScoreboardTeams.WHITE_TEAM,
-					HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL);
+					type == Material.WARPED_FUNGUS ? HighlightingItems.BLOCK_HIGHLIGHT_BORDER_MODEL
+							: ROAD_TEST_BLOCK);
 		}
 	}
 	

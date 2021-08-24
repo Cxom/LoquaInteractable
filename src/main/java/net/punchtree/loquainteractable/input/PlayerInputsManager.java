@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Manages PlayerInputs objects
@@ -26,11 +25,11 @@ public class PlayerInputsManager {
 		return playerInputsMap.get(uuid);
 	}
 	
-	public void initializeInputsForPlayer(@NotNull UUID uuid) {
+	public void initializeInputsForPlayer(UUID uuid) {
 		playerInputsMap.put(uuid, new PlayerInputs(uuid));
 	}
 	
-	public void destroyInputsForPlayer(@NotNull UUID uuid) {
+	public void destroyInputsForPlayer(UUID uuid) {
 		playerInputsMap.remove(uuid);
 	}
 	

@@ -13,6 +13,8 @@ import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
+import net.punchtree.loquainteractable.listeners.PlayerJoinListener;
+import net.punchtree.loquainteractable.listeners.PlayerQuitListener;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
@@ -34,11 +36,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		
 		registerEvents();
 		setCommandExecutors();
-		initializeInputProcessing();
 	}
 	
 	private void registerEvents() {
-		Bukkit.getPluginManager().registerEvents(new SendResourcePackOnJoin(), this);
 		Bukkit.getPluginManager().registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		
 		Bukkit.getPluginManager().registerEvents(InventoryMenuListener.getInstance(), this);
@@ -50,6 +50,10 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		// Just for testing
 		Bukkit.getPluginManager().registerEvents(new ArmorStandUtilsTesting(), this);
 		
+		// For now, only input processing, may have more concerns later
+		Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(playerInputsManager), this);
+		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(playerInputsManager), this);
+		
 	}
 	
 	private void setCommandExecutors() {
@@ -60,10 +64,6 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		getCommand("toast").setExecutor(new ToastTesting());
 		getCommand("getnbt").setExecutor(new NbtUtilCommands());
 		getCommand("verifyplayerinputsmap").setExecutor(new PlayerInputsTesting(playerInputsManager));
-	}
-	
-	private void initializeInputProcessing() {
-		
 	}
 	
 	@Override
