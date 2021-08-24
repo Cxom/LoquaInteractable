@@ -21,17 +21,14 @@ import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingS
 
 public class LoquaInteractablePlugin extends JavaPlugin {
 
-	private static LoquaInteractablePlugin instance;
 	public static LoquaInteractablePlugin getInstance() {
-		return instance;
+		return getPlugin(LoquaInteractablePlugin.class);
 	}
 	
 	private PlayerInputsManager playerInputsManager;
 	
 	@Override
 	public void onEnable() {
-		instance = this;
-		
 		playerInputsManager = new PlayerInputsManager();
 		
 		registerEvents();
