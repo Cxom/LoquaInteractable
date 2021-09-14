@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import net.kyori.adventure.text.Component;
 import net.punchtree.loquainteractable.lighting.LightSwitchMetadataEditingMode;
 import net.punchtree.loquainteractable.lighting.ToggleMetadataEditingMode;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
@@ -26,9 +27,9 @@ public class MetadataWand implements Listener {
 	private static final ItemStack METADATA_WAND_ITEM = new ItemStack(Material.BLAZE_ROD);
 	static {
 		ItemMeta im = METADATA_WAND_ITEM.getItemMeta();
-		im.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + "Metadata Wand");
-		im.setLore(Arrays.asList("Right click to inspect",
-								 "Left click to edit"));
+		im.displayName(Component.text(ChatColor.RESET + "" + ChatColor.WHITE + "Metadata Wand"));
+		im.lore(Arrays.asList(Component.text("Right click to inspect"),
+								 Component.text("Left click to edit")));
 		METADATA_WAND_ITEM.setItemMeta(im);
 	}
 	private static boolean isMetadataWandItem(ItemStack itemStack) {

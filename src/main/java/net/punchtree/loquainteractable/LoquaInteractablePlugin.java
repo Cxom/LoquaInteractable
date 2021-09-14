@@ -13,6 +13,8 @@ import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
+import net.punchtree.loquainteractable.item.DrinkItemListener;
+import net.punchtree.loquainteractable.item.GiveCustomItemCommandExecutor;
 import net.punchtree.loquainteractable.listeners.PlayerJoinListener;
 import net.punchtree.loquainteractable.listeners.PlayerQuitListener;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
@@ -51,6 +53,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(playerInputsManager), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(playerInputsManager), this);
 		
+		// Interactables/Consumables
+		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(), this);
+		
 	}
 	
 	private void setCommandExecutors() {
@@ -61,6 +66,10 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		getCommand("toast").setExecutor(new ToastTesting());
 		getCommand("getnbt").setExecutor(new NbtUtilCommands());
 		getCommand("verifyplayerinputsmap").setExecutor(new PlayerInputsTesting(playerInputsManager));
+		
+		var giveCustomItemCommandExecutor = new GiveCustomItemCommandExecutor();
+		getCommand("givecustom").setExecutor(giveCustomItemCommandExecutor);
+		getCommand("givecustom").setTabCompleter(giveCustomItemCommandExecutor);
 	}
 	
 	@Override
