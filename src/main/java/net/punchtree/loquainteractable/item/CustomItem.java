@@ -1,24 +1,37 @@
 package net.punchtree.loquainteractable.item;
 
+
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class CustomItem extends ItemStack {
 
-	private final Component customName;
+	private final TextComponent displayName;
 	
-	public CustomItem(String customName, ItemStack itemStack) {
-		this(Component.text(customName), itemStack);
+	public CustomItem(String itemName, ItemStack itemStack, int customModelData, CustomItemType customItemType) {
+		this(Component.text(itemName).decoration(TextDecoration.ITALIC, false), itemStack, customModelData, customItemType);
 	}
 	
-	public CustomItem(Component customName, ItemStack itemStack) {
+	public CustomItem(TextComponent displayName, ItemStack itemStack, int customModelData, CustomItemType customItemType) {
 		super(itemStack);
-		this.customName = customName;
+		this.displayName = displayName;
+		itemStack.editMeta(im -> {
+			im.setCustomModelData(customModelData);
+			im.displayName(displayName);
+			im.getPersistentDataContainer().set(CustomItemType.ITEM_TYPE_KEY, PersistentDataType.STRING, customItemType.name());
+		});
 	}
 
-	public final Component getCustomName() {
-		return customName;
+	public String getItemName() {
+		return displayName.content();
+	}
+	
+	public TextComponent getDisplayName() {
+		return displayName;
 	}
 	
 }
