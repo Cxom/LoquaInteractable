@@ -17,6 +17,7 @@ public enum CustomItemType {
 	public static final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(LoquaInteractablePlugin.getInstance(), "item-type");
 	
 	public static CustomItemType fromItemStack(ItemStack itemStack) {
+		if (itemStack == null) return null;
 		if (!itemStack.hasItemMeta()) return null;
 		return fromPersistentData(itemStack.getItemMeta());
 	}
