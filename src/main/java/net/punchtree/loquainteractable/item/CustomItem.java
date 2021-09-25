@@ -17,13 +17,18 @@ public class CustomItem extends ItemStack {
 	}
 	
 	public CustomItem(TextComponent displayName, ItemStack itemStack, int customModelData, CustomItemType customItemType) {
-		super(itemStack);
+		super(initializeItemMeta(displayName, itemStack, customModelData, customItemType));
 		this.displayName = displayName;
+		
+	}
+	
+	private static ItemStack initializeItemMeta(TextComponent displayName, ItemStack itemStack, int customModelData, CustomItemType customItemType) {
 		itemStack.editMeta(im -> {
 			im.setCustomModelData(customModelData);
 			im.displayName(displayName);
 			im.getPersistentDataContainer().set(CustomItemType.ITEM_TYPE_KEY, PersistentDataType.STRING, customItemType.name());
 		});
+		return itemStack;
 	}
 
 	public String getItemName() {
