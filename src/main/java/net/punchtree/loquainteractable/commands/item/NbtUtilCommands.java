@@ -7,8 +7,7 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.nbt.CompoundTag;
 
 public class NbtUtilCommands implements CommandExecutor {
 
@@ -30,8 +29,8 @@ public class NbtUtilCommands implements CommandExecutor {
 	public String getItemNbtString(ItemStack item) {
 		net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		if (!nmsItem.hasTag()) return "{}";
-		NBTTagCompound tag = nmsItem.getTag();
-		return tag.asString();
+		CompoundTag tag = nmsItem.getTag();
+		return tag.getAsString();
 	}
 	
 //	public String getStringForCompound(NBTTagCompound tag) {

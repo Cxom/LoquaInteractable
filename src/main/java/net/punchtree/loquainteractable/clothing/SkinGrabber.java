@@ -8,27 +8,27 @@ import org.bukkit.entity.Player;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerConnection;
 
 public class SkinGrabber {
 
 	public static void changeSkin(Player player) {
 		CraftPlayer craftPlayer = (CraftPlayer) player;
-		EntityPlayer playerHandle = craftPlayer.getHandle();
-		GameProfile profile = playerHandle.getProfile();
-		PlayerConnection connection = playerHandle.b;
+		ServerPlayer playerHandle = craftPlayer.getHandle();
+		GameProfile profile = playerHandle.getGameProfile();
+		ServerPlayerConnection connection = playerHandle.connection;
 		
-		connection.sendPacket(new PacketPlayOutPlayerInfo(
-				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, 
+		connection.send(new ClientboundPlayerInfoPacket(
+				ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, 
 				playerHandle));
 		
 		profile.getProperties().removeAll("textures");
 		profile.getProperties().put("textures", getSkin());
 		
-		connection.sendPacket(new PacketPlayOutPlayerInfo(
-				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, 
+		connection.send(new ClientboundPlayerInfoPacket(
+				ClientboundPlayerInfoPacket.Action.ADD_PLAYER, 
 				playerHandle));
 		
 	}
