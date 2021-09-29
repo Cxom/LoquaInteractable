@@ -3,6 +3,9 @@ package net.punchtree.loquainteractable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+
 import net.punchtree.loquainteractable.commands.item.CustomModelDataCommands;
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands;
 import net.punchtree.loquainteractable.commands.testing.CircleGameTesting;
@@ -27,11 +30,14 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		return getPlugin(LoquaInteractablePlugin.class);
 	}
 	
+	private ProtocolManager protocolManager;
 	private PlayerInputsManager playerInputsManager;
 	
 	@Override
 	public void onEnable() {
-		playerInputsManager = new PlayerInputsManager();
+
+		this.protocolManager = ProtocolLibrary.getProtocolManager();
+		this.playerInputsManager = new PlayerInputsManager();
 		
 		registerEvents();
 		setCommandExecutors();
@@ -54,7 +60,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(playerInputsManager), this);
 		
 		// Interactables/Consumables
-		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(), this);
+		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(this, protocolManager), this);
 		
 	}
 	
@@ -75,6 +81,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		MetadataEditingSessionManager.cleanupSessions();
+		protocolManager.removePacketListeners(this);
 	}
 	
 	
