@@ -16,3 +16,8 @@ commands:
     verifyplayerinputsmap:
     givecustom:
         aliases: [ic]
+
+############### PERMISSIONS ###############
+permissions:
+    givecustom:
+        default: false
