@@ -191,11 +191,14 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 	
 	@Override
 	public void onPacketReceiving(PacketEvent packetEvent) {
-		PacketContainer packetContainer  = packetEvent.getPacket();
+		PacketContainer packetContainer = packetEvent.getPacket();
 		assert(packetContainer.getHandle() instanceof ServerboundPlayerActionPacket);
 
-		if (isDrink(packetEvent.getPlayer().getItemInUse())) {
-			onAbortDrinking(packetEvent.getPlayer(), packetEvent.getPlayer().getItemInUse());
+		Player player = packetEvent.getPlayer();
+		ItemStack itemInUse = player.getItemInUse();
+		
+		if (isDrink(itemInUse)) {
+			onAbortDrinking(player, itemInUse);
 		}
 	}
 	

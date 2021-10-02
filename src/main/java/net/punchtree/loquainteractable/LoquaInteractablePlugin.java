@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
+import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService;
 import net.punchtree.loquainteractable.commands.item.CustomModelDataCommands;
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands;
 import net.punchtree.loquainteractable.commands.testing.CircleGameTesting;
@@ -33,6 +34,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	private ProtocolManager protocolManager;
 	private PlayerInputsManager playerInputsManager;
 	
+	private GarbageCansService garbageCansService;
+	
 	@Override
 	public void onEnable() {
 
@@ -41,6 +44,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		
 		registerEvents();
 		setCommandExecutors();
+		
+		garbageCansService = new GarbageCansService(this);
+		garbageCansService.onEnable();
 	}
 	
 	private void registerEvents() {
@@ -80,6 +86,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
+		garbageCansService.onDisable();
+		
 		MetadataEditingSessionManager.cleanupSessions();
 		protocolManager.removePacketListeners(this);
 	}

@@ -16,8 +16,13 @@ commands:
     verifyplayerinputsmap:
     givecustom:
         aliases: [ic]
+    purge-garbage-cans:
+        usage: /purge-garbage-cans [seconds]
 
 ############### PERMISSIONS ###############
 permissions:
+    garbagecans.purge:
+        description: Purge garbage cans
+        default: false
     givecustom:
         default: false
