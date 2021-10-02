@@ -21,6 +21,8 @@ import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
 public class GarbageCanCollection implements ConfigurationSerializable {
 
+	// Could, instead of saving location and contents, save only inventory IFF inventory serializes it's location, then repopulate the other way round
+	
 	private static final long ACCEPT_RETRY_DELAY = (long) (5 * 20);
 	private static final int DEFAULT_CAPACITY = 9;
 	
@@ -36,13 +38,13 @@ public class GarbageCanCollection implements ConfigurationSerializable {
 		this.location = location;
 	}
 	
-	@SuppressWarnings({ "unused", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public GarbageCanCollection(Map<String, Object> serialized) {
 		this.capacity = (int) serialized.get("capacity");
 		int rows = (int) Math.ceil(capacity / 9.0);
 		this.inventory = Bukkit.createInventory(null, rows * 9, Component.empty());
-		inventory.setContents(((List<ItemStack>) serialized.get("inventory")).toArray(new ItemStack[rows * 9]));
 		this.contents = new ArrayDeque<GarbageItem>((List<GarbageItem>) serialized.get("contents"));
+		this.contents.forEach(garbageItem -> this.inventory.addItem(garbageItem.item));
 		this.location = (Location) serialized.get("location");
 	}
 	
@@ -94,7 +96,6 @@ public class GarbageCanCollection implements ConfigurationSerializable {
 	public Map<String, Object> serialize() {
 		Map<String, Object> serialized = new HashMap<>();
 		serialized.put("capacity", capacity);
-		serialized.put("inventory", inventory.getContents());
 		serialized.put("contents", Arrays.asList(contents.toArray()));
 		serialized.put("location", location);
 		return serialized;
