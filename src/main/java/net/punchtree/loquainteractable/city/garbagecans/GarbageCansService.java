@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -52,7 +57,7 @@ public class GarbageCansService implements Listener {
 				}
 			}
 			toRemove.forEach(key -> garbageCans.remove(key));
-//			Bukkit.broadcastMessage(ChatColor.GRAY + "Purged " + ChatColor.RED + items + ChatColor.GRAY + " item(s) " + "and " + ChatColor.RED + cans + ChatColor.GRAY + " can(s)" + ".");
+			Bukkit.getLogger().finer(ChatColor.GRAY + "Purged " + ChatColor.RED + items + ChatColor.GRAY + " item(s) " + "and " + ChatColor.RED + cans + ChatColor.GRAY + " can(s)" + ".");
 		}
 	};
 	
@@ -118,13 +123,13 @@ public class GarbageCansService implements Listener {
 			@Override
 			public void run() {
 				if (!item.isDead() && item.getItemStack().getType() != Material.AIR) {
-					checkInGarbage(item, e.getPlayer());
+					attemptThrowIntoCan(item, e.getPlayer());
 				}
 			}
 		}.runTaskLater(plugin, ITEM_DROP_CHECK_DELAY);
 	}
 	
-	private void checkInGarbage(Item item, Player thrower) {
+	private void attemptThrowIntoCan(Item item, Player thrower) {
 		if (isGarbageCan(item.getLocation().getBlock())) {
 			Location loc = item.getLocation().getBlock().getLocation();
 			if (garbageCans.containsKey(loc)) {
@@ -134,13 +139,30 @@ public class GarbageCansService implements Listener {
 				garbageCans.put(loc, gcc);
 				gcc.addItem(item);
 			}
-			rewardThrower(thrower, item);
+			onThrowAwayItem(thrower, item);
 		}
 	}
 	
-	private void rewardThrower(Player player, Item item) {
+	private void onThrowAwayItem(Player player, Item item) {
 		// Give karma?
-		Bukkit.broadcastMessage(player.getName() + " threw away " + item.getName());
+		spawnThrowAwayParticles(item);
+		playThrowAwaySound(item);
+	}
+
+	private static final Color[] GARBAGE_COLORS = {
+			Color.fromRGB(40, 43, 22),
+			Color.fromRGB(24, 36, 15),
+			Color.fromRGB(30, 22, 19),
+			Color.fromRGB(20, 12, 8)
+	};
+	private void spawnThrowAwayParticles(Item item) {
+		item.getWorld().spawnParticle(Particle.SNEEZE, item.getLocation(), 1 + ThreadLocalRandom.current().nextInt(2), Math.random() * 0.3, Math.random() * 0.3, Math.random() * 0.3, 0.1);
+		item.getWorld().spawnParticle(Particle.REDSTONE, item.getLocation(), 3 + ThreadLocalRandom.current().nextInt(3), Math.random() * 0.65, -.1 + Math.random() * 0.3, Math.random() * 0.65, 1, 
+				new DustOptions(GARBAGE_COLORS[ThreadLocalRandom.current().nextInt(GARBAGE_COLORS.length)], (float) (1 + Math.random() * 0.3)));
+	}
+	
+	private void playThrowAwaySound(Item item) {
+		item.getWorld().playSound(item.getLocation(), Sound.ENTITY_MAGMA_CUBE_DEATH, 0.5f, 1.1f);
 	}
 	
 	@EventHandler
