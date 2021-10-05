@@ -38,7 +38,6 @@ public class PersistenceManager {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			GarbageCans.plugin.saveResource(GARBAGE_CANS_FILENAME, false);
 		}
 		
 		garbageCansConfig = new YamlConfiguration();
@@ -73,24 +72,5 @@ public class PersistenceManager {
 			e.printStackTrace();
 		}
 	}
-	
-//	public FileConfiguration getGarbageCansConfig(){
-//		return garbageCansConfig;
-//	}
-
-//	public void saveConfig(){
-//		LLChat.getPlugin().saveConfig();
-//	}
-//	
-//	public void savePlayersConfig() {
-//		try {
-//			players.save(playersf);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//		
-	
-
 	
 }
