@@ -24,6 +24,8 @@ import net.punchtree.loquainteractable.listeners.PlayerQuitListener;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
+import net.punchtree.loquainteractable.player.InteractablePlayer;
+import net.punchtree.loquainteractable.player.PlayerMapping;
 
 public class LoquaInteractablePlugin extends JavaPlugin {
 
@@ -31,10 +33,24 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		return getPlugin(LoquaInteractablePlugin.class);
 	}
 	
+	private boolean initialized = false;
+	
 	private ProtocolManager protocolManager;
 	private PlayerInputsManager playerInputsManager;
 	
 	private GarbageCansService garbageCansService;
+	
+	private PlayerMapping<InteractablePlayer> playerMapping;
+
+	public void setPlayerMapping(PlayerMapping<InteractablePlayer> playerMapping) {
+		if (!initialized) {
+			this.playerMapping = playerMapping;
+			onInitialize();
+			this.initialized = true;
+		} else {
+			throw new IllegalStateException("Can't initialize LoquaInteractable twice!");
+		}
+	}
 	
 	@Override
 	public void onEnable() {
@@ -47,6 +63,10 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		
 		garbageCansService = new GarbageCansService(this);
 		garbageCansService.onEnable();
+	}
+	
+	private void onInitialize() {
+		
 	}
 	
 	private void registerEvents() {
@@ -66,7 +86,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(playerInputsManager), this);
 		
 		// Interactables/Consumables
-		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(this, protocolManager), this);
+		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(this, protocolManager, playerMapping), this);
 		
 	}
 	

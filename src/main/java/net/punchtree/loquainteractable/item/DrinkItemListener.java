@@ -29,6 +29,10 @@ import com.comphenix.protocol.events.PacketEvent;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
+import net.punchtree.loquainteractable.player.PlayerMapping;
+import net.punchtree.loquainteractable.status.Status;
+import net.punchtree.loquainteractable.status.StatusReceiver;
+import net.punchtree.loquainteractable.status.StatusType;
 
 public class DrinkItemListener extends PacketAdapter implements Listener {
 
@@ -39,11 +43,14 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 	// But at that point, we'd be better off with a per-player abstraction for sound pre-scheduling 
 	// and cancelling if need be (say on logout). Drinking sounds aren't common, but sounds will be
 	
+	private final PlayerMapping<? extends StatusReceiver> statusReceiverMapping;
+	
 	private Map<Player, BukkitTask> drinkingSoundsForPlayers = new HashMap<>();
 	
-	public DrinkItemListener(Plugin plugin, ProtocolManager protocolManager) {
+	public DrinkItemListener(Plugin plugin, ProtocolManager protocolManager, PlayerMapping<? extends StatusReceiver> statusReceiverMapping) {
 		super(plugin, ListenerPriority.LOWEST, new PacketType[] { PacketType.Play.Client.BLOCK_DIG });
 		protocolManager.addPacketListener(this);
+		this.statusReceiverMapping = statusReceiverMapping;
 	}
 	
 	@EventHandler
@@ -178,6 +185,18 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 		
 		// Placeholder for future behavior
 		player.sendMessage(Component.text("Drunk a ").append(item.getItemMeta().displayName()));
+		applyCaffeinatedStatusEffect(player);
+	}
+	
+	
+	private static final int MINUTES = 60;
+	private static final int COFFEE_CAFFEINATION_DURATION_SECONDS = 3 * MINUTES + 20;
+	private void applyCaffeinatedStatusEffect(Player player) {
+//		StatusReceiver statusReceiver = statusReceiverMapping.get(player);
+//		Status coffeeCaffeination = new Status(StatusType.CAFFEINATED, COFFEE_CAFFEINATION_DURATION_SECONDS); 
+//		statusReceiver.applyStatus(coffeeCaffeination);
+		// This doesn't handle expiry - or do anything for that matter
+		// It will be implemented when it is needed
 	}
 	
 	public void onAbortDrinking(Player player, ItemStack item) {
