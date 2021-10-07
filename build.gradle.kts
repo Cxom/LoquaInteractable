@@ -5,7 +5,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.papermc.paperweight.userdev") version "1.1.11"
+    id("io.papermc.paperweight.userdev") version "1.1.12"
 }
 
 group = "net.punchtree"
