@@ -3,7 +3,7 @@ main: net.punchtree.loquainteractable.LoquaInteractablePlugin
 version: Indev-1.0
 api-version: 1.17
 author: Cxom
-depend: [PersistentMetadata, PunchTree-Util]
+depend: [PersistentMetadata, PunchTree-Util, ProtocolLib]
 
 commands:
     metadatawand:
