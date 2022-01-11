@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -98,8 +99,17 @@ public class Menu implements IMenu {
 		}
 	}
 
+	@Deprecated
 	public void showToPlayer(Player player) {
 		player.openInventory(inventory);
+	}
+	
+	public void openFor(HumanEntity humanEntity) {
+		humanEntity.openInventory(inventory);
+	}
+	
+	public Inventory getInventory() {
+		return this.inventory;
 	}
 	
 }
