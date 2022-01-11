@@ -1,6 +1,11 @@
 /target/
-*.iml
 dependency-reduced-pom.xml
 /bin/
 .gradle
 /build/
+
+## IDE specifics
+*.iml
+.classpath
+.project
+.settings/*
