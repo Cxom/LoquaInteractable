@@ -42,7 +42,7 @@ public class ArmorStandUtilsTesting implements Listener {
 	public void onPlayerStaticPlace(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK 
 				&& (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.WARPED_FUNGUS
-						|| event.getPlayer().getInventory().getItemInMainHand().getType() == Material.NETHERITE_INGOT)) {
+						|| event.getPlayer().getInventory().getItemInMainHand().getType() == Material.NETHERITE_SCRAP)) {
 			event.setCancelled(true);
 			if (event.getHand() != EquipmentSlot.HAND) {
 				return;
