@@ -6,7 +6,7 @@ plugins {
     `java-library`
     `maven-publish`
     eclipse
-    id("io.papermc.paperweight.userdev") version "1.2.0"
+    id("io.papermc.paperweight.userdev") version "1.3.3"
 }
 
 group = "net.punchtree"
@@ -23,18 +23,19 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.17.1-R0.1-SNAPSHOT")
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.17.1-R0.1-SNAPSHOT")
+    paperDevBundle("1.18.1-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.18.1-R0.1-SNAPSHOT")
     
     implementation("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
     implementation("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
     
-    implementation("com.comphenix.protocol:ProtocolLib:4.6.0")
+    implementation("com.comphenix.protocol:ProtocolLib:4.7.0")
+    implementation("cloud.commandframework:cloud-paper:1.6.1")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
     testImplementation("org.mockito:mockito-inline:3.12.4")
-    testImplementation("io.papermc.paper:paper:1.17.1-R0.1-SNAPSHOT")
-}
+    //testImplementation("io.papermc.paper:paper:1.18.1-R0.1-SNAPSHOT")
+} 
 
 tasks { 
 	
@@ -44,7 +45,7 @@ tasks {
 	
 	compileJava {
 	    options.encoding = Charsets.UTF_8.name()
-	    options.release.set(16)
+	    options.release.set(17)
 	}
 
 	processResources {
@@ -59,7 +60,7 @@ tasks.withType<JavaCompile>() {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 

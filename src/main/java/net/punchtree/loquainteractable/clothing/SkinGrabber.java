@@ -2,7 +2,7 @@ package net.punchtree.loquainteractable.clothing;
 
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.mojang.authlib.GameProfile;
