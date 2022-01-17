@@ -133,7 +133,7 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 	}
 
 	public boolean isDrink(ItemStack itemStack) {
-		return CustomItemType.fromItemStack(itemStack) == CustomItemType.DRINK;
+		return ItemTags.hasTag(itemStack, "DRINKABLE");
 	}
 	
 //	public void spawnItemParticles(Player player, ItemStack item, int amount) {	

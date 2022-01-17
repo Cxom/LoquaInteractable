@@ -18,6 +18,32 @@ commands:
         aliases: [ic]
     purge-garbage-cans:
         usage: /purge-garbage-cans [seconds]
+    additem:
+        usage: /additem <name> [category] [subcategory] [subcategory2]...
+    overrideitem:
+        usage: /overrideitem <name>
+    deleteitem:
+        usage: /deleteitem <name>
+    renameitemid:
+        usage: /renameitemid <idname> <idnewname>
+    addtag:
+        usage: /addtag <name> <tag1> [tag2]...
+    deletetag: 
+        usage: /deletetag <name> <tag1> [tag2]...
+    listtags:
+        usage: /listtags [name]
+
+    items:
+        usage: /items [category] [subcategory] [subcategory2]...
+    rename:
+        usage: /rename <newname>
+
+    addcategory:
+        usage: /addcategory <name> [parentname] [parentname2]...
+    deletecategory:
+        usage: /deletecategory <name>
+    categorizeitem:
+        usage: /categorizeitem <name> <category>
 
 ############### PERMISSIONS ###############
 permissions:

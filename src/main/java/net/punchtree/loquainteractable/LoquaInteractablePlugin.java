@@ -17,8 +17,15 @@ import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
+import net.punchtree.loquainteractable.item.CustomItemRegistry;
 import net.punchtree.loquainteractable.item.DrinkItemListener;
-import net.punchtree.loquainteractable.item.GiveCustomItemCommandExecutor;
+import net.punchtree.loquainteractable.item.command.AddItemCommand;
+import net.punchtree.loquainteractable.item.command.DeleteItemCommand;
+import net.punchtree.loquainteractable.item.command.GiveCustomItemCommand;
+import net.punchtree.loquainteractable.item.command.ItemsCommand;
+import net.punchtree.loquainteractable.item.command.RenameCommand;
+import net.punchtree.loquainteractable.item.command.RenameItemCommand;
+import net.punchtree.loquainteractable.item.command.TagCommands;
 import net.punchtree.loquainteractable.listeners.PlayerJoinListener;
 import net.punchtree.loquainteractable.listeners.PlayerQuitListener;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
@@ -37,6 +44,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	private ProtocolManager protocolManager;
 	private PlayerInputsManager playerInputsManager;
+	private CustomItemRegistry customItemRegistry;
 	
 	private GarbageCansService garbageCansService;
 	
@@ -57,12 +65,13 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		this.protocolManager = ProtocolLibrary.getProtocolManager();
 		this.playerInputsManager = new PlayerInputsManager();
-		
-		registerEvents();
-		setCommandExecutors();
+		this.customItemRegistry = CustomItemRegistry.load();
 		
 		garbageCansService = new GarbageCansService(this);
 		garbageCansService.onEnable();
+
+		registerEvents();
+		setCommandExecutors();
 	}
 	
 	private void onInitialize() {
@@ -99,13 +108,39 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		getCommand("getnbt").setExecutor(new NbtUtilCommands());
 		getCommand("verifyplayerinputsmap").setExecutor(new PlayerInputsTesting(playerInputsManager));
 		
-		var giveCustomItemCommandExecutor = new GiveCustomItemCommandExecutor();
-		getCommand("givecustom").setExecutor(giveCustomItemCommandExecutor);
-		getCommand("givecustom").setTabCompleter(giveCustomItemCommandExecutor);
+		var giveCustomItemCommand = new GiveCustomItemCommand(customItemRegistry);
+		getCommand("givecustom").setExecutor(giveCustomItemCommand);
+		getCommand("givecustom").setTabCompleter(giveCustomItemCommand);
+		
+		var addItemCommand = new AddItemCommand(customItemRegistry);
+		getCommand("additem").setExecutor(addItemCommand);
+		getCommand("additem").setTabCompleter(addItemCommand);
+		getCommand("overrideitem").setExecutor(addItemCommand);
+		getCommand("overrideitem").setTabCompleter(addItemCommand);
+		
+		var renameItemIdCommand = new RenameItemCommand(customItemRegistry);
+		getCommand("renameitemid").setExecutor(renameItemIdCommand);
+		getCommand("renameitemid").setTabCompleter(renameItemIdCommand);
+		
+		var deleteItemCommand = new DeleteItemCommand(customItemRegistry);
+		getCommand("deleteitem").setExecutor(deleteItemCommand);
+		getCommand("deleteitem").setTabCompleter(deleteItemCommand);
+		
+		var itemsCommand = new ItemsCommand(customItemRegistry);
+		getCommand("items").setExecutor(itemsCommand);
+		
+		getCommand("rename").setExecutor(new RenameCommand());
+		
+		var tagCommands = new TagCommands();
+		getCommand("addtag").setExecutor(tagCommands);
+		getCommand("deletetag").setExecutor(tagCommands);
+		getCommand("deletetag").setExecutor(tagCommands);
+		getCommand("listtags").setExecutor(tagCommands);
 	}
 	
 	@Override
 	public void onDisable() {
+		customItemRegistry.save();
 		garbageCansService.onDisable();
 		
 		MetadataEditingSessionManager.cleanupSessions();
