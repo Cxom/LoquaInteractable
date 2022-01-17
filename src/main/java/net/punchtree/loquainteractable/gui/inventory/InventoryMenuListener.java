@@ -6,6 +6,7 @@ import java.util.Map;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -42,6 +43,15 @@ public class InventoryMenuListener implements Listener {
 		IMenu menu = menus.get(inventoryHash);
 		if (menu != null) {
 			menu.onMenuDrag(event);
+		}
+	}
+	
+	@EventHandler
+	public void onMenuClose(InventoryCloseEvent event) {
+		int inventoryHash = event.getInventory().hashCode();
+		IMenu menu = menus.get(inventoryHash);
+		if (menu != null) {
+			menu.onMenuClose(event);
 		}
 	}
 	
