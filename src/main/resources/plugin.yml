@@ -44,6 +44,11 @@ commands:
         usage: /deletecategory <name>
     categorizeitem:
         usage: /categorizeitem <name> <category>
+        
+    setleathercolor:
+        usage: /setleathercolor r g b
+    killloquaarmorstand:
+        aliases: [killloquaas, klas]
 
 ############### PERMISSIONS ###############
 permissions:
