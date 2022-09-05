@@ -55,7 +55,7 @@ public class CustomItemRegistry {
 		return new String[] {};
 	}
 	
-	public Collection<ItemStack> getSublist(int from, int to) {
+	public List<ItemStack> getSublist(int from, int to) {
 		return new ArrayList<>(customItemRegistry.values()).subList(from, to);
 	}
 	

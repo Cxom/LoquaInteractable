@@ -78,6 +78,10 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		
 	}
 	
+	public CustomItemRegistry getCustomItemRegistry() {
+		return this.customItemRegistry;
+	}
+	
 	private void registerEvents() {
 		Bukkit.getPluginManager().registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		
