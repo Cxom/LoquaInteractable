@@ -28,6 +28,7 @@ public class GiveCustomItemCommand implements CommandExecutor, TabCompleter {
 		if ( ! (sender.hasPermission(GIVECUSTOM_PERMISSION))) {
 			// TODO this is a default that should be abstracted, maybe at the server level
 			player.sendMessage(ChatColor.RED + "Either this command doesn't exist or you don't have permission to perform this command.");
+			return true;
 		}
 		
 		if (args.length < 0) { return false; }
