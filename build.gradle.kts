@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     eclipse
-    id("io.papermc.paperweight.userdev") version "1.3.3"
+    id("io.papermc.paperweight.userdev") version "1.3.6"
 }
 
 group = "net.punchtree"
@@ -19,13 +19,13 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.18.1-R0.1-SNAPSHOT")
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.18.1-R0.1-SNAPSHOT")
+    paperDevBundle("1.19.2-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT")
     
     implementation("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
     implementation("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
     
-    implementation("com.comphenix.protocol:ProtocolLib:4.7.0")
+    implementation("com.comphenix.protocol:ProtocolLib:4.8.0")
     implementation("cloud.commandframework:cloud-paper:1.6.1")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
