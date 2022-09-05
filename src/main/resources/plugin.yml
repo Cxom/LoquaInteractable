@@ -8,52 +8,120 @@ depend: [PersistentMetadata, PunchTree-Util, ProtocolLib]
 commands:
     metadatawand:
         aliases: [mw]
-    invtest:
-    cmd:
-    circlegame:
-    toast:
-    getnbt:
-    verifyplayerinputsmap:
-    givecustom:
-        aliases: [ic]
-    purge-garbage-cans:
-        usage: /purge-garbage-cans [seconds]
-    additem:
-        usage: /additem <name> [category] [subcategory] [subcategory2]...
-    overrideitem:
-        usage: /overrideitem <name>
-    deleteitem:
-        usage: /deleteitem <name>
-    renameitemid:
-        usage: /renameitemid <idname> <idnewname>
-    addtag:
-        usage: /addtag <name> <tag1> [tag2]...
-    deletetag: 
-        usage: /deletetag <name> <tag1> [tag2]...
-    listtags:
-        usage: /listtags [name]
+        permission: loquainteractable.metadatawand
+        permission-message: You do not have permission to use this command!
 
-    items:
-        usage: /items [category] [subcategory] [subcategory2]...
+## test commands
+    circlegame:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    toast:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    invtest:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    verifyplayerinputsmap:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+
+## util commands
+    cmd:
+        permission: loquainteractable.commands.util
+        permission-message: You do not have permission to use this command!
+    getnbt:
+        permission: loquainteractable.commands.util
+        permission-message: You do not have permission to use this command!
     rename:
         usage: /rename <newname>
+        permission: loquainteractable.commands.util
+        permission-message: You do not have permission to use this command!
+    setleathercolor:
+        usage: /setleathercolor <r> <g> <b>
+        permission: loquainteractable.commands.util
+        permission-message: You do not have permission to use this command!
+    killloquaarmorstand:
+        aliases: [killloquaas, klas]
+        permission: loquainteractable.commands.killloquaarmorstand
+        permission-message: You do not have permission to use this command!
+
+## item commands
+    givecustom:
+        aliases: [ic]
+    items:
+        usage: /items [category] [subcategory] [subcategory2]...
+        permission: loquainteractable.givecustom
+        permission-message: You do not have permission to use this command!
+    additem:
+        usage: /additem <name> [category] [subcategory] [subcategory2]...
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    overrideitem:
+        usage: /overrideitem <name>
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    deleteitem:
+        usage: /deleteitem <name>
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    renameitemid:
+        usage: /renameitemid <idname> <idnewname>
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    addtag:
+        usage: /addtag <name> <tag1> [tag2]...
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    deletetag: 
+        usage: /deletetag <name> <tag1> [tag2]...
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+    listtags:
+        usage: /listtags [name]
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
 
     addcategory:
         usage: /addcategory <name> [parentname] [parentname2]...
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
     deletecategory:
         usage: /deletecategory <name>
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
     categorizeitem:
         usage: /categorizeitem <name> <category>
-        
-    setleathercolor:
-        usage: /setleathercolor r g b
-    killloquaarmorstand:
-        aliases: [killloquaas, klas]
+        permission: loquainteractable.manageitems
+        permission-message: You do not have permission to use this command!
+
+## other commands
+    purge-garbage-cans:
+        usage: /purge-garbage-cans [seconds]
 
 ############### PERMISSIONS ###############
 permissions:
-    garbagecans.purge:
+    loquainteractable.metadatawand:
+        default: false
+    loquainteractable.givecustom:
+        default: false
+    loquainteractable.manageitems:
+        default: false
+    loquainteractable.commands.test:
+        default: false
+    loquainteractable.commands.util:
+        default: false
+    loquainteractable.commands.killloquaarmorstand:
+        default: false
+    loquainteractable.garbagecans.purge:
         description: Purge garbage cans
         default: false
-    givecustom:
+    loquainteractable.all:
         default: false
+        children:
+            loquainteractable.metadatawand: true
+            loquainteractable.givecustom: true
+            loquainteractable.manageitems: true
+            loquainteractable.commands.test: true
+            loquainteractable.commands.util: true
+            loquainteractable.commands.killloquaarmorstand: true
+            loquainteractable.garbagecans.purge: true
