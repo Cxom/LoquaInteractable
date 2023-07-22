@@ -2,13 +2,13 @@ package net.punchtree.loquainteractable.clothing;
 
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+//import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 
@@ -20,17 +20,17 @@ public class SkinGrabber {
 		GameProfile profile = playerHandle.getGameProfile();
 		ServerPlayerConnection connection = playerHandle.connection;
 		
-		connection.send(new ClientboundPlayerInfoPacket(
-				ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, 
-				playerHandle));
-		
-		profile.getProperties().removeAll("textures");
-		profile.getProperties().put("textures", getSkin());
-		
-		connection.send(new ClientboundPlayerInfoPacket(
-				ClientboundPlayerInfoPacket.Action.ADD_PLAYER, 
-				playerHandle));
-		
+//		connection.send(new ClientboundPlayerInfoPacket(
+//				ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
+//				playerHandle));
+//
+//		profile.getProperties().removeAll("textures");
+//		profile.getProperties().put("textures", getSkin());
+//
+//		connection.send(new ClientboundPlayerInfoPacket(
+//				ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
+//				playerHandle));
+//
 	}
 	
 	private static Property getSkin() {

@@ -1,13 +1,12 @@
 package net.punchtree.loquainteractable.commands.item;
 
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import net.minecraft.nbt.CompoundTag;
 
 public class NbtUtilCommands implements CommandExecutor {
 

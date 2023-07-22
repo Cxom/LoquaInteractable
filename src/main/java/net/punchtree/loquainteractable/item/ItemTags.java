@@ -45,7 +45,7 @@ public class ItemTags implements PersistentDataType<String, Set<String>>{
 	}
 
 	public static Set<String> getTags(ItemStack itemStack) {
-		if (itemStack == null) {
+		if (itemStack == null || !itemStack.hasItemMeta()) {
 			return Collections.emptySet();
 		}
 		

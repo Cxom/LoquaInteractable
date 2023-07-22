@@ -214,7 +214,7 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 		assert(packetContainer.getHandle() instanceof ServerboundPlayerActionPacket);
 
 		Player player = packetEvent.getPlayer();
-		ItemStack itemInUse = player.getItemInUse();
+		ItemStack itemInUse = player.getActiveItem();
 		
 		if (isDrink(itemInUse)) {
 			onAbortDrinking(player, itemInUse);

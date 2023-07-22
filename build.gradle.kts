@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     eclipse
-    id("io.papermc.paperweight.userdev") version "1.3.6"
+    id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
 group = "net.punchtree"
@@ -18,19 +18,25 @@ repositories {
     }
 }
 
+val ftpAntTask by configurations.creating
+
 dependencies {
-    paperDevBundle("1.19.2-R0.1-SNAPSHOT")
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT")
-    
+    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+
     implementation("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
     implementation("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
     
-    implementation("com.comphenix.protocol:ProtocolLib:4.8.0")
-    implementation("cloud.commandframework:cloud-paper:1.6.1")
+    implementation("com.comphenix.protocol:ProtocolLib:5.0.0")
+//    implementation("cloud.commandframework:cloud-paper:1.6.1")
     
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
-    testImplementation("org.mockito:mockito-inline:3.12.4")
-    //testImplementation("io.papermc.paper:paper:1.18.1-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    ftpAntTask("org.apache.ant:ant-commons-net:1.10.12") {
+        module("commons-net:commons-net:1.4.1") {
+            dependencies("oro:oro:2.0.8:jar")
+        }
+    }
 } 
 
 tasks { 
@@ -47,7 +53,31 @@ tasks {
 	processResources {
 		filteringCharset = Charsets.UTF_8.name()
 	}
-	
+
+}
+
+val ftpHostUrl: String by project
+val ftpUsername: String by project
+val ftpPassword: String by project
+val localOutputDir: String by project
+
+task("uploadToServer") {
+    doLast{
+        ant.withGroovyBuilder {
+            "taskdef"("name" to "ftp", "classname" to "org.apache.tools.ant.taskdefs.optional.net.FTP", "classpath" to ftpAntTask.asPath)
+            "ftp"("server" to ftpHostUrl, "userid" to ftpUsername, "password" to ftpPassword, "remoteDir" to "/plugins") {
+                "fileset"("dir" to "build/libs") {
+                    "include"("name" to rootProject.name + "-" + version + ".jar")
+                }
+            }
+        }
+    }
+}
+
+task("buildAndPublish") {
+    dependsOn("build")
+    dependsOn("uploadToServer")
+    tasks.findByName("uploadToServer")!!.mustRunAfter("build")
 }
 
 tasks.withType<JavaCompile>() {

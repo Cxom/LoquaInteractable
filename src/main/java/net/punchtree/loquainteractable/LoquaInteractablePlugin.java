@@ -1,14 +1,10 @@
 package net.punchtree.loquainteractable;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService;
-import net.punchtree.loquainteractable.commands.item.CustomModelDataCommands;
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands;
+import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand;
 import net.punchtree.loquainteractable.commands.testing.CircleGameTesting;
 import net.punchtree.loquainteractable.commands.testing.PlayerInputsTesting;
 import net.punchtree.loquainteractable.commands.testing.ToastTesting;
@@ -19,13 +15,7 @@ import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
 import net.punchtree.loquainteractable.item.CustomItemRegistry;
 import net.punchtree.loquainteractable.item.DrinkItemListener;
-import net.punchtree.loquainteractable.item.command.AddItemCommand;
-import net.punchtree.loquainteractable.item.command.DeleteItemCommand;
-import net.punchtree.loquainteractable.item.command.GiveCustomItemCommand;
-import net.punchtree.loquainteractable.item.command.ItemsCommand;
-import net.punchtree.loquainteractable.item.command.RenameCommand;
-import net.punchtree.loquainteractable.item.command.RenameItemCommand;
-import net.punchtree.loquainteractable.item.command.TagCommands;
+import net.punchtree.loquainteractable.item.command.*;
 import net.punchtree.loquainteractable.listeners.PlayerJoinListener;
 import net.punchtree.loquainteractable.listeners.PlayerQuitListener;
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand;
@@ -33,6 +23,8 @@ import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 import net.punchtree.loquainteractable.player.InteractablePlayer;
 import net.punchtree.loquainteractable.player.PlayerMapping;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class LoquaInteractablePlugin extends JavaPlugin {
 
@@ -106,7 +98,6 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	private void setCommandExecutors() {
 		getCommand("metadatawand").setExecutor(new MetadataWandCommand());
 		getCommand("invtest").setExecutor(new InventoryMenuTesting());
-		getCommand("cmd").setExecutor(new CustomModelDataCommands());
 		getCommand("circlegame").setExecutor(new CircleGameTesting());
 		getCommand("toast").setExecutor(new ToastTesting());
 		getCommand("getnbt").setExecutor(new NbtUtilCommands());
@@ -140,6 +131,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		getCommand("deletetag").setExecutor(tagCommands);
 		getCommand("deletetag").setExecutor(tagCommands);
 		getCommand("listtags").setExecutor(tagCommands);
+
+		var setLeatherColorCommand = new SetLeatherColorCommand();
+		getCommand("setleathercolor").setExecutor(setLeatherColorCommand);
 	}
 	
 	@Override
