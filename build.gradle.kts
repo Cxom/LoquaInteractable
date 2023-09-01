@@ -23,10 +23,10 @@ val ftpAntTask by configurations.creating
 dependencies {
     paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
 
-    implementation("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
-    implementation("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
+    compileOnly("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
+    compileOnly("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
     
-    implementation("com.comphenix.protocol:ProtocolLib:5.0.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
