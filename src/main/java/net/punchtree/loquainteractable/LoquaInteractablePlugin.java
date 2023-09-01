@@ -54,6 +54,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
 
 		this.protocolManager = ProtocolLibrary.getProtocolManager();
 		this.playerInputsManager = new PlayerInputsManager();

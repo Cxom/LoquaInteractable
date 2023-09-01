@@ -1,0 +1,11 @@
+
+## Make sure strings containing colors are in quotes.
+Message Of The Day: "&3Welcome to Loqua City!"
+
+## Format in a list style:
+## Splashes:
+##    - Splash 1
+##    - Splash 2
+##    - Splash 3
+Splashes:
+  - Splashy splash!
