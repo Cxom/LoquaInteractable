@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     eclipse
-    id("io.papermc.paperweight.userdev") version "1.5.5"
+    id("io.papermc.paperweight.userdev") version "1.5.11"
 }
 
 group = "net.punchtree"
@@ -21,7 +21,7 @@ repositories {
 val ftpAntTask by configurations.creating
 
 dependencies {
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 
     compileOnly("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
     compileOnly("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
@@ -59,7 +59,7 @@ tasks {
 val ftpHostUrl: String by project
 val ftpUsername: String by project
 val ftpPassword: String by project
-val localOutputDir: String by project
+val localOutputDir: String? by project
 
 task("uploadToServer") {
     doLast{
@@ -74,7 +74,23 @@ task("uploadToServer") {
     }
 }
 
-task("buildAndPublish") {
+val buildLocal by tasks.registering(Copy::class) {
+    group = "build"
+    description = "Builds the shaded JAR locally without publishing to the live server."
+
+    from("build/libs/${project.name}-${project.version}.jar")
+    into(provider {
+        if (localOutputDir?.isNotEmpty() == true) {
+            localOutputDir?.let { project.file(it) }
+        } else {
+            logger.warn("Environment variable LOCAL_OUTPUT_DIR is not set. Using the default output directory.")
+            project.file("build/libs")
+        }
+    })
+    dependsOn("reobfJar")
+}
+
+task("buildAndUpload") {
     dependsOn("build")
     dependsOn("uploadToServer")
     tasks.findByName("uploadToServer")!!.mustRunAfter("build")
