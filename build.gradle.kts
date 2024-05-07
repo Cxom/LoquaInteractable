@@ -1,4 +1,5 @@
 plugins {
+    kotlin("jvm") version "1.9.22"
     `java-library`
     `maven-publish`
     eclipse
@@ -21,6 +22,8 @@ repositories {
 val ftpAntTask by configurations.creating
 
 dependencies {
+    compileOnly(kotlin("stdlib"))
+
     paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 
     compileOnly("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
@@ -37,7 +40,12 @@ dependencies {
             dependencies("oro:oro:2.0.8:jar")
         }
     }
-} 
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 
 tasks { 
 	
