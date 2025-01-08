@@ -109,6 +109,12 @@ commands:
     purge-garbage-cans:
         usage: /purge-garbage-cans [seconds]
 
+## testing/work-in-progress commands
+    streetcar:
+        usage: /streetcar <subcommand>
+        permission: loquainteractable.admin.experimental
+        permission-message: You do not have permission to use this command!
+
 ############### PERMISSIONS ###############
 permissions:
     loquainteractable.metadatawand:
@@ -125,6 +131,9 @@ permissions:
         default: false
     loquainteractable.garbagecans.purge:
         description: Purge garbage cans
+        default: false
+    loquainteractable.admin.experimental:
+        description: Experimental commands
         default: false
     loquainteractable.all:
         default: false

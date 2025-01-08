@@ -24,6 +24,8 @@ import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 import net.punchtree.loquainteractable.player.InteractablePlayer;
 import net.punchtree.loquainteractable.player.PlayerMapping;
+import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting;
+import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -137,6 +139,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		var setLeatherColorCommand = new SetLeatherColorCommand();
 		getCommand("setleathercolor").setExecutor(setLeatherColorCommand);
 
+		getCommand("streetcar").setExecutor(StreetcarTestingCommand.INSTANCE);
+
 		getCommand("changeskin").setExecutor(SkinGrabberTestCommand.INSTANCE);
 		getCommand("changecape").setExecutor(SkinGrabberTestCommand.INSTANCE);
 	}
@@ -145,6 +149,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	public void onDisable() {
 		customItemRegistry.save();
 		garbageCansService.onDisable();
+
+		StreetcarTesting.INSTANCE.onDisable();
 		
 		MetadataEditingSessionManager.cleanupSessions();
 		protocolManager.removePacketListeners(this);
