@@ -62,6 +62,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		this.protocolManager = ProtocolLibrary.getProtocolManager();
 		this.playerInputsManager = new PlayerInputsManager();
 		this.customItemRegistry = CustomItemRegistry.load();
+
+		CitizensNPCManager.INSTANCE.initialize();
 		
 		garbageCansService = new GarbageCansService(this);
 		garbageCansService.onEnable();
@@ -143,6 +145,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		getCommand("changeskin").setExecutor(SkinGrabberTestCommand.INSTANCE);
 		getCommand("changecape").setExecutor(SkinGrabberTestCommand.INSTANCE);
+
+		getCommand("create-npc").setExecutor(CitizensTestCommand.INSTANCE);
+		getCommand("make-npc-move").setExecutor(CitizensTestCommand.INSTANCE);
 	}
 	
 	@Override
@@ -151,6 +156,7 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		garbageCansService.onDisable();
 
 		StreetcarTesting.INSTANCE.onDisable();
+		CitizensNPCManager.INSTANCE.onDisable();
 		
 		MetadataEditingSessionManager.cleanupSessions();
 		protocolManager.removePacketListeners(this);

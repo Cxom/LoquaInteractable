@@ -20,6 +20,10 @@ repositories {
     maven {
     	url = uri("https://repo.dmulloy2.net/repository/public/")
     }
+    maven {
+        name = "citizens-repo"
+        url = uri("https://maven.citizensnpcs.co/repo")
+    }
 }
 
 val ftpAntTask by configurations.creating
@@ -34,6 +38,7 @@ dependencies {
     
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
+    compileOnly("net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")

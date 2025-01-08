@@ -35,6 +35,12 @@ commands:
         usage: /changeskin <skinUrl>
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
+    create-npc:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    make-npc-move:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
 
 ## util commands
     cmd:
