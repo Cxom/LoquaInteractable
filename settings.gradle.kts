@@ -1,7 +1,8 @@
 pluginManagement {
   repositories {
     gradlePluginPortal()
-    maven("https://papermc.io/repo/repository/maven-public/")
+    // Required for snapshot versions
+    maven("https://repo.papermc.io/repository/maven-public/")
   }
 }
 

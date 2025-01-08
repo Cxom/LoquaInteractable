@@ -1,20 +1,23 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.0"
     `java-library`
     `maven-publish`
-    eclipse
-    id("io.papermc.paperweight.userdev") version "1.5.11"
+    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT"
 }
 
 group = "net.punchtree"
 version = "0.0.1-SNAPSHOT"
 description = "LoquaInteractable"
 
+java.sourceCompatibility = JavaVersion.VERSION_21
+
 repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url = uri("https://papermc.io/repo/repository/maven-public/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    maven {
     	url = uri("https://repo.dmulloy2.net/repository/public/")
     }
 }
@@ -24,12 +27,12 @@ val ftpAntTask by configurations.creating
 dependencies {
     compileOnly(kotlin("stdlib"))
 
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 
     compileOnly("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
-    compileOnly("net.punchtree:punchtree-util:0.0.1-SNAPSHOT")
+    compileOnly("net.punchtree:punchtree-util:1.7.0-SNAPSHOT")
     
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
@@ -43,7 +46,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 
@@ -55,7 +58,7 @@ tasks {
 	
 	compileJava {
 	    options.encoding = Charsets.UTF_8.name()
-	    options.release.set(17)
+	    options.release.set(21)
 	}
 
 	processResources {
@@ -102,16 +105,6 @@ task("buildAndUpload") {
     dependsOn("build")
     dependsOn("uploadToServer")
     tasks.findByName("uploadToServer")!!.mustRunAfter("build")
-}
-
-tasks.withType<JavaCompile>() {
-    options.encoding = "UTF-8"
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
 }
 
 publishing {
