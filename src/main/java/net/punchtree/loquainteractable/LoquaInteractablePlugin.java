@@ -83,6 +83,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	}
 	
 	private void registerEvents() {
+		Bukkit.getPluginManager().registerEvents(new MessageOfTheDay(), this);
+
 		Bukkit.getPluginManager().registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		
 		Bukkit.getPluginManager().registerEvents(InventoryMenuListener.getInstance(), this);

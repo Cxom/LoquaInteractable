@@ -2,7 +2,6 @@ package net.punchtree.loquainteractable;
 
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
-import net.punchtree.core.PunchTreeCorePlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
