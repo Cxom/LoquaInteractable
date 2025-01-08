@@ -3,6 +3,7 @@ package net.punchtree.loquainteractable;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService;
+import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand;
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands;
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand;
 import net.punchtree.loquainteractable.commands.testing.CircleGameTesting;
@@ -135,6 +136,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		var setLeatherColorCommand = new SetLeatherColorCommand();
 		getCommand("setleathercolor").setExecutor(setLeatherColorCommand);
+
+		getCommand("changeskin").setExecutor(SkinGrabberTestCommand.INSTANCE);
+		getCommand("changecape").setExecutor(SkinGrabberTestCommand.INSTANCE);
 	}
 	
 	@Override

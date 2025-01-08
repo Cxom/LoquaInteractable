@@ -3,7 +3,7 @@ main: net.punchtree.loquainteractable.LoquaInteractablePlugin
 version: 1.2.1
 api-version: 1.21
 author: Cxom
-depend: [PersistentMetadata, PunchTree-Util, ProtocolLib]
+depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, Citizens]
 
 libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:1.9.22
@@ -25,6 +25,14 @@ commands:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
     verifyplayerinputsmap:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    changeskin:
+        usage: /changeskin <skinUrl>
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    changecape:
+        usage: /changeskin <skinUrl>
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
 
