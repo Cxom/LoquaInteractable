@@ -157,7 +157,7 @@ public class GarbageCansService implements Listener {
 	};
 	private void spawnThrowAwayParticles(Item item) {
 		item.getWorld().spawnParticle(Particle.SNEEZE, item.getLocation(), 1 + ThreadLocalRandom.current().nextInt(2), Math.random() * 0.3, Math.random() * 0.3, Math.random() * 0.3, 0.1);
-		item.getWorld().spawnParticle(Particle.REDSTONE, item.getLocation(), 3 + ThreadLocalRandom.current().nextInt(3), Math.random() * 0.65, -.1 + Math.random() * 0.3, Math.random() * 0.65, 1, 
+		item.getWorld().spawnParticle(Particle.DUST, item.getLocation(), 3 + ThreadLocalRandom.current().nextInt(3), Math.random() * 0.65, -.1 + Math.random() * 0.3, Math.random() * 0.65, 1,
 				new DustOptions(GARBAGE_COLORS[ThreadLocalRandom.current().nextInt(GARBAGE_COLORS.length)], (float) (1 + Math.random() * 0.3)));
 	}
 	

@@ -27,7 +27,7 @@ public class BlockHighlight {
 	}
 	
 	private ParticleType particleType = ParticleType.REDSTONE;
-	private Particle particle = Particle.FIREWORKS_SPARK;
+	private Particle particle = Particle.FIREWORK;
 	private Color color = Color.RED;
 	private float particleSize = 1;
 	public boolean border = true;
@@ -131,12 +131,13 @@ public class BlockHighlight {
 		}
 		return this;
 	}
-	
+
+	// TODO rename
 	public static void spawnRedstoneParticle(Location particleSpawnLocation, float particleSize, Color color) {
 		DustOptions dustOptions = new DustOptions(color, particleSize);
 		World world = particleSpawnLocation.getWorld();
 		world.spawnParticle(
-				Particle.REDSTONE, 
+				Particle.DUST,
 				particleSpawnLocation, 
 				1, 
 				dustOptions);

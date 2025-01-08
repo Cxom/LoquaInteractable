@@ -79,7 +79,9 @@ public class CustomAdvancement {
 	
 	public void add() {
 		try {
-			Bukkit.getUnsafe().loadAdvancement(key, generateJson().toString());
+			// no longer works, not how advancements work!  // TODO learn the new way!
+//			Bukkit.getUnsafe().loadAdvancement(key, generateJson().toString());
+			Bukkit.getLogger().warning("Toast testing with custom advancements will not work!");
 		} catch (IllegalArgumentException e) {
 			Bukkit.getLogger().info("Error while creating advancement '" + key + "' - it probably already exists");
 		}
