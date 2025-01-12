@@ -13,6 +13,8 @@ import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow;
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
+import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand;
+import net.punchtree.loquainteractable.heist.HeistTestCommand;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
 import net.punchtree.loquainteractable.item.CustomItemRegistry;
 import net.punchtree.loquainteractable.item.DrinkItemListener;
@@ -24,6 +26,7 @@ import net.punchtree.loquainteractable.metadata.editing.MetadataWand;
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager;
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand;
+import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting;
 import net.punchtree.loquainteractable.player.InteractablePlayer;
 import net.punchtree.loquainteractable.player.PlayerMapping;
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting;
@@ -150,8 +153,16 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		getCommand("changeskin").setExecutor(SkinGrabberTestCommand.INSTANCE);
 		getCommand("changecape").setExecutor(SkinGrabberTestCommand.INSTANCE);
 
+		// citizens test commands
 		getCommand("create-npc").setExecutor(CitizensTestCommand.INSTANCE);
 		getCommand("make-npc-move").setExecutor(CitizensTestCommand.INSTANCE);
+
+		// gun test commands
+		getCommand("test-gun").setExecutor(QualityArmoryTestCommand.INSTANCE);
+		getCommand("list-guns").setExecutor(QualityArmoryTestCommand.INSTANCE);
+
+		// heist test commands
+		getCommand("heist").setExecutor(HeistTestCommand.INSTANCE);
 	}
 	
 	@Override
@@ -161,6 +172,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		StreetcarTesting.INSTANCE.onDisable();
 		CitizensNPCManager.INSTANCE.onDisable();
+
+		GuardTesting.INSTANCE.onDisable();
 		
 		MetadataEditingSessionManager.cleanupSessions();
 		protocolManager.removePacketListeners(this);

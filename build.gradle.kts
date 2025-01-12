@@ -24,6 +24,10 @@ repositories {
         name = "citizens-repo"
         url = uri("https://maven.citizensnpcs.co/repo")
     }
+    maven {
+        name = "codemc-repo"
+        url = uri("https://repo.codemc.io/repository/maven-public/")
+    }
 }
 
 val ftpAntTask by configurations.creating
@@ -38,7 +42,10 @@ dependencies {
     
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
-    compileOnly("net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT") {
+        exclude("*", "*")
+    }
+    compileOnly("me.zombie_striker:QualityArmory:2.0.17")
     
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")

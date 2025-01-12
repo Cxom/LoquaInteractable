@@ -35,10 +35,22 @@ commands:
         usage: /changeskin <skinUrl>
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
+    ## citizens tests
     create-npc:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
     make-npc-move:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    ## gun tests
+    test-gun:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    list-guns:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
+    # heist test command
+    heist:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
 
