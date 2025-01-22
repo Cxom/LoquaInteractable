@@ -15,7 +15,12 @@ import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener;
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting;
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand;
 import net.punchtree.loquainteractable.heist.HeistTestCommand;
+import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter;
 import net.punchtree.loquainteractable.input.PlayerInputsManager;
+import net.punchtree.loquainteractable.input.SteerVehicleInputPacketAdapter;
+import net.punchtree.loquainteractable.instruments.InstrumentListener;
+import net.punchtree.loquainteractable.instruments.InstrumentManager;
+import net.punchtree.loquainteractable.instruments.InstrumentTestCommand;
 import net.punchtree.loquainteractable.item.CustomItemRegistry;
 import net.punchtree.loquainteractable.item.DrinkItemListener;
 import net.punchtree.loquainteractable.item.command.*;
@@ -32,6 +37,7 @@ import net.punchtree.loquainteractable.player.PlayerMapping;
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting;
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LoquaInteractablePlugin extends JavaPlugin {
@@ -44,6 +50,8 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	private ProtocolManager protocolManager;
 	private PlayerInputsManager playerInputsManager;
+	private SteerVehicleInputPacketAdapter vehicleInputPacketAdapter;
+	private ChangeHeldItemInputPacketAdapter heldItemInputPacketAdapter;
 	private CustomItemRegistry customItemRegistry;
 	
 	private GarbageCansService garbageCansService;
@@ -66,17 +74,34 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		this.protocolManager = ProtocolLibrary.getProtocolManager();
 		this.playerInputsManager = new PlayerInputsManager();
+
+
 		this.customItemRegistry = CustomItemRegistry.load();
 
 		CitizensNPCManager.INSTANCE.initialize();
 		
+
 		garbageCansService = new GarbageCansService(this);
 		garbageCansService.onEnable();
 
 		registerEvents();
 		setCommandExecutors();
+
+		// The way player input tracking is initialized is unrefined
+		// and so this happens after event registration so that player inputs object is initialized
+		// before packets are received and processed
+		initializeInputTracking();
 	}
 	
+
+	private void initializeInputTracking() {
+		this.vehicleInputPacketAdapter = new SteerVehicleInputPacketAdapter(this, playerInputsManager);
+		this.heldItemInputPacketAdapter = new ChangeHeldItemInputPacketAdapter(this, playerInputsManager);
+
+		protocolManager.addPacketListener(vehicleInputPacketAdapter);
+		protocolManager.addPacketListener(heldItemInputPacketAdapter);
+	}
+
 	private void onInitialize() {
 		
 	}
@@ -87,25 +112,29 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	
 	private void registerEvents() {
 		Bukkit.getPluginManager().registerEvents(new MessageOfTheDay(), this);
+		PluginManager pluginManager = Bukkit.getPluginManager();
 
-		Bukkit.getPluginManager().registerEvents(new ArmorStandChunkLoadingReglow(), this);
+		pluginManager.registerEvents(new MessageOfTheDay(), this);
+
+		pluginManager.registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		
-		Bukkit.getPluginManager().registerEvents(InventoryMenuListener.getInstance(), this);
+		pluginManager.registerEvents(InventoryMenuListener.getInstance(), this);
 		
 		// TODO per player instances for data accumulation?
-		Bukkit.getPluginManager().registerEvents(new MetadataWand(), this);
-		Bukkit.getPluginManager().registerEvents(MetadataEditingSessionManager.getInstance(), this);
+		pluginManager.registerEvents(new MetadataWand(), this);
+		pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this);
 		
 		// Just for testing
-		Bukkit.getPluginManager().registerEvents(new ArmorStandUtilsTesting(), this);
+		pluginManager.registerEvents(new ArmorStandUtilsTesting(), this);
 		
 		// For now, only input processing, may have more concerns later
-		Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(playerInputsManager), this);
-		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(playerInputsManager), this);
+		pluginManager.registerEvents(new PlayerJoinListener(playerInputsManager), this);
+		pluginManager.registerEvents(new PlayerQuitListener(playerInputsManager), this);
 		
 		// Interactables/Consumables
-		Bukkit.getPluginManager().registerEvents(new DrinkItemListener(this, protocolManager, playerMapping), this);
-		
+		pluginManager.registerEvents(new DrinkItemListener(this, protocolManager, playerMapping), this);
+
+		pluginManager.registerEvents(new InstrumentListener(playerInputsManager), this);
 	}
 	
 	private void setCommandExecutors() {
@@ -163,6 +192,9 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 
 		// heist test commands
 		getCommand("heist").setExecutor(HeistTestCommand.INSTANCE);
+
+		// instrument test command
+		getCommand("instrument").setExecutor(new InstrumentTestCommand(playerInputsManager));
 	}
 	
 	@Override
@@ -170,12 +202,15 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		customItemRegistry.save();
 		garbageCansService.onDisable();
 
+		InstrumentManager.INSTANCE.onDisable();
+
 		StreetcarTesting.INSTANCE.onDisable();
 		CitizensNPCManager.INSTANCE.onDisable();
 
 		GuardTesting.INSTANCE.onDisable();
 		
 		MetadataEditingSessionManager.cleanupSessions();
+
 		protocolManager.removePacketListeners(this);
 	}
 	
