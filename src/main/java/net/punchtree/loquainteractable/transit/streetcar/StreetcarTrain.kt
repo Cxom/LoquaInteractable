@@ -182,12 +182,12 @@ class StreetcarTrain private constructor(
             var tb = start + lineLength
             var b: Location
 
-            var error = 0.0
+            var error = wheelbase // some arbitrary high value for first iteration
             for (i in 0 until MAX_ITERATIONS) {
                 b = route.path.pointAt(tb)
 
                 val newError = lineLength - a.distance(b)
-                check(newError < error) { "Error is increasing! Is the track impossible for the train car?!?! (lineLength: $lineLength, distance: ${a.distance(b)}, error: $error, newError: $newError)" }
+                check(newError <= error) { "Error is increasing! Is the track impossible for the train car?!?! (lineLength: $lineLength, distance: ${a.distance(b)}, error: $error, newError: $newError)" }
                 error = newError
                 check(error >= -0.00001) { "Distance can never be larger than the wheelbase! What happened!?!?! (lineLength: $lineLength, distance: ${a.distance(b)}, error: $error, condition: ${error >= -0.00001})" }
 

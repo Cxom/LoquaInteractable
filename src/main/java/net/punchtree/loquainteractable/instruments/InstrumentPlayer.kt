@@ -24,6 +24,10 @@ class InstrumentPlayer(
     private val playerInputs: PlayerInputs
 ) : PlayerInputsObserver {
 
+    /** this value, if true, disables hotbar slot resetting, makes jump repeat the last note, and disables
+     *  shifting up and down strings relatively with shift and jump*/
+    private val isJumpDoesRepeat = DebugVars.getBoolean("instrument-isJumpDoesRepeat", false)
+
     private lateinit var chair: Entity
 
     init {
@@ -43,6 +47,9 @@ class InstrumentPlayer(
             it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "instrument_stool")) // the metadata value here is unused
         }
         playerInputs.registerObserver(this)
+        if (!isJumpDoesRepeat) {
+            player.inventory.heldItemSlot = 0
+        }
     }
 
     override fun onUpdate(player: Player, inputs: PlayerInputs, updateType: PlayerInputs.PlayerInputsUpdateType) {
@@ -56,10 +63,7 @@ class InstrumentPlayer(
     }
 
     private var fns_currString = 0
-    val isJumpDoesRepeat = DebugVars.getBoolean("instrument-isJumpDoesRepeat", false)
     private fun doFifthsNumberStringing(updateType: PlayerInputs.PlayerInputsUpdateType, inputs: PlayerInputs) {
-        /** this value, if true, disables hotbar slot resetting, makes jump repeat the last note, and disables
-         *  shifting up and down strings relatively with shift and jump*/
 
         val quantizeAmount = 10
         val quantizePeriod = 50L
