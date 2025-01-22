@@ -5,15 +5,15 @@ import java.util.*
 
 object InstrumentManager {
 
-    private val playersPlayingInstruments = mutableMapOf<UUID, AcousticGuitarPlayer>()
+    private val playersPlayingInstruments = mutableMapOf<UUID, InstrumentPlayer>()
 
     internal fun isPlayingInstrument(player: Player): Boolean {
         return playersPlayingInstruments.containsKey(player.uniqueId)
     }
 
-    fun startPlayerPlaying(player: Player, acousticGuitarPlayer: AcousticGuitarPlayer) {
+    fun startPlayerPlaying(player: Player, instrumentPlayer: InstrumentPlayer) {
         stopPlayerPlaying(player)
-        playersPlayingInstruments[player.uniqueId] = acousticGuitarPlayer
+        playersPlayingInstruments[player.uniqueId] = instrumentPlayer
     }
 
     fun stopPlayerPlaying(player: Player) {

@@ -1,16 +1,13 @@
 package net.punchtree.loquainteractable.instruments
 
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.util.extensionmethods.textContent
-import org.bukkit.Bukkit
+import net.punchtree.loquainteractable.instruments.Instruments.isInstrument
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
-import org.bukkit.inventory.ItemStack
 
 class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listener {
 
@@ -47,11 +44,6 @@ class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listene
 
         event.isCancelled = true
 
-    }
-
-    private fun isInstrument(itemStack: ItemStack): Boolean {
-        // TODO proper metadata
-        return Instruments.GUITAR.equals(itemStack)
     }
 
 }

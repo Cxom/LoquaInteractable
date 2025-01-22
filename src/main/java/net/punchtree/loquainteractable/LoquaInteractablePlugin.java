@@ -79,7 +79,6 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		this.customItemRegistry = CustomItemRegistry.load();
 
 		CitizensNPCManager.INSTANCE.initialize();
-		
 
 		garbageCansService = new GarbageCansService(this);
 		garbageCansService.onEnable();
@@ -92,7 +91,6 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 		// before packets are received and processed
 		initializeInputTracking();
 	}
-	
 
 	private void initializeInputTracking() {
 		this.vehicleInputPacketAdapter = new SteerVehicleInputPacketAdapter(this, playerInputsManager);

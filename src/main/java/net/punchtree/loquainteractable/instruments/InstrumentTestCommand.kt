@@ -7,7 +7,6 @@ import net.kyori.adventure.text.format.NamedTextColor.GREEN
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.loquainteractable.instruments.Instruments.GUITAR
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -62,7 +61,7 @@ class InstrumentTestCommand(
     private fun doPlayAcousticGuitar(player: Player) {
         // TODO maybe move lifecycle management of InstrumentPlayer classes exclusively to InstrumentManager
         val playerInputs = checkNotNull(playerInputsManager.getInputsForPlayer(player))
-        val acousticGuitarPlayer = AcousticGuitarPlayer(player, playerInputs)
+        val acousticGuitarPlayer = InstrumentPlayer(player, Instruments.AcousticGuitar, playerInputs)
         InstrumentManager.startPlayerPlaying(player, acousticGuitarPlayer)
     }
 
@@ -138,7 +137,7 @@ class InstrumentTestCommand(
             player.sendMessage("Available instruments: guitar")
         }
         when (args[1].lowercase()) {
-            "guitar" -> player.inventory.addItem(GUITAR)
+            "guitar" -> player.inventory.addItem(Instruments.AcousticGuitar.itemStack())
         }
     }
 

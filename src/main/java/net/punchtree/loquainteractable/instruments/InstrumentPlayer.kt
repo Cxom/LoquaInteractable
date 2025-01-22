@@ -5,7 +5,6 @@ import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsObserver
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemDisplay
@@ -19,7 +18,11 @@ import org.joml.Vector3f
 import kotlin.math.max
 import kotlin.math.min
 
-class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) : PlayerInputsObserver {
+class InstrumentPlayer(
+    val player: Player,
+    val instrument: Instruments.Instrument,
+    private val playerInputs: PlayerInputs
+) : PlayerInputsObserver {
 
     private lateinit var chair: Entity
 
@@ -37,7 +40,7 @@ class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) :
             it.setItemStack(ItemStack(Material.SCAFFOLDING))
             it.addPassenger(player)
             it.transformation = Transformation(Vector3f(0f, -.5f, 0f), Quaternionf(), Vector3f(1f, 1f, 1f), Quaternionf())
-            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "acoustic_guitar"))
+            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "instrument_stool")) // the metadata value here is unused
         }
         playerInputs.registerObserver(this)
     }
@@ -53,7 +56,7 @@ class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) :
     }
 
     private var fns_currString = 0
-    val isJumpDoesRepeat = DebugVars.getBoolean("guitar-isJumpDoesRepeat", false)
+    val isJumpDoesRepeat = DebugVars.getBoolean("instrument-isJumpDoesRepeat", false)
     private fun doFifthsNumberStringing(updateType: PlayerInputs.PlayerInputsUpdateType, inputs: PlayerInputs) {
         /** this value, if true, disables hotbar slot resetting, makes jump repeat the last note, and disables
          *  shifting up and down strings relatively with shift and jump*/
@@ -82,9 +85,9 @@ class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) :
                 // TODO quantization would go here, but because it runs at a frequency faster than tick,
                 //  it needs to be applied directly to the outgoing packet - all asynchronous
                 Thread.sleep(millisUntilNextPeriod) // LOL just freeze the world to make the mortals be on beat
-                playNote(notes[fns_currString * 7 + fret - 1])
+                playNote(instrument.notes()[fns_currString * 7 + fret - 1])
             } else {
-                playNote(notes[fns_currString * 7 + fret - 1])
+                playNote(instrument.notes()[fns_currString * 7 + fret - 1])
             }
             if (!isJumpDoesRepeat) {
                 player.inventory.heldItemSlot = 0
@@ -127,7 +130,7 @@ class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) :
                 else -> 0
             }
         if (fret != -1) {
-            playNote(notes[string + fret])
+            playNote(instrument.notes()[string + fret])
         }
 
         jumpOnLastUpdate = inputs.jump
@@ -143,70 +146,33 @@ class AcousticGuitarPlayer(var player: Player, val playerInputs: PlayerInputs) :
         updateType: PlayerInputs.PlayerInputsUpdateType,
         inputs: PlayerInputs
     ) {
+        val keyOffset = 8
         if (updateType == PlayerInputs.PlayerInputsUpdateType.CHANGE_HOTBAR_SLOT) {
             when (inputs.heldItemSlot) {
-                0 -> playNote(c_3)
-                1 -> playNote(d_3)
-                2 -> playNote(f_3)
-                3 -> playNote(g_3)
-                4 -> playNote(g_sharp_3)
-                5 -> playNote(a_3)
-                6 -> playNote(c_4)
-                7 -> playNote(d_4)
-                8 -> playNote(f_4)
+                0 -> playNote(instrument.notes()[0 + keyOffset])
+                1 -> playNote(instrument.notes()[2 + keyOffset])
+                2 -> playNote(instrument.notes()[5 + keyOffset])
+                3 -> playNote(instrument.notes()[7 + keyOffset])
+                4 -> playNote(instrument.notes()[8 + keyOffset])
+                5 -> playNote(instrument.notes()[9 + keyOffset])
+                6 -> playNote(instrument.notes()[12 + keyOffset])
+                7 -> playNote(instrument.notes()[14 + keyOffset])
+                8 -> playNote(instrument.notes()[17 + keyOffset])
             }
         }
     }
 
-    var playingSound: String? = null
+    private var playingSound: String? = null
     private fun playNote(sound: String) {
-//        playingSound?.let { player.stopSound(it) }
-//        playingSound = sound
+        if (!instrument.letRing()) {
+            playingSound?.let { player.stopSound(it) }
+            playingSound = sound
+        }
         player.playSound(player.location, sound, 1f, 1f)
     }
 
     fun stopPlaying() {
         chair.remove()
         playerInputs.unregisterObserver(this)
-    }
-
-    companion object {
-        val e_2 =       "punchtree:instrument.guitar.e_2"
-        val f_2 =       "punchtree:instrument.guitar.f_2"
-        val f_sharp_2 = "punchtree:instrument.guitar.f_sharp_2"
-        val g_2 =       "punchtree:instrument.guitar.g_2"
-        val g_sharp_2 = "punchtree:instrument.guitar.g_sharp_2"
-        val a_2 =       "punchtree:instrument.guitar.a_2"
-        val a_sharp_2 = "punchtree:instrument.guitar.a_sharp_2"
-        val b_2 =       "punchtree:instrument.guitar.b_2"
-        val c_3 =       "punchtree:instrument.guitar.c_3"
-        val c_sharp_3 = "punchtree:instrument.guitar.c_sharp_3"
-        val d_3 =       "punchtree:instrument.guitar.d_3"
-        val d_sharp_3 = "punchtree:instrument.guitar.d_sharp_3"
-        val e_3 =       "punchtree:instrument.guitar.e_3"
-        val f_3 =       "punchtree:instrument.guitar.f_3"
-        val f_sharp_3 = "punchtree:instrument.guitar.f_sharp_3"
-        val g_3 =       "punchtree:instrument.guitar.g_3"
-        val g_sharp_3 = "punchtree:instrument.guitar.g_sharp_3"
-        val a_3 =       "punchtree:instrument.guitar.a_3"
-        val a_sharp_3 = "punchtree:instrument.guitar.a_sharp_3"
-        val b_3 =       "punchtree:instrument.guitar.b_3"
-        val c_4 =       "punchtree:instrument.guitar.c_4"
-        val c_sharp_4 = "punchtree:instrument.guitar.c_sharp_4"
-        val d_4 =       "punchtree:instrument.guitar.d_4"
-        val d_sharp_4 = "punchtree:instrument.guitar.d_sharp_4"
-        val e_4 =       "punchtree:instrument.guitar.e_4"
-        val f_4 =       "punchtree:instrument.guitar.f_4"
-        val f_sharp_4 = "punchtree:instrument.guitar.f_sharp_4"
-        val g_4 =       "punchtree:instrument.guitar.g_4"
-        val g_sharp_4 = "punchtree:instrument.guitar.g_sharp_4"
-        val a_4 =       "punchtree:instrument.guitar.a_4"
-        val a_sharp_4 = "punchtree:instrument.guitar.a_sharp_4"
-        val b_4 =       "punchtree:instrument.guitar.b_4"
-        val notes = listOf(
-            e_2, f_2, f_sharp_2, g_2, g_sharp_2, a_2, a_sharp_2, b_2,
-            c_3, c_sharp_3, d_3, d_sharp_3, e_3, f_3, f_sharp_3, g_3, g_sharp_3, a_3, a_sharp_3, b_3,
-            c_4, c_sharp_4, d_4, d_sharp_4, e_4, f_4, f_sharp_4, g_4, g_sharp_4, a_4, a_sharp_4, b_4
-        )
     }
 }
