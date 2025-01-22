@@ -3,10 +3,10 @@ main: net.punchtree.loquainteractable.LoquaInteractablePlugin
 version: 1.2.1
 api-version: 1.21
 author: Cxom
-depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, Citizens]
+depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, Citizens, QualityArmory]
 
 libraries:
-    - org.jetbrains.kotlin:kotlin-stdlib:1.9.22
+    - org.jetbrains.kotlin:kotlin-stdlib:2.1.0
 
 commands:
     metadatawand:
