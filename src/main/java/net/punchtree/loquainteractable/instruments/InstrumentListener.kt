@@ -18,7 +18,7 @@ class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listene
         // TODO we need to resolve the conflict between routing the swap event to the player inputs
         //  and the ability/fact of the event being cancelled
         //  detecting the input and deciding whether or not to let the swap proceed are two different things
-        if (isInstrument(event.offHandItem)) {
+        if (InstrumentManager.isPlayingInstrument(event.player)) {
             event.isCancelled = true
         }
     }
@@ -39,11 +39,9 @@ class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listene
 
     @EventHandler
     fun onDropItem(event: PlayerDropItemEvent) {
-        if (!isInstrument(event.itemDrop.itemStack)) return
-        if (!InstrumentManager.isPlayingInstrument(event.player)) return
-
-        event.isCancelled = true
-
+        if (InstrumentManager.isPlayingInstrument(event.player)) {
+            event.isCancelled = true
+        }
     }
 
 }

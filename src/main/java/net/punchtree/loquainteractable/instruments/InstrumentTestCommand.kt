@@ -1,5 +1,6 @@
 package net.punchtree.loquainteractable.instruments
 
+import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor.GRAY
@@ -7,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor.GREEN
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsManager
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -30,11 +32,12 @@ class InstrumentTestCommand(
                 "give",
                 "basic-input-monitoring-test",
                 "play-acoustic-guitar",
+                "play-trumpet",
                 "stop-playing"
             )
         }
         if (args.size == 2 && args[0].lowercase() == "give") {
-            return mutableListOf("guitar")
+            return mutableListOf("guitar", "trumpet")
         }
         return null
     }
@@ -47,7 +50,8 @@ class InstrumentTestCommand(
         when (args[0].lowercase()) {
             "give" -> giveInstrument(sender, args)
             "basic-input-monitoring-test" -> doBasicInputMonitoringTest(sender)
-            "play-acoustic-guitar" -> doPlayAcousticGuitar(sender)
+            "play-acoustic-guitar" -> startPlayingInstrument(sender, Instruments.AcousticGuitar)
+            "play-trumpet" -> startPlayingInstrument(sender, Instruments.LegatoTrumpet)
             "stop-playing" -> stopPlaying(sender)
         }
 
@@ -58,20 +62,24 @@ class InstrumentTestCommand(
         InstrumentManager.stopPlayerPlaying(player)
     }
 
-    private fun doPlayAcousticGuitar(player: Player) {
+    private fun startPlayingInstrument(player: Player, instrument: Instruments.Instrument) {
         // TODO maybe move lifecycle management of InstrumentPlayer classes exclusively to InstrumentManager
         val playerInputs = checkNotNull(playerInputsManager.getInputsForPlayer(player))
-        val acousticGuitarPlayer = InstrumentPlayer(player, Instruments.AcousticGuitar, playerInputs)
-        InstrumentManager.startPlayerPlaying(player, acousticGuitarPlayer)
+        val instrumentPlayer = InstrumentPlayer(player, instrument, playerInputs)
+        InstrumentManager.startPlayerPlaying(player, instrumentPlayer)
     }
 
     private fun doBasicInputMonitoringTest(player: Player) {
+        val originalGameMode = player.gameMode
+        player.gameMode = GameMode.SPECTATOR
         val somethingToRide = player.world.spawnEntity(player.location, EntityType.ITEM_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM) {
             it as ItemDisplay
             it.setItemStack(ItemStack(Material.SCAFFOLDING))
-            it.addPassenger(player)
+            it.interpolationDuration = 1
+            it.teleportDuration = 1
             it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "acoustic_guitar"))
         }
+        player.spectatorTarget = somethingToRide
 
         val runLength = 3 * 20L
         object : BukkitRunnable() {
@@ -106,6 +114,13 @@ class InstrumentTestCommand(
                     .append(swapHandsComponent)
                 player.sendActionBar(assembledComponent)
 
+//                , (counter * 2).toFloat()
+//                somethingToRide.setRotation(counter.toFloat(), 0f)
+                somethingToRide.teleport(somethingToRide.location.also {
+                    it.yaw = (counter * 2).toFloat()
+                    it.pitch = counter.toFloat()
+                }, TeleportFlag.Relative.VELOCITY_ROTATION, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z)
+
                 counter++
             }
 
@@ -127,6 +142,7 @@ class InstrumentTestCommand(
         object : BukkitRunnable() {
             override fun run() {
                 somethingToRide.remove()
+                player.gameMode = originalGameMode
             }
         }.runTaskLater(LoquaInteractablePlugin.getInstance(), runLength + 1)
     }
@@ -134,10 +150,11 @@ class InstrumentTestCommand(
     private fun giveInstrument(player: Player, args: Array<out String>) {
         if (args.size < 2) {
             player.sendMessage("Usage: /instrument give <instrument>")
-            player.sendMessage("Available instruments: guitar")
+            player.sendMessage("Available instruments: guitar, trumpet")
         }
         when (args[1].lowercase()) {
             "guitar" -> player.inventory.addItem(Instruments.AcousticGuitar.itemStack())
+            "trumpet" -> player.inventory.addItem(Instruments.LegatoTrumpet.itemStack())
         }
     }
 

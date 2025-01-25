@@ -24,6 +24,17 @@ class InstrumentPlayer(
     private val playerInputs: PlayerInputs
 ) : PlayerInputsObserver {
 
+    /* Next steps for instruments
+     * - Make playingSound happen on the world, and stop playing happen for all nearby entities
+     * - Fill the hotbar slot when playing with an instrument, restore on quit/death/stop playing
+     * - Really think about how player death interacts with these mechanics. We handle server disabling well, but not quitting or death
+     * - Add instructions for how to play to the lore of instruments
+     * - Add actionbar visuals to help with understanding note layout and current string
+     * - Look at adding default minecraft instruments!
+     * - Make the commands for playing instruments generated from the available instruments
+     * - Add a way to play an instrument and stop playing without using commands
+     */
+
     /** this value, if true, disables hotbar slot resetting, makes jump repeat the last note, and disables
      *  shifting up and down strings relatively with shift and jump*/
     private val isJumpDoesRepeat = DebugVars.getBoolean("instrument-isJumpDoesRepeat", false)
@@ -63,10 +74,9 @@ class InstrumentPlayer(
     }
 
     private var fns_currString = 0
+    private val quantizeAmount = DebugVars.getInteger("instrument-quantizeAmount", 10)
+    private val quantizePeriod = DebugVars.getInteger("instrument-quantizePeriod", 50)
     private fun doFifthsNumberStringing(updateType: PlayerInputs.PlayerInputsUpdateType, inputs: PlayerInputs) {
-
-        val quantizeAmount = 10
-        val quantizePeriod = 50L
 
         if (inputs.left) {
             fns_currString = 0
@@ -76,22 +86,31 @@ class InstrumentPlayer(
             fns_currString = 2
         } else if (updateType == PlayerInputs.PlayerInputsUpdateType.SWAP_HANDS) {
             fns_currString = 3
-        } else if (inputs.jump && !isJumpDoesRepeat) {
+        }
+        if (inputs.jump && !isJumpDoesRepeat) {
             fns_currString = min(fns_currString + 1, 3)
-        } else if (inputs.shift && !isJumpDoesRepeat) {
+        }
+        if (inputs.shift && !isJumpDoesRepeat) {
             fns_currString = max(fns_currString - 1, 0)
+        }
+        if (inputs.forward) {
+            stopNote()
         }
         if (updateType == PlayerInputs.PlayerInputsUpdateType.CHANGE_HOTBAR_SLOT && inputs.heldItemSlot != 0 || (inputs.jump && isJumpDoesRepeat)) {
             val fret = inputs.heldItemSlot
 
+            val noteIndex = (fns_currString * 7 + fret - 1)
+                .coerceAtMost(instrument.notes().lastIndex)
+
             val millisUntilNextPeriod = quantizePeriod - (System.currentTimeMillis() % quantizePeriod)
-            if (millisUntilNextPeriod <= quantizeAmount) {
+            if (DebugVars.getBoolean("instrument-do-quantizing", false)
+                && millisUntilNextPeriod <= quantizeAmount) {
                 // TODO quantization would go here, but because it runs at a frequency faster than tick,
                 //  it needs to be applied directly to the outgoing packet - all asynchronous
                 Thread.sleep(millisUntilNextPeriod) // LOL just freeze the world to make the mortals be on beat
-                playNote(instrument.notes()[fns_currString * 7 + fret - 1])
+                playNote(instrument.notes()[noteIndex])
             } else {
-                playNote(instrument.notes()[fns_currString * 7 + fret - 1])
+                playNote(instrument.notes()[noteIndex])
             }
             if (!isJumpDoesRepeat) {
                 player.inventory.heldItemSlot = 0
@@ -169,10 +188,15 @@ class InstrumentPlayer(
     private var playingSound: String? = null
     private fun playNote(sound: String) {
         if (!instrument.letRing()) {
-            playingSound?.let { player.stopSound(it) }
+            stopNote()
             playingSound = sound
         }
         player.playSound(player.location, sound, 1f, 1f)
+    }
+
+    private fun stopNote() {
+        playingSound?.let { player.stopSound(it) }
+        playingSound = null
     }
 
     fun stopPlaying() {
