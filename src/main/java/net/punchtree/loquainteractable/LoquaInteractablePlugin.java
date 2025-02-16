@@ -33,6 +33,7 @@ import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager;
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand;
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting;
 import net.punchtree.loquainteractable.player.InteractablePlayer;
+import net.punchtree.loquainteractable.player.LoquaPlayerManager;
 import net.punchtree.loquainteractable.player.PlayerMapping;
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting;
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand;
@@ -109,10 +110,11 @@ public class LoquaInteractablePlugin extends JavaPlugin {
 	}
 	
 	private void registerEvents() {
-		Bukkit.getPluginManager().registerEvents(new MessageOfTheDay(), this);
 		PluginManager pluginManager = Bukkit.getPluginManager();
 
 		pluginManager.registerEvents(new MessageOfTheDay(), this);
+
+		pluginManager.registerEvents(LoquaPlayerManager.INSTANCE, this);
 
 		pluginManager.registerEvents(new ArmorStandChunkLoadingReglow(), this);
 		
