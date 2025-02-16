@@ -33,9 +33,7 @@ import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager.initialize
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
-import net.punchtree.loquainteractable.player.InteractablePlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
-import net.punchtree.loquainteractable.player.PlayerMapping
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
 import org.bukkit.Bukkit
@@ -52,18 +50,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
         private set
 
     private lateinit var garbageCansService: GarbageCansService
-
-    private lateinit var playerMapping: PlayerMapping<InteractablePlayer>
-
-    fun setPlayerMapping(playerMapping: PlayerMapping<InteractablePlayer>) {
-        if (!initialized) {
-            this.playerMapping = playerMapping
-            onInitialize()
-            this.initialized = true
-        } else {
-            throw IllegalStateException("Can't initialize LoquaInteractable twice!")
-        }
-    }
 
     override fun onEnable() {
         saveDefaultConfig()
@@ -126,7 +112,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
 
         // Interactables/Consumables
-        pluginManager.registerEvents(DrinkItemListener(this, protocolManager, playerMapping), this)
+        pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)
 
         pluginManager.registerEvents(InstrumentListener(playerInputsManager), this)
     }

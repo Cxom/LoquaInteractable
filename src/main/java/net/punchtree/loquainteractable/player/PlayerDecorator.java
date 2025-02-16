@@ -59,11 +59,11 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class PlayerProxy implements Player {
+public class PlayerDecorator implements Player {
 
     private final Player player;
 
-    public PlayerProxy(Player player) {
+    public PlayerDecorator(Player player) {
         this.player = player;
     }
 

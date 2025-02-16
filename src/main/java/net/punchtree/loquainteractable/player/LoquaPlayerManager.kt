@@ -1,6 +1,7 @@
 package net.punchtree.loquainteractable.player
 
-import net.punchtree.loquainteractable.player.LoquaPlayerManager.getLoquaPlayer
+import net.punchtree.loquainteractable.player.LoquaPlayerManager.get
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -29,15 +30,22 @@ object LoquaPlayerManager : Listener {
         playersToLoquaPlayers.remove(player.uniqueId)
     }
 
-    fun getLoquaPlayer(player: Player): LoquaPlayer? {
-        return getLoquaPlayer(player.uniqueId)
+    fun getSafe(player: Player): LoquaPlayer? {
+        return playersToLoquaPlayers[player.uniqueId]
     }
 
-    fun getLoquaPlayer(uuid: UUID): LoquaPlayer? {
-        return playersToLoquaPlayers[uuid]
+    operator fun get(player: Player): LoquaPlayer {
+        return get(player.uniqueId)
+    }
+
+    operator fun get(uuid: UUID): LoquaPlayer {
+        return checkNotNull(playersToLoquaPlayers[uuid]) {
+            val playerName = Bukkit.getOfflinePlayer(uuid).name
+            "Tried fetching LoquaPlayer for player [$playerName:${uuid}] and it didn't work! Are they not online?"
+        }
     }
 }
 
 fun Player.toLoquaPlayer(): LoquaPlayer? {
-    return getLoquaPlayer(this.uniqueId)
+    return LoquaPlayerManager[uniqueId]
 }

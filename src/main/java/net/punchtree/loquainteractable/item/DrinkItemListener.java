@@ -29,10 +29,6 @@ import com.comphenix.protocol.events.PacketEvent;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
-import net.punchtree.loquainteractable.player.PlayerMapping;
-import net.punchtree.loquainteractable.status.Status;
-import net.punchtree.loquainteractable.status.StatusReceiver;
-import net.punchtree.loquainteractable.status.StatusType;
 
 public class DrinkItemListener extends PacketAdapter implements Listener {
 
@@ -43,14 +39,14 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 	// But at that point, we'd be better off with a per-player abstraction for sound pre-scheduling 
 	// and cancelling if need be (say on logout). Drinking sounds aren't common, but sounds will be
 	
-	private final PlayerMapping<? extends StatusReceiver> statusReceiverMapping;
-	
+//	private final PlayerMapping<? extends StatusReceiver> statusReceiverMapping;
+
 	private Map<Player, BukkitTask> drinkingSoundsForPlayers = new HashMap<>();
 	
-	public DrinkItemListener(Plugin plugin, ProtocolManager protocolManager, PlayerMapping<? extends StatusReceiver> statusReceiverMapping) {
+	public DrinkItemListener(Plugin plugin, ProtocolManager protocolManager) {
 		super(plugin, ListenerPriority.LOWEST, new PacketType[] { PacketType.Play.Client.BLOCK_DIG });
 		protocolManager.addPacketListener(this);
-		this.statusReceiverMapping = statusReceiverMapping;
+//		this.statusReceiverMapping = statusReceiverMapping;
 	}
 	
 	@EventHandler
