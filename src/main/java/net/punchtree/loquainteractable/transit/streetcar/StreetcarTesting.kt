@@ -50,7 +50,7 @@ object StreetcarTesting {
                     trainsToCleanup.remove(train)
                 }
             }
-        }.runTaskTimer(LoquaInteractablePlugin.getInstance(), 0, 1)
+        }.runTaskTimer(LoquaInteractablePlugin.instance, 0, 1)
 
     }
 

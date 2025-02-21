@@ -17,6 +17,7 @@ object LoquaPlayerManager : Listener {
 
     private val playersToLoquaPlayers = mutableMapOf<UUID, LoquaPlayer>()
 
+    // TODO HANDLE JOIN AND LEAVING IN EXACTLY ONE PLACE - as a readable entrypoint
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player

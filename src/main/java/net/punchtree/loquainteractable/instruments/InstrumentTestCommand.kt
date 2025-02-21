@@ -77,7 +77,7 @@ class InstrumentTestCommand(
             it.setItemStack(ItemStack(Material.SCAFFOLDING))
             it.interpolationDuration = 1
             it.teleportDuration = 1
-            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "acoustic_guitar"))
+            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.instance, "acoustic_guitar"))
         }
         player.spectatorTarget = somethingToRide
 
@@ -137,14 +137,14 @@ class InstrumentTestCommand(
                 val right = text("→").color(if (playerInputs.right) GREEN else GRAY)
                 return text().append(left).append(right).build()
             }
-        }.runTaskTimer(LoquaInteractablePlugin.getInstance(), 0, 1)
+        }.runTaskTimer(LoquaInteractablePlugin.instance, 0, 1)
 
         object : BukkitRunnable() {
             override fun run() {
                 somethingToRide.remove()
                 player.gameMode = originalGameMode
             }
-        }.runTaskLater(LoquaInteractablePlugin.getInstance(), runLength + 1)
+        }.runTaskLater(LoquaInteractablePlugin.instance, runLength + 1)
     }
 
     private fun giveInstrument(player: Player, args: Array<out String>) {

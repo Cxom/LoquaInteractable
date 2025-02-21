@@ -18,7 +18,7 @@ object PathDrawer {
                     cancel()
                 }
             }
-        }.runTaskTimer(LoquaInteractablePlugin.getInstance(), 0, period)
+        }.runTaskTimer(LoquaInteractablePlugin.instance, 0, period)
     }
 
     internal fun drawPath(path: Path, step: Double, color: Color = Color.RED) {

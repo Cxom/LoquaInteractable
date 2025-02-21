@@ -55,7 +55,7 @@ class InstrumentPlayer(
             it.setItemStack(ItemStack(Material.SCAFFOLDING))
             it.addPassenger(player)
             it.transformation = Transformation(Vector3f(0f, -.5f, 0f), Quaternionf(), Vector3f(1f, 1f, 1f), Quaternionf())
-            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.getInstance(), "instrument_stool")) // the metadata value here is unused
+            it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.instance, "instrument_stool")) // the metadata value here is unused
         }
         playerInputs.registerObserver(this)
         if (!isJumpDoesRepeat) {

@@ -1,14 +1,25 @@
 name: LoquaInteractable
 main: net.punchtree.loquainteractable.LoquaInteractablePlugin
-version: 1.2.1
+version: 1.2.1.1
 api-version: 1.21
 author: Cxom
-depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, Citizens, QualityArmory]
+depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, LuckPerms, Citizens, QualityArmory]
 
 libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:2.1.0
 
 commands:
+
+################## NEW GTA COMMANDS #######################
+## staff commands:
+    staff-mode:
+        permission: loqua.staff
+    unstaff-mode:
+        permission: loqua.staff
+
+
+###########################################################
+
     metadatawand:
         aliases: [mw]
         permission: loquainteractable.metadatawand
@@ -57,6 +68,8 @@ commands:
     instrument:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
+    pdctesting:
+    permtesting:
 
 ## util commands
     cmd:

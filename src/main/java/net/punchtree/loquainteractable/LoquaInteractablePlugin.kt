@@ -2,6 +2,8 @@ package net.punchtree.loquainteractable
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
+import net.punchtree.loquainteractable._unstable.experimental.PDCTestingCommand
+import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
 import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
@@ -34,10 +36,14 @@ import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager.initializ
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
+import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
 import org.bukkit.Bukkit
+import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
+
+internal const val LOQUA_NAMESPACE = "loqua"
 
 class LoquaInteractablePlugin : JavaPlugin() {
     private var initialized = false
@@ -118,6 +124,13 @@ class LoquaInteractablePlugin : JavaPlugin() {
     }
 
     private fun setCommandExecutors() {
+        // --------------- NEW GTA COMMANDS -----------------
+
+        getCommand("staff-mode")!!.setExecutor(StaffModeCommand)
+        getCommand("unstaff-mode")!!.setExecutor(StaffModeCommand)
+
+        // --------------------------------------------------
+
         getCommand("metadatawand")!!.setExecutor(MetadataWandCommand())
         getCommand("invtest")!!.setExecutor(InventoryMenuTesting())
         getCommand("circlegame")!!.setExecutor(CircleGameTesting())
@@ -175,6 +188,10 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         // instrument test command
         getCommand("instrument")!!.setExecutor(InstrumentTestCommand(playerInputsManager))
+
+        // experimental
+        getCommand("pdctesting")!!.setExecutor(PDCTestingCommand)
+        getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
     }
 
     override fun onDisable() {
@@ -198,5 +215,12 @@ class LoquaInteractablePlugin : JavaPlugin() {
         @JvmStatic
 		val instance: LoquaInteractablePlugin
             get() = getPlugin(LoquaInteractablePlugin::class.java)
+
+        @JvmStatic
+        val world by lazy {
+            requireNotNull(Bukkit.getWorld("GTA_City")) {
+                "GTA_City world not found!!"
+            }
+        }
     }
 }

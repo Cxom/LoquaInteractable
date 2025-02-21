@@ -41,6 +41,7 @@ dependencies {
     compileOnly("net.punchtree:punchtree-util:1.7.0-SNAPSHOT")
     
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
+
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
     compileOnly("net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT") {
         exclude("*", "*")
@@ -66,8 +67,10 @@ tasks {
 	
 	build {
 		dependsOn(reobfJar)
+		dependsOn(shadowJar)
 	}
 	
+
 	compileJava {
 	    options.encoding = Charsets.UTF_8.name()
 	    options.release.set(21)

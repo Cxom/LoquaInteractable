@@ -61,9 +61,9 @@ import java.util.function.Consumer;
 
 public class PlayerDecorator implements Player {
 
-    private final Player player;
+    private final @NotNull Player player;
 
-    public PlayerDecorator(Player player) {
+    public PlayerDecorator(@NotNull Player player) {
         this.player = player;
     }
 
