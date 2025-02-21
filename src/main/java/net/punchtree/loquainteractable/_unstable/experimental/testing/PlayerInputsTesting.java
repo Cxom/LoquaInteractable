@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.commands.testing;
+package net.punchtree.loquainteractable._unstable.experimental.testing;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

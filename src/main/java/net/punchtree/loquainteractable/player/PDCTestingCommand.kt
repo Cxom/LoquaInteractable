@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable._unstable.experimental
+package net.punchtree.loquainteractable.player
 
 import com.jeff_media.morepersistentdatatypes.DataType
 import net.punchtree.loquainteractable.player.LoquaDataKeys.INVENTORY

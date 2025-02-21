@@ -2,15 +2,15 @@ package net.punchtree.loquainteractable
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import net.punchtree.loquainteractable._unstable.experimental.PDCTestingCommand
+import net.punchtree.loquainteractable.player.PDCTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
 import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
-import net.punchtree.loquainteractable.commands.testing.CircleGameTesting
-import net.punchtree.loquainteractable.commands.testing.PlayerInputsTesting
-import net.punchtree.loquainteractable.commands.testing.ToastTesting
+import net.punchtree.loquainteractable._unstable.experimental.testing.CircleGameTesting
+import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInputsTesting
+import net.punchtree.loquainteractable._unstable.experimental.testing.ToastTesting
 import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
 import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener
@@ -40,7 +40,6 @@ import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
 import org.bukkit.Bukkit
-import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
 
 internal const val LOQUA_NAMESPACE = "loqua"

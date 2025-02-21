@@ -3,6 +3,8 @@ plugins {
     `java-library`
     `maven-publish`
     id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT"
+
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 group = "net.punchtree"
@@ -10,6 +12,8 @@ version = "0.0.1-SNAPSHOT"
 description = "LoquaInteractable"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 repositories {
     mavenLocal()
@@ -28,6 +32,7 @@ repositories {
         name = "codemc-repo"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
+    maven { url = uri("https://maven.enginehub.org/repo/") }
 }
 
 val ftpAntTask by configurations.creating
@@ -41,6 +46,10 @@ dependencies {
     compileOnly("net.punchtree:punchtree-util:1.7.0-SNAPSHOT")
     
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
+
+    compileOnly("net.luckperms:api:5.4")
+
+    implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
 
 //    implementation("cloud.commandframework:cloud-paper:1.6.1")
     compileOnly("net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT") {
@@ -64,12 +73,10 @@ kotlin {
 
 
 tasks { 
-	
+
 	build {
-		dependsOn(reobfJar)
 		dependsOn(shadowJar)
 	}
-	
 
 	compileJava {
 	    options.encoding = Charsets.UTF_8.name()
@@ -81,6 +88,7 @@ tasks {
 	}
 
 }
+
 
 val ftpHostUrl: String by project
 val ftpUsername: String by project
@@ -104,7 +112,7 @@ val buildLocal by tasks.registering(Copy::class) {
     group = "build"
     description = "Builds the shaded JAR locally without publishing to the live server."
 
-    from("build/libs/${project.name}-${project.version}.jar")
+    from(tasks.named("shadowJar"))
     into(provider {
         if (localOutputDir?.isNotEmpty() == true) {
             localOutputDir?.let { project.file(it) }
@@ -113,7 +121,7 @@ val buildLocal by tasks.registering(Copy::class) {
             project.file("build/libs")
         }
     })
-    dependsOn("reobfJar")
+    dependsOn("shadowJar")
 }
 
 task("buildAndUpload") {
