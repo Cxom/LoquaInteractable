@@ -13,7 +13,7 @@ class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listene
 
     @EventHandler
     fun onSwapHand(event: PlayerSwapHandItemsEvent) {
-        playerInputsManager.getInputsForPlayer(event.player)?.updateSwapHands(event.player)
+        playerInputsManager[event.player].updateSwapHands(event.player)
 
         // TODO we need to resolve the conflict between routing the swap event to the player inputs
         //  and the ability/fact of the event being cancelled

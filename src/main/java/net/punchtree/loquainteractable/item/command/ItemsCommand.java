@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import net.punchtree.loquainteractable.gui.inventory.Menu;
+import net.punchtree.loquainteractable.ui.inventory.Menu;
 import net.punchtree.loquainteractable.item.CustomItemRegistry;
 
 public class ItemsCommand implements CommandExecutor, TabCompleter {

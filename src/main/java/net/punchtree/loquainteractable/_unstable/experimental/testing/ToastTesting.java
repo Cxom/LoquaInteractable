@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
-import net.punchtree.loquainteractable.gui.hud.advancements.CustomAdvancement;
+import net.punchtree.loquainteractable._unstable.experimental.advancements.CustomAdvancement;
 
 public class ToastTesting implements CommandExecutor {
 

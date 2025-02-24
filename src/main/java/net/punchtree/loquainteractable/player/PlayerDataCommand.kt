@@ -314,7 +314,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
             DataType.SHORT -> text(value.toString()).color(DATA_VALUE_COLOR)
             DataType.LOCATION -> {
                 value as Location
-                // TODO minimessage color
+                // TODO minimessage color (USE player::sendRichMessage)
                 text(value.toSimpleString()).color(DATA_VALUE_COLOR)
             }
             DataType.ITEM_STACK -> {

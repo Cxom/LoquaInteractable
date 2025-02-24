@@ -73,6 +73,7 @@ commands:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
     permtesting:
+    uitesting:
 
 ## util commands
     cmd:

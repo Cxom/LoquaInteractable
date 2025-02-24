@@ -5,8 +5,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.punchtree.loquainteractable.gui.hud.CircleGame;
-
 public class CircleGameTesting implements CommandExecutor {
 
 	@Override

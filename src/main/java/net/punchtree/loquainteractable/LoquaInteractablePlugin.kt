@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import net.punchtree.loquainteractable.player.PlayerDataCommand
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
+import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
 import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
@@ -13,8 +14,8 @@ import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInpu
 import net.punchtree.loquainteractable._unstable.experimental.testing.ToastTesting
 import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
-import net.punchtree.loquainteractable.gui.inventory.InventoryMenuListener
-import net.punchtree.loquainteractable.gui.inventory.InventoryMenuTesting
+import net.punchtree.loquainteractable.ui.inventory.InventoryMenuListener
+import net.punchtree.loquainteractable.ui.inventory.InventoryMenuTesting
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
 import net.punchtree.loquainteractable.heist.HeistTestCommand
 import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter
@@ -32,10 +33,8 @@ import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
-import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager.initialize
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
-import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
@@ -45,7 +44,6 @@ import org.bukkit.plugin.java.JavaPlugin
 internal const val LOQUA_NAMESPACE = "loqua"
 
 class LoquaInteractablePlugin : JavaPlugin() {
-    private var initialized = false
 
     private lateinit var protocolManager: ProtocolManager
     private lateinit var playerInputsManager: PlayerInputsManager
@@ -65,8 +63,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         this.customItemRegistry = CustomItemRegistry.load()
 
-        initialize()
-
         garbageCansService = GarbageCansService(this)
         garbageCansService.onEnable()
 
@@ -85,9 +81,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         protocolManager.addPacketListener(vehicleInputPacketAdapter)
         protocolManager.addPacketListener(heldItemInputPacketAdapter)
-    }
-
-    private fun onInitialize() {
     }
 
     private fun registerEvents() {
@@ -184,9 +177,10 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // instrument test command
         getCommand("instrument")!!.setExecutor(InstrumentTestCommand(playerInputsManager))
 
-        // experimental
         getCommand("playerdata")!!.setExecutor(PlayerDataCommand)
+        // experimental
         getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
+        getCommand("uitesting")!!.setExecutor(UiTestingCommand)
     }
 
     override fun onDisable() {

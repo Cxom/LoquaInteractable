@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.gui.hud.advancements;
+package net.punchtree.loquainteractable._unstable.experimental.advancements;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
