@@ -12,19 +12,22 @@ class PlayerInputsManager {
     // Don't make this a weakhashmap without also making the uuid member of PlayerInputs a weakreference
     private val playerInputsMap: MutableMap<UUID, PlayerInputs> = HashMap()
 
-    fun getInputsForPlayer(player: Player): PlayerInputs? {
-        return getInputsForPlayer(player.uniqueId)
+    operator fun get(player: Player): PlayerInputs {
+        return get(player.uniqueId)
     }
 
-    fun getInputsForPlayer(uuid: UUID): PlayerInputs? {
-        return playerInputsMap[uuid]
+    operator fun get(uuid: UUID): PlayerInputs {
+        return checkNotNull(playerInputsMap[uuid]) {
+            val playerName = Bukkit.getOfflinePlayer(uuid).name
+            "Tried fetching PlayerInputs for player [$playerName:${uuid}] and it didn't work! Are they not online?"
+        }
     }
 
-    fun initializeInputsForPlayer(uuid: UUID) {
+    fun initializeInputs(uuid: UUID) {
         playerInputsMap[uuid] = PlayerInputs(uuid)
     }
 
-    fun destroyInputsForPlayer(uuid: UUID) {
+    fun destroyInputs(uuid: UUID) {
         playerInputsMap.remove(uuid)
     }
 

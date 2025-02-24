@@ -28,7 +28,6 @@ class SteerVehicleInputPacketAdapter(
 
         val player = packetEvent.player
 
-        val playerInputs = playerInputsManager.getInputsForPlayer(player)
-        playerInputs?.updateVehicleInput(player, input)
+        playerInputsManager[player].updateVehicleInput(player, input)
     }
 }

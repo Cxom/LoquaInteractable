@@ -95,8 +95,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         pluginManager.registerEvents(MessageOfTheDay(), this)
 
-        pluginManager.registerEvents(LoquaPlayerManager, this)
-
         pluginManager.registerEvents(ArmorStandChunkLoadingReglow(), this)
 
         pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
@@ -110,11 +108,9 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // Just for testing
         pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
 
-
-        // For now, only input processing, may have more concerns later
+        // Player Join/Quit
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
-
 
         // Interactables/Consumables
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)

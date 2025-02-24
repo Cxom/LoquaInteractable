@@ -1,14 +1,12 @@
 package net.punchtree.loquainteractable.player
 
-import net.punchtree.loquainteractable.player.LoquaPlayerManager.get
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
 import java.util.*
 
-object LoquaPlayerManager : Listener {
+// TODO dependency inject? it'd be nice to do it with a proper framework
+//  ...It'd also be nice to test such that I actually need to avoid using singletons...
+object LoquaPlayerManager {
 
     /**
      * Player objects needed to be created when a player joins
@@ -18,16 +16,12 @@ object LoquaPlayerManager : Listener {
     private val playersToLoquaPlayers = mutableMapOf<UUID, LoquaPlayer>()
 
     // TODO HANDLE JOIN AND LEAVING IN EXACTLY ONE PLACE - as a readable entrypoint
-    @EventHandler
-    fun onJoin(event: PlayerJoinEvent) {
-        val player = event.player
+    internal fun initializePlayer(player: Player) {
         val loquaPlayer = LoquaPlayer(player)
         playersToLoquaPlayers[player.uniqueId] = loquaPlayer
     }
 
-    @EventHandler
-    fun onLeave(event: org.bukkit.event.player.PlayerQuitEvent) {
-        val player = event.player
+    internal fun destroyPlayer(player: Player) {
         playersToLoquaPlayers.remove(player.uniqueId)
     }
 

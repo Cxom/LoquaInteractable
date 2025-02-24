@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.PacketEvent
 import org.bukkit.plugin.Plugin
 
 class ChangeHeldItemInputPacketAdapter(
-    plugin: Plugin?,
+    plugin: Plugin,
     private val playerInputsManager: PlayerInputsManager
 ) : PacketAdapter(
     plugin, ListenerPriority.LOWEST, *arrayOf(
@@ -20,7 +20,6 @@ class ChangeHeldItemInputPacketAdapter(
         val newSlot = packetContainer.integers.readSafely(0)
         val player = packetEvent.player
 
-        val playerInputs = playerInputsManager.getInputsForPlayer(player)
-        playerInputs?.updateHeldItemSlot(player, newSlot)
+        playerInputsManager[player].updateHeldItemSlot(player, newSlot)
     }
 }

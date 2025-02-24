@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor.GREEN
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsManager
+import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -64,7 +65,7 @@ class InstrumentTestCommand(
 
     private fun startPlayingInstrument(player: Player, instrument: Instruments.Instrument) {
         // TODO maybe move lifecycle management of InstrumentPlayer classes exclusively to InstrumentManager
-        val playerInputs = checkNotNull(playerInputsManager.getInputsForPlayer(player))
+        val playerInputs = playerInputsManager[player]
         val instrumentPlayer = InstrumentPlayer(player, instrument, playerInputs)
         InstrumentManager.startPlayerPlaying(player, instrumentPlayer)
     }
@@ -75,8 +76,8 @@ class InstrumentTestCommand(
         val somethingToRide = player.world.spawnEntity(player.location, EntityType.ITEM_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM) {
             it as ItemDisplay
             it.setItemStack(ItemStack(Material.SCAFFOLDING))
-            it.interpolationDuration = 1
-            it.teleportDuration = 1
+            it.interpolationDuration = DebugVars.getInteger("loquainteractable.bimt.interpolation-duration", 0)
+            it.teleportDuration = DebugVars.getInteger("loquainteractable.bimt.teleport-duration", 0)
             it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.instance, "acoustic_guitar"))
         }
         player.spectatorTarget = somethingToRide
@@ -90,7 +91,7 @@ class InstrumentTestCommand(
                     return
                 }
 
-                val playerInputs = playerInputsManager.getInputsForPlayer(player)!!
+                val playerInputs = playerInputsManager[player]
                 val sidewaysAxisComponent = buildSidewaysAxisComponent(playerInputs)
                 val forwardBackwardAxisComponent = buildForwardBackwardAxisComponent(playerInputs)
                 val sneakComponent = text("Sh ").color(if (playerInputs.shift) GREEN else GRAY)
@@ -119,7 +120,9 @@ class InstrumentTestCommand(
                 somethingToRide.teleport(somethingToRide.location.also {
                     it.yaw = (counter * 2).toFloat()
                     it.pitch = counter.toFloat()
-                }, TeleportFlag.Relative.VELOCITY_ROTATION, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z)
+                }
+                    , TeleportFlag.Relative.VELOCITY_ROTATION, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z
+                )
 
                 counter++
             }

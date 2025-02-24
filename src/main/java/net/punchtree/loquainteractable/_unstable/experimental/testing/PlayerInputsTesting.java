@@ -20,7 +20,8 @@ public class PlayerInputsTesting implements CommandExecutor {
 				
 //		if ( ! ( sender instanceof Player )) return true;
 //		Player player = (Player) sender;
-		
+
+		// TODO adapt this to loqua player manager?
 		if ( "verifyplayerinputsmap".equalsIgnoreCase(label) ) {
 			boolean verified = playerInputsManager.verifyAllPlayersAreOnline();
 			sender.sendMessage("All players are online: " + verified);

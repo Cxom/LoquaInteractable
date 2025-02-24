@@ -1,9 +1,11 @@
 package net.punchtree.loquainteractable.player
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
+import net.punchtree.loquainteractable.input.PlayerInputs
 import org.bukkit.entity.Player
 
 class LoquaPlayer(player: Player) : PlayerDecorator(player) {
+
     fun saveInventory() {
         persistentDataContainer.set(
             LoquaDataKeys.INVENTORY,

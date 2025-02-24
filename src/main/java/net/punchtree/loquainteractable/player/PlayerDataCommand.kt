@@ -334,6 +334,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
     }
 
     // TODO move/organize into single location for pretty-printing utils
+    //  -- See: PrintingObjectUtils <- unify with that
     internal fun Location.toSimpleString(decimalPrecision: Int = 2): String {
         /** constrained decimal precision */
         val cdp = decimalPrecision.coerceIn(0, 10)
