@@ -2,7 +2,7 @@ package net.punchtree.loquainteractable
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import net.punchtree.loquainteractable.player.PDCTestingCommand
+import net.punchtree.loquainteractable.player.PlayerDataCommand
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
 import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
@@ -189,7 +189,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         getCommand("instrument")!!.setExecutor(InstrumentTestCommand(playerInputsManager))
 
         // experimental
-        getCommand("pdctesting")!!.setExecutor(PDCTestingCommand)
+        getCommand("playerdata")!!.setExecutor(PlayerDataCommand)
         getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
     }
 

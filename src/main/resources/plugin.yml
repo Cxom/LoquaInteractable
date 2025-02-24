@@ -17,6 +17,10 @@ commands:
     unstaff-mode:
         permission: loqua.staff
 
+    playerdata:
+        aliases: [pdata]
+        permission: loqua.staff.administrator
+
 
 ###########################################################
 
@@ -68,7 +72,6 @@ commands:
     instrument:
         permission: loquainteractable.commands.test
         permission-message: You do not have permission to use this command!
-    pdctesting:
     permtesting:
 
 ## util commands
