@@ -9,3 +9,26 @@ dependency-reduced-pom.xml
 .classpath
 .project
 .settings/*
+
+# Ignore .idea directory and its contents
+.idea/*
+
+# Track useful files
+!.idea/*.iml
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/vcs.xml
+!.idea/.name
+!.idea/gradle.xml
+
+# Ignore files that are specific to local environments
+.idea/.gitignore
+.idea/compiler.xml
+.idea/kotlinc.xml
+.idea/jarRepositories.xml
+.idea/uiDesigner.xml
+.idea/workspace.xml
+.idea/shelf/
+.idea/libraries/
+.idea/deployment/
+.idea/dictionaries/
