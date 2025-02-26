@@ -20,6 +20,9 @@ class ChangeHeldItemInputPacketAdapter(
         val newSlot = packetContainer.integers.readSafely(0)
         val player = packetEvent.player
 
-        playerInputsManager[player].updateHeldItemSlot(player, newSlot)
+        // TODO this is only necessary because a packet is received immediately upon connection before the playerjoinevent
+        //  maybe there's a better way to avoid this case than null check
+        //  maybe login event?
+        playerInputsManager.getSafe(player.uniqueId)?.updateHeldItemSlot(player, newSlot)
     }
 }

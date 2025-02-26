@@ -23,6 +23,10 @@ class PlayerInputsManager {
         }
     }
 
+    fun getSafe(uuid: UUID): PlayerInputs? {
+        return playerInputsMap[uuid]
+    }
+
     fun initializeInputs(uuid: UUID) {
         playerInputsMap[uuid] = PlayerInputs(uuid)
     }

@@ -9,25 +9,26 @@ import java.time.Duration
 
 data object Fade {
 
+    // TODO using special characters in titles doesn't work with HUD disabled - look into textdisplays for that
+
     fun blackOut(player: Player) {
         fadeOut(player, 0)
     }
 
-    fun fadeOut(player: Player, fadeOutTime: Int) {
+    fun fadeOut(player: Player, fadeOutMillis: Long) {
         player.showTitle(
             Title.title(
                 SpecialCharacters.DARK,
                 Component.empty(),
-                Title.Times.times(Duration.ofMillis(fadeOutTime * 50L), Duration.ofDays(1), Duration.ZERO)))
+                Title.Times.times(Duration.ofMillis(fadeOutMillis), Duration.ofDays(1), Duration.ZERO)))
     }
 
-    fun fadeIn(player: Player, fadeInTime: Int) {
-        val fadeInTime = DebugVars.getInteger("ui-fade-in-time", 5)
+    fun fadeIn(player: Player, fadeInMillis: Long) {
         player.showTitle(
             Title.title(
                 SpecialCharacters.DARK,
                 Component.empty(),
-                Title.Times.times(Duration.ZERO, Duration.ZERO, Duration.ofMillis(fadeInTime * 50L))
+                Title.Times.times(Duration.ZERO, Duration.ZERO, Duration.ofMillis(fadeInMillis))
             )
         )
     }
