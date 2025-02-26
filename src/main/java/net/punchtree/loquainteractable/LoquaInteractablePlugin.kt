@@ -2,7 +2,7 @@ package net.punchtree.loquainteractable
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import net.punchtree.loquainteractable.player.PlayerDataCommand
+import net.punchtree.loquainteractable.data.PdcCommand
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
@@ -181,7 +181,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // instrument test command
         getCommand("instrument")!!.setExecutor(InstrumentTestCommand(playerInputsManager))
 
-        getCommand("playerdata")!!.setExecutor(PlayerDataCommand)
+        getCommand("persistent-data")!!.setExecutor(PdcCommand)
         // experimental
         getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
         getCommand("uitesting")!!.setExecutor(UiTestingCommand)

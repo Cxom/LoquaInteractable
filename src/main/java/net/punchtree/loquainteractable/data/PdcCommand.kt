@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.player
+package net.punchtree.loquainteractable.data
 
 import com.jeff_media.morepersistentdatatypes.DataType
 import net.kyori.adventure.text.Component
@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.punchtree.loquainteractable.LoquaConstants
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
+import net.punchtree.loquainteractable.player.LoquaDataKeys
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -25,7 +26,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 /** Command for operating on the data stored to players' PersistentDataContainers (PDCs) */
-object PlayerDataCommand : CommandExecutor, TabCompleter {
+object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO go through all messaging and make sure it's got consistent styling
 
@@ -99,7 +100,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
 
     private fun get(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 3) {
-            sender.sendMessage("Usage: /playerdata <player> get <namespacedKey>")
+            sender.sendMessage("Usage: /pdc <player> get <namespacedKey>")
             return
         }
         val pdc = pdcHolder.persistentDataContainer
@@ -127,7 +128,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
 
     private fun set(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 4) {
-            sender.sendMessage("Usage: /playerdata <player> set <namespacedKey> <value>")
+            sender.sendMessage("Usage: /pdc <player> set <namespacedKey> <value>")
             return
         }
         val pdc = pdcHolder.persistentDataContainer
@@ -242,7 +243,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
     @Suppress("UnstableApiUsage")
     private fun viewItems(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 3) {
-            sender.sendMessage("Usage: /playerdata <player> view-items <namespacedKey>")
+            sender.sendMessage("Usage: /pdc <player> view-items <namespacedKey>")
             return
         }
         val pdc = pdcHolder.persistentDataContainer
@@ -327,13 +328,15 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
             }
             DataType.ITEM_STACK -> {
                 value as ItemStack
-                text("[${value.type}:${value.amount}]").decorate(TextDecoration.UNDERLINED).hoverEvent(value).color(DATA_VALUE_COLOR)
+                text("[${value.type}:${value.amount}]").decorate(TextDecoration.UNDERLINED).hoverEvent(value).color(
+                    DATA_VALUE_COLOR
+                )
             }
             DataType.ITEM_STACK_ARRAY -> {
                 @Suppress("UNCHECKED_CAST")
                 value as Array<ItemStack>
                 text("ItemStack Array[${value.size}]").decorate(TextDecoration.UNDERLINED).clickEvent(
-                    ClickEvent.suggestCommand("/playerdata $pdcHolderName view-items ${namespacedKey.namespace}:${namespacedKey.key}")
+                    ClickEvent.suggestCommand("/pdc $pdcHolderName view-items ${namespacedKey.namespace}:${namespacedKey.key}")
                 ).color(DATA_VALUE_COLOR)
             }
             // TODO add more types
@@ -352,7 +355,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
     private fun removeData(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         // TODO this is kind of dangerous - should we do something to protect stuff? maybe an undo cache?
         if (args.size < 3) {
-            sender.sendMessage("Usage: /playerdata <player> remove <namespacedKey>")
+            sender.sendMessage("Usage: /pdc <player> remove <namespacedKey>")
             return
         }
         val pdc = pdcHolder.persistentDataContainer

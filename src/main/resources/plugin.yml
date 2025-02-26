@@ -17,8 +17,8 @@ commands:
     unstaff-mode:
         permission: loqua.staff
 
-    playerdata:
-        aliases: [pdata]
+    persistent-data:
+        aliases: [pdc]
         permission: loqua.staff.administrator
 
 
