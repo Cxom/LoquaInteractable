@@ -18,6 +18,7 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MenuType
+import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.persistence.PersistentDataType
 import java.io.Serializable
 import kotlin.math.absoluteValue
@@ -42,20 +43,22 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
 
         if (args.size < 2) return false
 
-        val targetPlayerName = args[0]
-        val targetPlayer = Bukkit.getPlayer(targetPlayerName) ?: run {
-            sender.sendMessage(Messages.PLAYER_NOT_FOUND(targetPlayerName))
+        val pdcHolderName = args[0]
+        val pdcHolder = if (pdcHolderName.lowercase() == "world") {
+            LoquaInteractablePlugin.world
+        } else Bukkit.getPlayerExact(pdcHolderName) ?: run {
+            sender.sendMessage(Messages.PLAYER_NOT_FOUND(pdcHolderName))
             return true
         }
 
         when (val subcommand = args[1].lowercase()) {
-            "keys" -> showKeys(sender, targetPlayer, args)
-            "remove" -> removeData(sender, targetPlayer, args)
-            "view-items" -> viewItems(sender, targetPlayer, args)
-            "get" -> get(sender, targetPlayer, args)
-            "set" -> set(sender, targetPlayer, args)
-            "get-unsafe" -> getUnsafe(sender, targetPlayer, args)
-            "set-unsafe" -> setUnsafe(sender, targetPlayer, args)
+            "keys" -> showKeys(sender, pdcHolder, pdcHolderName, args)
+            "remove" -> removeData(sender, pdcHolder, pdcHolderName, args)
+            "view-items" -> viewItems(sender, pdcHolder, pdcHolderName, args)
+            "get" -> get(sender, pdcHolder, pdcHolderName, args)
+            "set" -> set(sender, pdcHolder, pdcHolderName, args)
+            "get-unsafe" -> getUnsafe(sender, pdcHolder, pdcHolderName, args)
+            "set-unsafe" -> setUnsafe(sender, pdcHolder, pdcHolderName, args)
             else -> sender.sendMessage("Unknown subcommand: $subcommand")
         }
 
@@ -67,11 +70,11 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
     private val PDC_SOURCE_COLOR = LoquaConstants.Colors.LoquaFlagBlue
     private val SUCCESSFUL_MODIFICATION_COLOR = LoquaConstants.Colors.LoquaFlagYellowLight
 
-    private fun showKeys(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun showKeys(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         // TODO paginate
-        val headerMessage = text("«======== ${targetPlayer.name}'s Data ========»").color(PDC_SOURCE_COLOR)
+        val headerMessage = text("«======== ${pdcHolderName}'s Data ========»").color(PDC_SOURCE_COLOR)
         sender.sendMessage(headerMessage)
-        val pdc = targetPlayer.persistentDataContainer
+        val pdc = pdcHolder.persistentDataContainer
         val filteredKeys = pdc.keys.filter {
             return@filter when {
                 args.size >= 3 && it.namespace != args[2] -> false
@@ -86,7 +89,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
             }
             // TODO Create a read-unsafe subcommand and handle attempting to parse non-registry data with a passed in datatype there
             val value = pdc.get(namespacedKey, dataType)
-            val valueComponent = getPdcValueString(value, dataType, namespacedKey, targetPlayer)
+            val valueComponent = getPdcValueString(value, dataType, namespacedKey, pdcHolderName)
             val namespacedKeyComponent = namespacedKeyComponent(namespacedKey)
             sender.sendMessage(namespacedKeyComponent
                 .append(text(" "))
@@ -94,40 +97,40 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
         }
     }
 
-    private fun get(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun get(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 3) {
             sender.sendMessage("Usage: /playerdata <player> get <namespacedKey>")
             return
         }
-        val pdc = targetPlayer.persistentDataContainer
+        val pdc = pdcHolder.persistentDataContainer
         val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
         }
         val dataType = LoquaDataKeys.registry[namespacedKey]?.persistentDataType ?: run {
             if (!pdc.has(namespacedKey)) {
-                sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in ${targetPlayer.name}'s data")
+                sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in ${pdcHolderName}'s data")
             } else {
                 sender.sendMessage(text("Error:").color(NamedTextColor.RED).append(text("NamespacedKey '$namespacedKey' is not in the Loqua registry - use 'get-unsafe' to access it anyway").color(LoquaConstants.Colors.LoquaFlagRedLight)))
             }
             return
         }
         val value = pdc.get(namespacedKey, dataType) ?: run {
-            sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in ${targetPlayer.name}'s data")
+            sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in ${pdcHolderName}'s data")
             return
         }
-        val pdcSourceComponent = pdcSourceComponent(targetPlayer)
+        val pdcSourceComponent = pdcSourceComponent(pdcHolderName)
         val namespacedKeyComponent = namespacedKeyComponent(namespacedKey)
-        val valueComponent = getPdcValueString(value, dataType, namespacedKey, targetPlayer)
+        val valueComponent = getPdcValueString(value, dataType, namespacedKey, pdcHolderName)
         sender.sendMessage(pdcSourceComponent.append(text(" ")).append(namespacedKeyComponent).append(text(" ")).append(valueComponent))
     }
 
-    private fun set(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun set(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 4) {
             sender.sendMessage("Usage: /playerdata <player> set <namespacedKey> <value>")
             return
         }
-        val pdc = targetPlayer.persistentDataContainer
+        val pdc = pdcHolder.persistentDataContainer
         val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
@@ -197,12 +200,12 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
             }
 
             DataType.LOCATION -> {
-                if (!targetPlayer.location.world.equals(LoquaInteractablePlugin.world)) {
-                    sender.sendMessage("Error: '${targetPlayer.location.world.name}' is not the Loqua world")
+                if (!sender.location.world.equals(LoquaInteractablePlugin.world)) {
+                    sender.sendMessage("Error: '${sender.location.world.name}' is not the Loqua world")
                     return
                 }
-                pdc.set(namespacedKey, DataType.LOCATION, targetPlayer.location)
-                targetPlayer.location
+                pdc.set(namespacedKey, DataType.LOCATION, sender.location)
+                sender.location
             }
             else -> {
                 sender.sendMessage("Error: NamespacedKey '$namespacedKey' is not a supported type for setting (${dataType.complexType.simpleName})")
@@ -212,37 +215,37 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
 
         val setDataMessage =
             text("Set ").color(SUCCESSFUL_MODIFICATION_COLOR)
-            .append(pdcSourceComponent(targetPlayer))
+            .append(pdcSourceComponent(pdcHolderName))
             .append(text(" "))
             .append(namespacedKeyComponent(namespacedKey))
             .append(text(" to ").color(SUCCESSFUL_MODIFICATION_COLOR))
-            .append(getPdcValueString(setValue, loquaDataKey.persistentDataType, namespacedKey, targetPlayer))
+            .append(getPdcValueString(setValue, loquaDataKey.persistentDataType, namespacedKey, pdcHolderName))
         sender.sendMessage(setDataMessage)
     }
 
-    private fun pdcSourceComponent(targetPlayer: Player) =
-        text("[${targetPlayer.name}]").color(PDC_SOURCE_COLOR)
+    private fun pdcSourceComponent(pdcHolderName: String) =
+        text("[$pdcHolderName]").color(PDC_SOURCE_COLOR)
 
     private fun namespacedKeyComponent(namespacedKey: NamespacedKey) =
         text(namespacedKey.toString()).color(NAMESPACED_KEY_COLOR).insertion(namespacedKey.toString())
 
-    private fun getUnsafe(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun getUnsafe(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         sender.sendMessage("Sorry, get-unsafe is not implemented yet!")
         // TODO implement get-unsafe
     }
 
-    private fun setUnsafe(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun setUnsafe(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         sender.sendMessage("Sorry, set-unsafe is not implemented yet!")
         // TODO implement set-unsafe
     }
 
     @Suppress("UnstableApiUsage")
-    private fun viewItems(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun viewItems(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         if (args.size < 3) {
             sender.sendMessage("Usage: /playerdata <player> view-items <namespacedKey>")
             return
         }
-        val pdc = targetPlayer.persistentDataContainer
+        val pdc = pdcHolder.persistentDataContainer
         val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
@@ -274,7 +277,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
             else -> MenuType.GENERIC_9X6
         }
         val inventoryView = menuType.builder()
-            .title(text("V:${targetPlayer.name}'s $namespacedKey"))
+            .title(text("V:${pdcHolderName}'s $namespacedKey"))
             .build(sender)
         if (items.size <= 54) {
             for (i in items.indices) {
@@ -299,7 +302,12 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
 //        ((this + divisor - 1) / divisor)
         this.floorDiv(divisor) + this.rem(divisor).sign.absoluteValue
 
-    private fun getPdcValueString(value: Any?, dataType: PersistentDataType<out Serializable, out Any>, namespacedKey: NamespacedKey, targetPlayer: Player): Component {
+    private fun getPdcValueString(
+        value: Any?,
+        dataType: PersistentDataType<out Serializable, out Any>,
+        namespacedKey: NamespacedKey,
+        pdcHolderName: String
+    ): Component {
         if (value == null) {
             return text("null (${dataType.complexType.simpleName})").color(DATA_VALUE_COLOR)
         }
@@ -325,7 +333,7 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
                 @Suppress("UNCHECKED_CAST")
                 value as Array<ItemStack>
                 text("ItemStack Array[${value.size}]").decorate(TextDecoration.UNDERLINED).clickEvent(
-                    ClickEvent.suggestCommand("/playerdata ${targetPlayer.name} view-items ${namespacedKey.namespace}:${namespacedKey.key}")
+                    ClickEvent.suggestCommand("/playerdata $pdcHolderName view-items ${namespacedKey.namespace}:${namespacedKey.key}")
                 ).color(DATA_VALUE_COLOR)
             }
             // TODO add more types
@@ -341,19 +349,19 @@ object PlayerDataCommand : CommandExecutor, TabCompleter {
         return "[x:%.${cdp}f y:%.${cdp}f z:%.${cdp}f yaw:%.${cdp}f pitch:%.${cdp}f]".format(x, y, z, yaw, pitch)
     }
 
-    private fun removeData(sender: Player, targetPlayer: Player, args: Array<out String>) {
+    private fun removeData(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         // TODO this is kind of dangerous - should we do something to protect stuff? maybe an undo cache?
         if (args.size < 3) {
             sender.sendMessage("Usage: /playerdata <player> remove <namespacedKey>")
             return
         }
-        val pdc = targetPlayer.persistentDataContainer
+        val pdc = pdcHolder.persistentDataContainer
         val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
         }
         pdc.remove(namespacedKey)
-        sender.sendMessage("Removed $namespacedKey from ${targetPlayer.name}'s PDC")
+        sender.sendMessage("Removed $namespacedKey from ${pdcHolderName}'s PDC")
     }
 
     // TODO implement a way to set a player inventory based on a stored inventory, if it proves useful
