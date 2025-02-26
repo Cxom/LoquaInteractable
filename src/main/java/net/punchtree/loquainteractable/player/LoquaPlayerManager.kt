@@ -16,9 +16,10 @@ object LoquaPlayerManager {
     private val playersToLoquaPlayers = mutableMapOf<UUID, LoquaPlayer>()
 
     // TODO HANDLE JOIN AND LEAVING IN EXACTLY ONE PLACE - as a readable entrypoint
-    internal fun initializePlayer(player: Player) {
+    internal fun initializePlayer(player: Player): LoquaPlayer {
         val loquaPlayer = LoquaPlayer(player)
         playersToLoquaPlayers[player.uniqueId] = loquaPlayer
+        return loquaPlayer
     }
 
     internal fun destroyPlayer(player: Player) {

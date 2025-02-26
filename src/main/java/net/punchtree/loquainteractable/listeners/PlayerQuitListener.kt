@@ -9,6 +9,9 @@ import org.bukkit.event.player.PlayerQuitEvent
 class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
+        val loquaPlayer = LoquaPlayerManager[event.player]
+        loquaPlayer.saveInventoryIfNotOutOfBody()
+
         playerInputsManager.destroyInputs(event.player.uniqueId)
         LoquaPlayerManager.destroyPlayer(event.player)
     }

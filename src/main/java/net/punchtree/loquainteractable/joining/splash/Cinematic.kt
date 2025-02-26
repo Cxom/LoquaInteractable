@@ -256,6 +256,7 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
         }
 
         fun startCinematic(player: Player, cameraTracks: List<CameraTrack>) {
+            activeCinematics.remove(player)?.destroy()
             activeCinematics[player] = Cinematic(player, cameraTracks)
         }
     }

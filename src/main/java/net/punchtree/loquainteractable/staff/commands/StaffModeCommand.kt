@@ -23,8 +23,6 @@ object StaffModeCommand : CommandExecutor {
      *  - Player mode inventory contents - save persistently to player data
      */
 
-    private const val LOQUA_STAFF_PERMISSION = "loqua.staff"
-
     data object Messages {
         // staff mode messages
         val ALREADY_IN_STAFF_MODE = text("You are already in staff mode.").color(RED)
@@ -41,7 +39,7 @@ object StaffModeCommand : CommandExecutor {
         if ( sender !is Player ) return false
         val loquaPlayer = LoquaPlayerManager[sender]
 
-        if (!loquaPlayer.hasPermission(LOQUA_STAFF_PERMISSION)) return true
+        if (!loquaPlayer.isStaffMember()) return true
 
         if (label.equals("staff-mode", true)) {
             enterStaffMode(loquaPlayer, args)
@@ -53,7 +51,7 @@ object StaffModeCommand : CommandExecutor {
     }
 
     private fun enterStaffMode(loquaPlayer: LoquaPlayer, args: Array<out String>) {
-        if (isInStaffMode(loquaPlayer)) {
+        if (loquaPlayer.isInStaffMode()) {
             loquaPlayer.sendMessage(Messages.ALREADY_IN_STAFF_MODE)
             return
         }
@@ -95,7 +93,7 @@ object StaffModeCommand : CommandExecutor {
 
     // TODO probably want to save the staff mode inventory too
     private fun exitStaffMode(staffMember: LoquaPlayer) {
-        if (!isInStaffMode(staffMember)) {
+        if (!staffMember.isInStaffMode()) {
             staffMember.sendMessage(Messages.ALREADY_NOT_IN_STAFF_MODE)
             return
         }
@@ -174,36 +172,13 @@ object StaffModeCommand : CommandExecutor {
         return args.isEmpty() || args[0].lowercase() != "confirm"
     }
 
-    enum class StaffRole {
-
-        ADMINISTRATOR,
-        // WHILE INDEV ON BUILD SERVER - REPLACE WITH REAL STAFF ROLES IN PRODUCTION
-        ARCHITECT,
-        BUILDER,
-        EXPLORER;
-
-        companion object {
-            fun getRoleFor(loquaPlayer: LoquaPlayer): StaffRole =
-                when {
-                    loquaPlayer.hasPermission("$LOQUA_STAFF_PERMISSION.explorer") -> EXPLORER
-                    loquaPlayer.hasPermission("$LOQUA_STAFF_PERMISSION.builder") -> BUILDER
-                    loquaPlayer.hasPermission("$LOQUA_STAFF_PERMISSION.architect") -> ARCHITECT
-                    loquaPlayer.hasPermission("$LOQUA_STAFF_PERMISSION.administrator") -> ADMINISTRATOR
-                    else -> throw IllegalStateException("Staff member ${loquaPlayer.name} has no staff role!")
-                }
-        }
-        fun getPermissionGroup(): LuckPermsNode {
-            return LuckPermsNode.builder("loqua.staff.${name.lowercase()}").build()
-        }
-    }
-
     private fun giveStaffPermissions(loquaPlayer: LoquaPlayer) {
         // The idea for this is that each staff member has a permission custom assigned to this that follows the pattern:
         // loqua.staff.<STAFF_ROLE>
         // When we give them staff permissions, we check for any such permission
         // and then give them the corresponding *group* permission group.<STAFF_ROLE>
         // inverse to remove
-        val staffRole = StaffRole.getRoleFor(loquaPlayer)
+        val staffRole = LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)
 
         val permsApi = LuckPermsProvider.get()
         val user = permsApi.getPlayerAdapter(Player::class.java).getUser(loquaPlayer)
@@ -215,7 +190,7 @@ object StaffModeCommand : CommandExecutor {
         val permsApi = LuckPermsProvider.get()
         val user = permsApi.getPlayerAdapter(Player::class.java).getUser(loquaPlayer)
 
-        val staffRole = StaffRole.getRoleFor(loquaPlayer)
+        val staffRole = LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)
         user.data().remove(staffRole.getPermissionGroup())
     }
 
@@ -226,15 +201,5 @@ object StaffModeCommand : CommandExecutor {
     private fun isInCombat(staffMember: LoquaPlayer): Boolean {
         return false
         TODO("Not yet implemented")
-    }
-
-    // TODO make this a method on LoquaPlayer
-    private fun isInStaffMode(staffMember: LoquaPlayer): Boolean {
-        return staffMember.persistentDataContainer.get(LoquaDataKeys.IS_IN_STAFF_MODE)?.let {
-            if (!it) {
-                staffMember.persistentDataContainer.remove(LoquaDataKeys.IS_IN_STAFF_MODE)
-            }
-            it
-        } ?: false
     }
 }

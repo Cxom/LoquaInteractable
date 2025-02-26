@@ -27,7 +27,8 @@ import net.punchtree.loquainteractable.instruments.InstrumentTestCommand
 import net.punchtree.loquainteractable.item.CustomItemRegistry
 import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
-import net.punchtree.loquainteractable.listeners.PlayerJoinListener
+import net.punchtree.loquainteractable.joining.PlayerJoinListener
+import net.punchtree.loquainteractable.joining.SplashScreenManager
 import net.punchtree.loquainteractable.listeners.PlayerQuitListener
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand
@@ -47,6 +48,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
     private lateinit var protocolManager: ProtocolManager
     private lateinit var playerInputsManager: PlayerInputsManager
+    private lateinit var splashScreenManager: SplashScreenManager
     private lateinit var vehicleInputPacketAdapter: SteerVehicleInputPacketAdapter
     private lateinit var heldItemInputPacketAdapter: ChangeHeldItemInputPacketAdapter
     lateinit var customItemRegistry: CustomItemRegistry
@@ -59,6 +61,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         this.protocolManager = ProtocolLibrary.getProtocolManager()
         this.playerInputsManager = PlayerInputsManager()
+        this.splashScreenManager = SplashScreenManager()
 
 
         this.customItemRegistry = CustomItemRegistry.load()
@@ -102,7 +105,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
 
         // Player Join/Quit
-        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager), this)
+        pluginManager.registerEvents(splashScreenManager, this)
+        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables
