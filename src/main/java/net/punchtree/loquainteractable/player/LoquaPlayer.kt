@@ -1,10 +1,17 @@
 package net.punchtree.loquainteractable.player
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
-import org.bukkit.Bukkit
+import net.punchtree.loquainteractable.data.LoquaDataKeys
+import net.punchtree.loquainteractable.data.get
+import net.punchtree.loquainteractable.data.remove
+import net.punchtree.loquainteractable.data.set
 import org.bukkit.entity.Player
 
 class LoquaPlayer(player: Player) : PlayerDecorator(player) {
+
+    // TODO we have a very strong expectation that there is exactly one LoquaPlayer per CraftPlayer
+    //  it may be a good idea to enforce this in the constructor, or better yet maybe even make the
+    //  constructor private and move the player manager into the same file
 
     internal var isInSplashScreen = false
     private var isInCharacterSelect = false
@@ -15,9 +22,9 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
 
     internal fun isInStaffMode(): Boolean {
         if (!isStaffMember()) return false
-        return persistentDataContainer.get(LoquaDataKeys.IS_IN_STAFF_MODE)?.let { isInStaffMode ->
+        return persistentDataContainer.get(LoquaDataKeys.Player.IS_IN_STAFF_MODE)?.let { isInStaffMode ->
             if (!isInStaffMode) {
-                persistentDataContainer.remove(LoquaDataKeys.IS_IN_STAFF_MODE)
+                persistentDataContainer.remove(LoquaDataKeys.Player.IS_IN_STAFF_MODE)
             }
             isInStaffMode
         } ?: false
@@ -25,14 +32,14 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
 
     fun saveInventory() {
         persistentDataContainer.set(
-            LoquaDataKeys.INVENTORY,
+            LoquaDataKeys.Player.INVENTORY,
             inventory.contents
         )
     }
 
     /** Restores the inventory to the last saved state. */
     fun restoreInventoryToLastSave() {
-        persistentDataContainer.get(LoquaDataKeys.INVENTORY)?.let {
+        persistentDataContainer.get(LoquaDataKeys.Player.INVENTORY)?.let {
             inventory.contents = it
         } ?: LoquaInteractablePlugin.instance.logger.severe("No saved inventory found when trying to restore inventory for $name.")
     }
@@ -50,13 +57,12 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     }
 
     fun saveInventoryIfNotOutOfBody() {
+        LoquaInteractablePlugin.instance.logger.info("${name} staff mode: ${isInStaffMode()} isInSplashScreen: $isInSplashScreen isInCharacterSelect: $isInCharacterSelect isPlaying: ${isPlaying()} isOutOfBody: ${isOutOfBody()}")
         if (!isOutOfBody()) {
             LoquaInteractablePlugin.instance.logger.info("Saving inventory for not-out-of-body player $name")
-            Bukkit.broadcastMessage("Saving inventory for not-out-of-body player $name")
             saveInventory()
         } else {
             LoquaInteractablePlugin.instance.logger.info("Not saving inventory for out-of-body player $name")
-            Bukkit.broadcastMessage("Not saving inventory for out-of-body player $name")
         }
     }
 }

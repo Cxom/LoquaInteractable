@@ -11,6 +11,8 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PositionMoveRotation
 import net.minecraft.world.phys.Vec3
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
+import net.punchtree.loquainteractable.player.LoquaPlayer
+import net.punchtree.loquainteractable.player.craftPlayer
 import net.punchtree.loquainteractable.ui.Fade.blackOut
 import net.punchtree.loquainteractable.ui.Fade.fadeIn
 import net.punchtree.loquainteractable.ui.Fade.fadeOut
@@ -28,7 +30,7 @@ const val ONE_TICK_MILLIS = 50L
 
 const val TEXT_DISPLAY_TEXT_ID = 23
 
-class Cinematic private constructor(val player: Player, private val cameraTracks: List<CameraTrack>) {
+class Cinematic private constructor(val player: CraftPlayer, private val cameraTracks: List<CameraTrack>) {
 
     private val fakeCameraEntityId = Entity.nextEntityId()
 
@@ -61,7 +63,7 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
 
         player.gameMode = GameMode.SPECTATOR
 
-        spawnFakeCameraForPlayer(player, currentKeyframe.location, 0)
+        spawnFakeCamera(currentKeyframe.location, 0)
 
         startTrackToNextKeyframe()
     }
@@ -80,7 +82,7 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
         if (durationTicks == 0) {
             // There is no way to avoid packets potentially being processed on the client out of order, so create a new camera on instant teleport
             // I'm pretty sure the reusing of the entity id prevents this from actually leaving behind old entities on the client, but not sure
-            spawnFakeCameraForPlayer(player, location, 0)
+            spawnFakeCamera(location, 0)
             return
         }
 
@@ -101,11 +103,10 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
         )
 
         val packetBundle = ClientboundBundlePacket(listOf(metadataPacket, teleportPacket))
-        (player as CraftPlayer).handle.connection.send(packetBundle)
+        player.handle.connection.send(packetBundle)
     }
 
-    private fun spawnFakeCameraForPlayer(
-        player: Player,
+    private fun spawnFakeCamera(
         location: Location,
         durationTicks: Int
     ) {
@@ -145,13 +146,15 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
             GameMode.SPECTATOR.value.toFloat()
         )
         // constructor takes an entity but we only have an entityId, so we need reflection - ignore the passing of the player to the constructor
-        val spectateTheCameraPacket = ClientboundSetCameraPacket((player as CraftPlayer).handle)
+        val spectateTheCameraPacket = ClientboundSetCameraPacket(player.handle)
         val cameraIdField = ClientboundSetCameraPacket::class.java.getDeclaredField("cameraId")
         cameraIdField.isAccessible = true
         cameraIdField.setInt(spectateTheCameraPacket, fakeCameraEntityId)
 
         val packetBundle =
             ClientboundBundlePacket(listOf(addPacket, metadataPacket, gameModeChangePacket, spectateTheCameraPacket))
+
+        // TODO extensions for packets
         player.handle.connection.send(packetBundle)
     }
 
@@ -219,7 +222,6 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
     }
 
     private fun destroy() {
-        player as CraftPlayer
         player.handle.connection.send(ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, player.gameMode.value.toFloat()))
         player.handle.connection.send(ClientboundSetCameraPacket(player.handle))
         player.handle.connection.send(ClientboundRemoveEntitiesPacket(fakeCameraEntityId))
@@ -231,7 +233,7 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
         private lateinit var cinematicTick: BukkitTask
 
         private val activeCinematics by lazy {
-            mutableMapOf<Player, Cinematic>().also { activeCinematics ->
+            mutableMapOf<CraftPlayer, Cinematic>().also { activeCinematics ->
                 cinematicTick = object : BukkitRunnable() {
                     override fun run() {
                         val iterator = activeCinematics.iterator()
@@ -252,12 +254,12 @@ class Cinematic private constructor(val player: Player, private val cameraTracks
         }
 
         fun stopCinematic(player: Player) {
-            activeCinematics.remove(player)?.destroy()
+            activeCinematics.remove(player.craftPlayer())?.destroy()
         }
 
         fun startCinematic(player: Player, cameraTracks: List<CameraTrack>) {
-            activeCinematics.remove(player)?.destroy()
-            activeCinematics[player] = Cinematic(player, cameraTracks)
+            activeCinematics.remove(player.player)?.destroy()
+            activeCinematics[player.craftPlayer()] = Cinematic(player.craftPlayer(), cameraTracks)
         }
     }
 

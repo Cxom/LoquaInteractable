@@ -5,7 +5,10 @@ import net.kyori.adventure.text.format.NamedTextColor.*
 import net.luckperms.api.LuckPermsProvider
 import net.punchtree.loquainteractable.housing.Housings
 import net.punchtree.loquainteractable.player.*
-import net.punchtree.loquainteractable.player.LoquaDataKeys
+import net.punchtree.loquainteractable.data.LoquaDataKeys
+import net.punchtree.loquainteractable.data.get
+import net.punchtree.loquainteractable.data.remove
+import net.punchtree.loquainteractable.data.set
 import org.bukkit.GameMode
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -74,7 +77,7 @@ object StaffModeCommand : CommandExecutor {
         // TODO make spectator in production
         loquaPlayer.gameMode = GameMode.CREATIVE
 
-        loquaPlayer.persistentDataContainer.set(LoquaDataKeys.IS_IN_STAFF_MODE, true)
+        loquaPlayer.persistentDataContainer.set(LoquaDataKeys.Player.IS_IN_STAFF_MODE, true)
 
         // gives them their staff permission group as parent
         giveStaffPermissions(loquaPlayer)
@@ -111,9 +114,9 @@ object StaffModeCommand : CommandExecutor {
         // if we want total guarding against staff abuse (I believe it's a good practice, generally) we could clear this value periodically
         // TODO it's a cool idea to create a timestamped generic datatype that wraps others and includes a timestamp - useful generally
         // TODO move this to ::restorePlayModeState
-        staffMember.persistentDataContainer.get(LoquaDataKeys.STAFF_LAST_PLAY_MODE_LOCATION)?.let {
+        staffMember.persistentDataContainer.get(LoquaDataKeys.Player.STAFF_LAST_PLAY_MODE_LOCATION)?.let {
             staffMember.teleport(it)
-            staffMember.persistentDataContainer.remove(LoquaDataKeys.STAFF_LAST_PLAY_MODE_LOCATION)
+            staffMember.persistentDataContainer.remove(LoquaDataKeys.Player.STAFF_LAST_PLAY_MODE_LOCATION)
         } ?: run {
             // TODO generalize this to a proper spawn-in on join system
             staffMember.teleport(Housings.DEFAULT_HOUSING_SPAWN)
@@ -123,7 +126,7 @@ object StaffModeCommand : CommandExecutor {
         restorePlayModeState(staffMember)
 
         // remove the staff mode state
-        staffMember.persistentDataContainer.remove(LoquaDataKeys.IS_IN_STAFF_MODE)
+        staffMember.persistentDataContainer.remove(LoquaDataKeys.Player.IS_IN_STAFF_MODE)
 
         // message them
         staffMember.sendMessage(Messages.NOW_EXITED_STAFF_MODE)
@@ -131,13 +134,13 @@ object StaffModeCommand : CommandExecutor {
 
     private fun saveStaffModeInventory(staffMember: LoquaPlayer) {
         staffMember.persistentDataContainer.set(
-            LoquaDataKeys.STAFF_MODE_INVENTORY,
+            LoquaDataKeys.Player.STAFF_MODE_INVENTORY,
             staffMember.inventory.contents
         )
     }
 
     private fun restoreStaffModeInventory(staffMember: LoquaPlayer) {
-        staffMember.persistentDataContainer.get(LoquaDataKeys.STAFF_MODE_INVENTORY)?.let {
+        staffMember.persistentDataContainer.get(LoquaDataKeys.Player.STAFF_MODE_INVENTORY)?.let {
             staffMember.inventory.contents = it
         }
     }
@@ -165,7 +168,7 @@ object StaffModeCommand : CommandExecutor {
     }
 
     private fun saveStaffLastPlayModeLocation(staffMember: LoquaPlayer) {
-        staffMember.persistentDataContainer.set(LoquaDataKeys.STAFF_LAST_PLAY_MODE_LOCATION, staffMember.location)
+        staffMember.persistentDataContainer.set(LoquaDataKeys.Player.STAFF_LAST_PLAY_MODE_LOCATION, staffMember.location)
     }
 
     private fun isWithoutConfirmation(args: Array<out String>): Boolean {

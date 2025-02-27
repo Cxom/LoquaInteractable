@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.punchtree.loquainteractable.LoquaConstants
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
-import net.punchtree.loquainteractable.player.LoquaDataKeys
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -29,6 +28,7 @@ import kotlin.math.sign
 object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO go through all messaging and make sure it's got consistent styling
+    // TODO make sure keys are case-insensitive by forcing all input to be lowercase
 
     /** Certain third-party namespaces are data we're not interested in */
     private val defaultFilters = setOf("axiom")
@@ -45,9 +45,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
         if (args.size < 2) return false
 
         val pdcHolderName = args[0]
-        val pdcHolder = if (pdcHolderName.lowercase() == "world") {
-            LoquaInteractablePlugin.world
-        } else Bukkit.getPlayerExact(pdcHolderName) ?: run {
+        val pdcHolder = getPdcHolderFromName(pdcHolderName) ?: run {
             sender.sendMessage(Messages.PLAYER_NOT_FOUND(pdcHolderName))
             return true
         }
@@ -64,6 +62,12 @@ object PdcCommand : CommandExecutor, TabCompleter {
         }
 
         return true;
+    }
+
+    private fun getPdcHolderFromName(pdcHolderName: String) : PersistentDataHolder? {
+        return if (pdcHolderName.lowercase() == "world") {
+            LoquaInteractablePlugin.world
+        } else Bukkit.getPlayerExact(pdcHolderName)
     }
 
     private val DATA_VALUE_COLOR = LoquaConstants.Colors.LoquaFlagYellow
@@ -84,7 +88,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             }
         }
         filteredKeys.forEach { namespacedKey ->
-            val dataType = LoquaDataKeys.registry[namespacedKey]?.persistentDataType ?: run {
+            val dataType = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]?.persistentDataType ?: run {
                 sender.sendMessage(text("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry - not trying to display").color(LoquaConstants.Colors.LoquaFlagWhite))
                 return@forEach
             }
@@ -108,7 +112,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
         }
-        val dataType = LoquaDataKeys.registry[namespacedKey]?.persistentDataType ?: run {
+        val dataType = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]?.persistentDataType ?: run {
             if (!pdc.has(namespacedKey)) {
                 sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in ${pdcHolderName}'s data")
             } else {
@@ -136,7 +140,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             sender.sendMessage("Invalid namespacedKey '${args[2]}'")
             return
         }
-        val loquaDataKey = LoquaDataKeys.registry[namespacedKey] ?: run {
+        val loquaDataKey = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey] ?: run {
             sender.sendMessage("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry - use 'set-unsafe' to access it anyway")
             return
         }
@@ -205,8 +209,20 @@ object PdcCommand : CommandExecutor, TabCompleter {
                     sender.sendMessage("Error: '${sender.location.world.name}' is not the Loqua world")
                     return
                 }
-                pdc.set(namespacedKey, DataType.LOCATION, sender.location)
-                sender.location
+                when {
+                    args[3] == "eye" -> {
+                        pdc.set(namespacedKey, DataType.LOCATION, sender.eyeLocation)
+                        sender.eyeLocation
+                    }
+                    args[3] == "feet" -> {
+                        pdc.set(namespacedKey, DataType.LOCATION, sender.location)
+                        sender.location
+                    }
+                    else -> {
+                        sender.sendMessage("Error: '${args[3]}' is not 'eye' or 'feet'")
+                        return
+                    }
+                }
             }
             else -> {
                 sender.sendMessage("Error: NamespacedKey '$namespacedKey' is not a supported type for setting (${dataType.complexType.simpleName})")
@@ -256,10 +272,10 @@ object PdcCommand : CommandExecutor, TabCompleter {
                 sender.sendMessage("Error: NamespacedKey '$namespacedKey' not found in PDC")
                 return
             }
-            LoquaDataKeys.registry[namespacedKey] == null -> {
+            LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey] == null -> {
                 sender.sendMessage("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry")
             }
-            LoquaDataKeys.registry[namespacedKey]!!.persistentDataType != DataType.ITEM_STACK_ARRAY -> {
+            LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]!!.persistentDataType != DataType.ITEM_STACK_ARRAY -> {
                 sender.sendMessage("Error: NamespacedKey '$namespacedKey' is not an ItemStack array! This won't work. If you are confident that the underlying data is not the type defined in the registry of Loqua Data Keys, rename or remove the data!")
                 return
             }
@@ -303,9 +319,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
 //        ((this + divisor - 1) / divisor)
         this.floorDiv(divisor) + this.rem(divisor).sign.absoluteValue
 
-    private fun getPdcValueString(
-        value: Any?,
-        dataType: PersistentDataType<out Serializable, out Any>,
+    private fun <P, C> getPdcValueString(
+        value: C?,
+        dataType: PersistentDataType<out P, out C>,
         namespacedKey: NamespacedKey,
         pdcHolderName: String
     ): Component {
@@ -370,26 +386,58 @@ object PdcCommand : CommandExecutor, TabCompleter {
     // TODO implement a way to set a player inventory based on a stored inventory, if it proves useful
 
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String>? {
-        return when {
-            args.size == 1 -> Bukkit.matchPlayer(args[0]).map { it.name }.toMutableList().also {
-                if (args[0].isEmpty()) it.add("<targetPlayer>")
-            }
-            args.size == 2 -> mutableListOf("keys", "remove", "view-items", "get", "set", "get-unsafe", "set-unsafe").also {
+        if (args.isEmpty()) return null
+        if (args.size == 1) {
+            return Bukkit.matchPlayer(args[0])
+                .map { it.name }
+                .toMutableList()
+                .also {
+                    it.add("world")
+                    if (args[0].isEmpty()) it.add("<pdcHolder>")
+                }
+        }
+        val pdcHolder = getPdcHolderFromName(args[0]) ?: return listOf("INVALID PDC HOLDER!")
+        if (args.size == 2) {
+            return mutableListOf("keys", "remove", "view-items", "get", "set", "get-unsafe", "set-unsafe").also {
                 if (args[1].isEmpty()) it.add("<subcommand>")
             }
-            args.size == 3 -> when (val subcommand = args[1].lowercase()) {
-                "keys" -> mutableListOf("loqua", "minecraft").also {
-                    if (args[2].isEmpty()) it.add("[filter (namespace:key)]")
-                }
-                "view-items", "get", "set", "get-unsafe", "set-unsafe", "remove"
-                    -> mutableListOf("loqua", "minecraft").also {
-                    if (args[2].isEmpty()) it.add("<namespace:key>")
-                }
-                else -> emptyList()
-            }
-            // TODO namespacedKey tabcompletion based on actual data on the player
-            else -> mutableListOf()
         }
+
+        val loquaDataKeysRegistry = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)
+        if (args.size == 3) {
+            val subcommand = args[1].lowercase()
+            val keysOnPdcHolder = pdcHolder.persistentDataContainer.keys
+            return when (subcommand) {
+                "keys" -> {
+                    mutableListOf("loqua", "minecraft").also {
+                        if (args[2].isEmpty()) it.add("[filter (namespace:key)]")
+                    }
+                }
+
+                "view-items", "get", "set", "get-unsafe", "set-unsafe", "remove"
+                -> {
+                    val allKeys = (keysOnPdcHolder + loquaDataKeysRegistry.keys)
+                        .filter { !defaultFilters.contains(it.namespace) }
+                        .map { it.toString() }
+                        .filter { it.contains(args[2]) }
+                        .toMutableList()
+                        .also { if (args[2].isEmpty()) it.add("<namespace:key>") }
+                    return allKeys
+                }
+
+                else -> {
+                    emptyList()
+                }
+            }
+        }
+
+        if (args.size == 4 && args[1].lowercase() == "set" && loquaDataKeysRegistry[NamespacedKey.fromString(args[2])]?.persistentDataType == DataType.LOCATION) {
+            return mutableListOf("eye", "feet").also {
+                if (args[3].isEmpty()) it.add("<eye-or-feet>")
+            }
+        }
+
+        return mutableListOf()
     }
 
 }

@@ -10,6 +10,7 @@ import io.papermc.paper.entity.PlayerGiveResult;
 import io.papermc.paper.entity.TeleportFlag;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
+import me.lucko.spark.paper.lib.protobuf.Any;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
@@ -24,6 +25,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.sign.Side;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
 import org.bukkit.entity.memory.MemoryKey;
@@ -67,6 +69,30 @@ public class PlayerDecorator implements Player {
         this.player = player;
     }
 
+    public CraftPlayer craftPlayer() {
+        if (player instanceof CraftPlayer) {
+            return (CraftPlayer) player;
+        } else if (player instanceof PlayerDecorator) {
+            return ((PlayerDecorator) player).craftPlayer();
+        } else {
+            throw new IllegalStateException("Player is not a CraftPlayer!");
+        }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // Make SURE this is symmetrical
+        if (other == this) return true;
+        if (other instanceof OfflinePlayer) return getUniqueId().equals(((OfflinePlayer) other).getUniqueId());
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return player.hashCode();
+    }
+
+    //region wrapped methods
     @Override
     public @UnmodifiableView @NotNull Iterable<? extends BossBar> activeBossBars() {
         return player.activeBossBars();
@@ -3513,4 +3539,5 @@ public class PlayerDecorator implements Player {
     public <T extends Projectile> @NotNull T launchProjectile(@NotNull Class<? extends T> aClass, @org.jetbrains.annotations.Nullable Vector vector, @org.jetbrains.annotations.Nullable Consumer<? super T> consumer) {
         return player.launchProjectile(aClass, vector, consumer);
     }
+    //endregion
 }
