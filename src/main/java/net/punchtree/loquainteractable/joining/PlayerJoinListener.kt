@@ -27,7 +27,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.bukkit.scheduler.BukkitRunnable
 
 class PlayerJoinListener(
     private val playerInputsManager: PlayerInputsManager,
@@ -79,13 +78,7 @@ class PlayerJoinListener(
         // TODO test if the player remains visible in their log-out location while in the splash screen
         player.gameMode = GameMode.SPECTATOR
 
-
-        if (DebugVars.getBoolean("do-join-after-client-loads-world", false)) {
-            // nothin'
-        } else {
-//            player.sendRichMessage("Doing on join from <red>join</red>!");
-            onJoin(loquaPlayer)
-        }
+        onJoin(loquaPlayer)
 
         // TODO make a convenience method for this
         player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
@@ -107,36 +100,18 @@ class PlayerJoinListener(
         }
 //        Bukkit.broadcastMessage("Player ${player.name} client loaded world event - Timeout: ${event.isTimeout}!")
 
-        if (DebugVars.getBoolean("do-join-after-client-loads-world", false)) {
-            object : BukkitRunnable() {
-                override fun run() {
-                    Fade.fadeIn(player, 3000L)
-                    // Don't need to reset the player's helmet because the cinematic will do that
-//                event.player.inventory.helmet = null
-
-                    onJoin(player)
-                    player.sendRichMessage("Doing on join from <color:#ff5e00>client loaded world</color>!");
-
-                }
-            }.runTaskLater(LoquaInteractablePlugin.instance, DebugVars.getInteger("join-fade-in-delay", 0).toLong())
-        } else {
-            // The cinematic has already started - do the fade in, and then set the helmet
-//            object : BukkitRunnable() {
-//                override fun run() {
-                    Fade.fadeIn(player, 3000L)
-                    // TODO if we go with this method, we will need to make sure that we don't call fadeIn
-                    //  if the cinematic is actively fading out - instead, just wait to remove the helmet
-                    //  until the end of the current track
-                    player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
-                        it.editMeta { meta ->
-                            val equippable = meta.equippable
-                            equippable.slot = EquipmentSlot.HEAD
-                            equippable.cameraOverlay = NamespacedKey("punchtree", "font/special/loqua_splash")
-                            meta.setEquippable(equippable)
-                        }
-                    }
-//                }
-//            }.runTaskLater(LoquaInteractablePlugin.instance, DebugVars.getInteger("join-fade-in-delay", 20).toLong())
+        // The cinematic has already started - do the fade in, and then set the helmet
+        Fade.fadeIn(player, 3000L)
+        // TODO if we go with this method, we will need to make sure that we don't call fadeIn
+        //  if the cinematic is actively fading out - instead, just wait to remove the helmet
+        //  until the end of the current track
+        player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
+            it.editMeta { meta ->
+                val equippable = meta.equippable
+                equippable.slot = EquipmentSlot.HEAD
+                equippable.cameraOverlay = NamespacedKey("punchtree", "font/special/loqua_splash")
+                meta.setEquippable(equippable)
+            }
         }
     }
 
@@ -164,7 +139,7 @@ class PlayerJoinListener(
         require(player.isConnected)
         val loquaPlayer = LoquaPlayerManager[player]
         require(!loquaPlayer.isInStaffMode()) {
-            // Unclear what we would do with their inventory in this case
+            // TODO Unclear what we would do with their inventory in this case
         }
 
         // This WILL reset their inventory if we're not saving it
