@@ -33,6 +33,8 @@ repositories {
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
     maven { url = uri("https://maven.enginehub.org/repo/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 }
 
 val ftpAntTask by configurations.creating
@@ -46,6 +48,7 @@ dependencies {
     compileOnly("net.punchtree:punchtree-util:1.7.0-SNAPSHOT")
     
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
 
     compileOnly("net.luckperms:api:5.4")
 

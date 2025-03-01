@@ -30,6 +30,7 @@ class SplashScreenManager : Listener {
 
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
+    @Suppress("UnstableApiUsage")
     internal fun showSplashScreen(player: LoquaPlayer) {
         require(!splashScreenPlayers.contains(player.uniqueId)) {
             "Player ${player.name} is already in the splash screen!"
@@ -37,7 +38,7 @@ class SplashScreenManager : Listener {
 
         splashScreenPlayers.add(player.uniqueId)
         player.isInSplashScreen = true
-        player.inventory.helmet = ItemStack(Material.BLUE_CONCRETE).also {
+        player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
             it.editMeta { meta ->
                 val equippable = meta.equippable
                 equippable.slot = EquipmentSlot.HEAD

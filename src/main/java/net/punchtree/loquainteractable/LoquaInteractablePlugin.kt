@@ -2,20 +2,20 @@ package net.punchtree.loquainteractable
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import net.punchtree.loquainteractable.data.PdcCommand
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.event.PacketListenerPriority
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
+import net.punchtree.loquainteractable._unstable.experimental.testing.CircleGameTesting
+import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInputsTesting
+import net.punchtree.loquainteractable._unstable.experimental.testing.ToastTesting
 import net.punchtree.loquainteractable.city.garbagecans.GarbageCansService
 import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
-import net.punchtree.loquainteractable._unstable.experimental.testing.CircleGameTesting
-import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInputsTesting
-import net.punchtree.loquainteractable._unstable.experimental.testing.ToastTesting
+import net.punchtree.loquainteractable.data.PdcCommand
 import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
-import net.punchtree.loquainteractable.ui.inventory.InventoryMenuListener
-import net.punchtree.loquainteractable.ui.inventory.InventoryMenuTesting
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
 import net.punchtree.loquainteractable.heist.HeistTestCommand
 import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter
@@ -39,6 +39,8 @@ import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
+import net.punchtree.loquainteractable.ui.inventory.InventoryMenuListener
+import net.punchtree.loquainteractable.ui.inventory.InventoryMenuTesting
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -106,7 +108,9 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
-        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager), this)
+        val playerJoinListener = PlayerJoinListener(playerInputsManager, splashScreenManager)
+        pluginManager.registerEvents(playerJoinListener, this)
+        PacketEvents.getAPI().eventManager.registerListener(playerJoinListener, PacketListenerPriority.MONITOR)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables

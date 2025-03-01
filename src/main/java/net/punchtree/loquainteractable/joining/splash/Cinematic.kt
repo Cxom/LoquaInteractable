@@ -1,24 +1,21 @@
 package net.punchtree.loquainteractable.joining.splash
 
 import io.papermc.paper.adventure.PaperAdventure
-import net.kyori.adventure.text.Component.text
-import net.minecraft.network.protocol.game.*
-import net.minecraft.network.syncher.EntityDataSerializers
-import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.world.entity.Display
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.PositionMoveRotation
-import net.minecraft.world.phys.Vec3
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
-import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.craftPlayer
+import net.punchtree.loquainteractable.ui.Fade
 import net.punchtree.loquainteractable.ui.Fade.blackOut
 import net.punchtree.loquainteractable.ui.Fade.fadeIn
 import net.punchtree.loquainteractable.ui.Fade.fadeOut
 import net.punchtree.util.debugvar.DebugVars
-import org.bukkit.GameMode
 import org.bukkit.Location
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -32,10 +29,18 @@ const val TEXT_DISPLAY_TEXT_ID = 23
 
 class Cinematic private constructor(val player: CraftPlayer, private val cameraTracks: List<CameraTrack>) {
 
+    // TODO maybe make the fading out and in (to/from black) based on a parameter in the camera tracks?
+
     private val fakeCameraEntityId = Entity.nextEntityId()
+    private val fakeAudioListenerEntityId =
+        if (DebugVars.getBoolean("player-is-audio-listener", false))
+            player.handle.id
+        else
+            Entity.nextEntityId()
 
     private val fadeOutTimeMillis = DebugVars.getInteger("cinematic-fade-out-time", 500).toLong()
 
+    // TODO implement a full blackout buffer AFTER time, for chunk loading
     /** How long after a full black out before teleporting the player (adjust to prevent visual hiccups where the teleport is visible) **/
 //    private val fullBlackOutBufferTime = DebugVars.getInteger("cinematic-full-black-out-buffer-time", 50).toLong()
 
@@ -61,12 +66,58 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
 
         blackOut(player)
 
-        player.gameMode = GameMode.SPECTATOR
+        if (!DebugVars.getBoolean("player-is-audio-listener", false)) {
+            spawnFakeAudioListener(fakeAudioListenerEntityId, player, currentKeyframe.location)
+        }
 
-        spawnFakeCamera(currentKeyframe.location, 0)
+        CameraUtils.spawnFakeCamera(fakeCameraEntityId, player, currentKeyframe.location, 0, fakeAudioListenerEntityId)
 
         startTrackToNextKeyframe()
+
+        // TODO formalize this into audio cues that come in as a list as part of the camera tracks
+        playMusic()
     }
+
+    private fun playMusic() {
+        val musicPacket = ClientboundSoundEntityPacket(
+            PaperAdventure.resolveSound(
+                net.kyori.adventure.sound.Sound.sound(
+                    Sound.MUSIC_DISC_RELIC,
+                    SoundCategory.MASTER,
+                    1.0f,
+                    1.0f
+                ).name()
+            ),
+            SoundSource.MASTER,
+            player.craftPlayer().handle,
+            1.0f,
+            1.0f,
+            0L,
+        )
+        val entityIdField = ClientboundSoundEntityPacket::class.java.getDeclaredField("id")
+        entityIdField.isAccessible = true
+        entityIdField.setInt(musicPacket, fakeAudioListenerEntityId)
+
+        player.handle.connection.send(musicPacket)
+    }
+
+    private fun spawnFakeAudioListener(audioListenerEntityId: Int, player: CraftPlayer, location: Location) {
+        val addPacket = ClientboundAddEntityPacket(
+            audioListenerEntityId,
+            UUID.randomUUID(),
+            location.x,
+            location.y,
+            location.z,
+            location.pitch,
+            location.yaw,
+            net.minecraft.world.entity.EntityType.ITEM_DISPLAY,
+            0,
+            net.minecraft.world.phys.Vec3.ZERO,
+            0.0
+        )
+        player.handle.connection.send(addPacket)
+    }
+
 
     private fun validateCameraTracks() {
         // We must have at least one track and each track must have at least two keyframes
@@ -76,86 +127,6 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
             require(it.keyframes.first().timeMillis == 0L) { "The first keyframe of each track must occur at time 0. Track $index's first keyframe doesn't." }
             require(it.keyframes.none { it.timeMillis < 0L }) { "Keyframes must occur at time >= 0. Track $index has a keyframe that doesn't." }
         }
-    }
-
-    private fun teleportFakeCamera(location: Location, durationTicks: Int) {
-        if (durationTicks == 0) {
-            // There is no way to avoid packets potentially being processed on the client out of order, so create a new camera on instant teleport
-            // I'm pretty sure the reusing of the entity id prevents this from actually leaving behind old entities on the client, but not sure
-            spawnFakeCamera(location, 0)
-            return
-        }
-
-        val metadataPacket = ClientboundSetEntityDataPacket(
-            fakeCameraEntityId,
-            listOf(SynchedEntityData.DataValue(Display.DATA_POS_ROT_INTERPOLATION_DURATION_ID.id, EntityDataSerializers.INT, durationTicks))
-        )
-        val teleportPacket = ClientboundTeleportEntityPacket(
-            fakeCameraEntityId,
-            PositionMoveRotation(
-                Vec3(location.x, location.y, location.z),
-                Vec3.ZERO,
-                location.yaw,
-                location.pitch,
-            ),
-            emptySet(),
-            false
-        )
-
-        val packetBundle = ClientboundBundlePacket(listOf(metadataPacket, teleportPacket))
-        player.handle.connection.send(packetBundle)
-    }
-
-    private fun spawnFakeCamera(
-        location: Location,
-        durationTicks: Int
-    ) {
-//        player.sendMessage("Creating a new fake camera in teleportFakeCamera")
-
-        val addPacket = ClientboundAddEntityPacket(
-            fakeCameraEntityId,
-            UUID.randomUUID(),
-            location.x,
-            location.y,
-            location.z,
-            location.pitch,
-            location.yaw,
-            EntityType.TEXT_DISPLAY,
-            0,
-            Vec3.ZERO,
-            0.0
-        )
-        val metadataPacket = ClientboundSetEntityDataPacket(
-            fakeCameraEntityId,
-            listOf(
-                SynchedEntityData.DataValue(
-                    Display.DATA_POS_ROT_INTERPOLATION_DURATION_ID.id,
-                    EntityDataSerializers.INT,
-                    durationTicks
-                ),
-                // TODO right now this is just given a name so we can see it, but we should use a transformation combined with a big flat black square or two to prevent disabling the HUD from preventing the fade out
-                SynchedEntityData.DataValue(
-                    TEXT_DISPLAY_TEXT_ID,
-                    EntityDataSerializers.COMPONENT,
-                    PaperAdventure.asVanilla(text("camera"))
-                )
-            )
-        )
-        val gameModeChangePacket = ClientboundGameEventPacket(
-            ClientboundGameEventPacket.CHANGE_GAME_MODE,
-            GameMode.SPECTATOR.value.toFloat()
-        )
-        // constructor takes an entity but we only have an entityId, so we need reflection - ignore the passing of the player to the constructor
-        val spectateTheCameraPacket = ClientboundSetCameraPacket(player.handle)
-        val cameraIdField = ClientboundSetCameraPacket::class.java.getDeclaredField("cameraId")
-        cameraIdField.isAccessible = true
-        cameraIdField.setInt(spectateTheCameraPacket, fakeCameraEntityId)
-
-        val packetBundle =
-            ClientboundBundlePacket(listOf(addPacket, metadataPacket, gameModeChangePacket, spectateTheCameraPacket))
-
-        // TODO extensions for packets
-        player.handle.connection.send(packetBundle)
     }
 
     private fun startTrackToNextKeyframe() {
@@ -175,7 +146,7 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
 
 //        player.sendMessage("Advancing to track ${currentTrackIndex}, keyframe $currentKeyframeIndex (${currentKeyframe.timeMillis})")
 
-        teleportFakeCamera(currentKeyframe.location, calculateCurrentTeleportDuration())
+        CameraUtils.teleportFakeCamera(fakeCameraEntityId, fakeAudioListenerEntityId, player, currentKeyframe.location, calculateCurrentTeleportDuration())
     }
 
     private fun calculateCurrentTeleportDuration(): Int {
@@ -192,7 +163,7 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
         endOfCurrentTrack = currentTrackStartTimeMillis + currentTrack.keyframes.last().timeMillis
 
 //        player.sendMessage("Advancing to track $currentTrackIndex")
-        teleportFakeCamera(currentKeyframe.location, 0)
+        CameraUtils.teleportFakeCamera(fakeCameraEntityId, fakeAudioListenerEntityId, player, currentKeyframe.location, 0)
     }
 
     private fun nextTrackIndex(): Int {
@@ -222,10 +193,10 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
     }
 
     private fun destroy() {
-        player.handle.connection.send(ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, player.gameMode.value.toFloat()))
-        player.handle.connection.send(ClientboundSetCameraPacket(player.handle))
-        player.handle.connection.send(ClientboundRemoveEntitiesPacket(fakeCameraEntityId))
+        CameraUtils.removeCamera(fakeCameraEntityId, player)
+        player.handle.connection.send(ClientboundRemoveEntitiesPacket(fakeAudioListenerEntityId))
 
+        Fade.clear(player)
         isDestroyed = true
     }
 
@@ -258,7 +229,7 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
         }
 
         fun startCinematic(player: Player, cameraTracks: List<CameraTrack>) {
-            activeCinematics.remove(player.player)?.destroy()
+            activeCinematics.remove(player.craftPlayer())?.destroy()
             activeCinematics[player.craftPlayer()] = Cinematic(player.craftPlayer(), cameraTracks)
         }
     }

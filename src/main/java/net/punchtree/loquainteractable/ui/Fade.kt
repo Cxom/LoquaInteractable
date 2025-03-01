@@ -3,7 +3,6 @@ package net.punchtree.loquainteractable.ui
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.punchtree.loquainteractable.font.SpecialCharacters
-import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.entity.Player
 import java.time.Duration
 
@@ -13,6 +12,10 @@ data object Fade {
 
     fun blackOut(player: Player) {
         fadeOut(player, 0)
+    }
+
+    fun clear(player: Player) {
+        player.clearTitle()
     }
 
     fun fadeOut(player: Player, fadeOutMillis: Long) {
