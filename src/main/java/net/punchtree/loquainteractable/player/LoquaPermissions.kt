@@ -24,7 +24,7 @@ data object LoquaPermissions {
                 }
         }
         fun getPermissionGroup(): LuckPermsNode {
-            return LuckPermsNode.builder("loqua.staff.${name.lowercase()}").build()
+            return LuckPermsNode.builder("group.${name.lowercase()}").build()
         }
     }
 }

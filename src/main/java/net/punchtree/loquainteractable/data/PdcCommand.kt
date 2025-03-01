@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MenuType
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.persistence.PersistentDataType
-import java.io.Serializable
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -29,6 +28,8 @@ object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO go through all messaging and make sure it's got consistent styling
     // TODO make sure keys are case-insensitive by forcing all input to be lowercase
+
+    // TODO implement the ability to set locations with actual data
 
     /** Certain third-party namespaces are data we're not interested in */
     private val defaultFilters = setOf("axiom")
@@ -340,7 +341,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             DataType.LOCATION -> {
                 value as Location
                 // TODO minimessage color (USE player::sendRichMessage)
-                text(value.toSimpleString()).color(DATA_VALUE_COLOR)
+                value.toSimpleString().color(DATA_VALUE_COLOR)
             }
             DataType.ITEM_STACK -> {
                 value as ItemStack
@@ -362,10 +363,12 @@ object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO move/organize into single location for pretty-printing utils
     //  -- See: PrintingObjectUtils <- unify with that
-    internal fun Location.toSimpleString(decimalPrecision: Int = 2): String {
+    internal fun Location.toSimpleString(decimalPrecision: Int = 2): Component {
         /** constrained decimal precision */
         val cdp = decimalPrecision.coerceIn(0, 10)
-        return "[x:%.${cdp}f y:%.${cdp}f z:%.${cdp}f yaw:%.${cdp}f pitch:%.${cdp}f]".format(x, y, z, yaw, pitch)
+        val text = "[x:%.${cdp}f y:%.${cdp}f z:%.${cdp}f yaw:%.${cdp}f pitch:%.${cdp}f]".format(x, y, z, yaw, pitch)
+        val rawNumbers = "%.${cdp}f %.${cdp}f %.${cdp}f  %.${cdp}f %.${cdp}f".format(x, y, z, yaw, pitch)
+        return text(text).insertion(rawNumbers)
     }
 
     private fun removeData(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {

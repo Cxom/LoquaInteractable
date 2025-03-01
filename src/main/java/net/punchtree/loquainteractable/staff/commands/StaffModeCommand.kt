@@ -31,6 +31,8 @@ object StaffModeCommand : CommandExecutor {
 
     // TODO store and offer an option for going back to the last STAFF MODE location
 
+    // TODO make isStaffMember just check all roles and not loqua.staff
+
     data object Messages {
         // staff mode messages
         val ALREADY_IN_STAFF_MODE = text("You are already in staff mode.").color(RED)
