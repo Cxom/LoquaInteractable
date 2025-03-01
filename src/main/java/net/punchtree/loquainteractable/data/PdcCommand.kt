@@ -363,6 +363,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO move/organize into single location for pretty-printing utils
     //  -- See: PrintingObjectUtils <- unify with that
+    // TODO rename this function to reflect that it is not a string
     internal fun Location.toSimpleString(decimalPrecision: Int = 2): Component {
         /** constrained decimal precision */
         val cdp = decimalPrecision.coerceIn(0, 10)

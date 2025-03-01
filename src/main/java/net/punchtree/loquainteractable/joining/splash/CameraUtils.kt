@@ -66,7 +66,7 @@ object CameraUtils {
                     durationTicks
                 ),
                 // TODO the PRESS_F5 screen does get the point across, but fails to actually block the camera's line of sight
-                //  an item display with a double sided flat plan would block both other f5 modes
+                //  an item display with a double sided flat plane would block both other f5 modes
                 //  and, if used with a composite model, could also offer a non-toggleable overlay
                 //  (although, for the opening cinematic, I don't mind the hud being toggleable)
                 SynchedEntityData.DataValue(

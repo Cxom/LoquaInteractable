@@ -153,6 +153,9 @@ commands:
         usage: /streetcar <subcommand>
         permission: loquainteractable.admin.experimental
         permission-message: You do not have permission to use this command!
+    side-profile-render:
+        usage: /side-profile-render scan <left> <up> <right> <down>
+        permission: loquainteractable.commands.side-profile-render
 
 ############### PERMISSIONS ###############
 permissions:

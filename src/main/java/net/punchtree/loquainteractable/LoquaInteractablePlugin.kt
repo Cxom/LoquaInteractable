@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolManager
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
+import net.punchtree.loquainteractable._unstable.experimental.SideProfileRenderCommand
 import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.testing.CircleGameTesting
 import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInputsTesting
@@ -167,6 +168,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         getCommand("setleathercolor")!!.setExecutor(setLeatherColorCommand)
 
         getCommand("streetcar")!!.setExecutor(StreetcarTestingCommand)
+        getCommand("side-profile-render")!!.setExecutor(SideProfileRenderCommand)
 
         getCommand("changeskin")!!.setExecutor(SkinGrabberTestCommand)
         getCommand("changecape")!!.setExecutor(SkinGrabberTestCommand)
