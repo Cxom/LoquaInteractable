@@ -1,5 +1,6 @@
 package net.punchtree.loquainteractable.joining
 
+import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.LoquaDataKeys
@@ -27,34 +28,13 @@ class SplashScreenManager : Listener {
 
     internal var onExitSplashScreen : ((Player) -> Unit)? = null
 
-    private val splashCameraTracks by lazy {
-        // TODO replace this with data stored on the world PDC not in debugvars
-        val world = LoquaInteractablePlugin.world
-        val defaultLocation = Housings.DEFAULT_HOUSING_SPAWN
-        val track1Start = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_START, defaultLocation)
-        val track1End = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_END, defaultLocation)
-        val track1Duration = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_DURATION, 100000).toLong()
-        val track2Start = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_START, defaultLocation)
-        val track2End = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_END, defaultLocation)
-        val track2Duration = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_DURATION, 100000).toLong()
-        val track1 = CameraTrack(
-            sortedSetOf(
-                CameraKeyframe(track1Start, 0),
-                CameraKeyframe(track1End, track1Duration)
-            )
-        )
-        val track2 = CameraTrack(
-            sortedSetOf(
-                CameraKeyframe(track2Start, 0),
-                CameraKeyframe(track2End, track2Duration)
-            )
-        )
-        listOf(track1, track2)
-    }
-
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
     internal fun showSplashScreen(player: LoquaPlayer) {
+        require(!splashScreenPlayers.contains(player.uniqueId)) {
+            "Player ${player.name} is already in the splash screen!"
+        }
+
         splashScreenPlayers.add(player.uniqueId)
         player.isInSplashScreen = true
         player.inventory.helmet = ItemStack(Material.BLUE_CONCRETE).also {
@@ -97,13 +77,48 @@ class SplashScreenManager : Listener {
 
     private fun cleanupSplashScreen(player: Player) {
         Cinematic.stopCinematic(player)
+        player.stopSound(SPLASH_SCREEN_MUSIC)
         splashScreenPlayers.remove(player.uniqueId)
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        cleanupSplashScreen(event.player)
+        if (splashScreenPlayers.contains(event.player.uniqueId)) {
+            // TODO do we maybe need to handle this in the cinematic itself?????
+            //  what if we forget somewhere else?????
+            cleanupSplashScreen(event.player)
+        }
         // Don't reset loquaPlayer.isInSplashScreen,
         // because we don't want other quit listeners to think they were actually playing
+    }
+
+    companion object {
+        val SPLASH_SCREEN_MUSIC = Sound.sound(org.bukkit.Sound.MUSIC_DISC_WAIT, Sound.Source.MASTER, 1f, 1f)
+
+        // TODO make this private once done testing
+        internal val splashCameraTracks by lazy {
+            // TODO replace this with data stored on the world PDC not in debugvars
+            val world = LoquaInteractablePlugin.world
+            val defaultLocation = Housings.DEFAULT_HOUSING_SPAWN
+            val track1Start = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_START, defaultLocation)
+            val track1End = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_END, defaultLocation)
+            val track1Duration = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_DURATION, 100000).toLong()
+            val track2Start = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_START, defaultLocation)
+            val track2End = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_END, defaultLocation)
+            val track2Duration = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_2_DURATION, 100000).toLong()
+            val track1 = CameraTrack(
+                sortedSetOf(
+                    CameraKeyframe(track1Start, 0),
+                    CameraKeyframe(track1End, track1Duration)
+                )
+            )
+            val track2 = CameraTrack(
+                sortedSetOf(
+                    CameraKeyframe(track2Start, 0),
+                    CameraKeyframe(track2End, track2Duration)
+                )
+            )
+            listOf(track1, track2)
+        }
     }
 }

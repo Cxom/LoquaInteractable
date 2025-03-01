@@ -1,14 +1,17 @@
 package net.punchtree.loquainteractable.staff.commands
 
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor.*
+import net.kyori.adventure.text.format.NamedTextColor.GOLD
+import net.kyori.adventure.text.format.NamedTextColor.RED
 import net.luckperms.api.LuckPermsProvider
-import net.punchtree.loquainteractable.housing.Housings
-import net.punchtree.loquainteractable.player.*
 import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.get
 import net.punchtree.loquainteractable.data.remove
 import net.punchtree.loquainteractable.data.set
+import net.punchtree.loquainteractable.housing.Housings
+import net.punchtree.loquainteractable.player.LoquaPermissions
+import net.punchtree.loquainteractable.player.LoquaPlayer
+import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import org.bukkit.GameMode
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -25,6 +28,8 @@ object StaffModeCommand : CommandExecutor {
      *  - Toggle for resetting spawn on join - save persistently to player data
      *  - Player mode inventory contents - save persistently to player data
      */
+
+    // TODO store and offer an option for going back to the last STAFF MODE location
 
     data object Messages {
         // staff mode messages
