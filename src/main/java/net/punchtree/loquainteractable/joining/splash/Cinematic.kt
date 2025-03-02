@@ -54,7 +54,8 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
     private var currentTrackStartTimeMillis = System.currentTimeMillis() + ONE_TICK_MILLIS
     private var endOfCurrentKeyframe = currentTrackStartTimeMillis + currentKeyframe.timeMillis
     private var endOfCurrentTrack = currentTrackStartTimeMillis + currentTrack.keyframes.last().timeMillis
-    private var isFadingOut = false
+    internal var isFadingOut = false
+        private set
 
     private var isDestroyed = false
 
@@ -231,6 +232,10 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
         fun startCinematic(player: Player, cameraTracks: List<CameraTrack>) {
             activeCinematics.remove(player.craftPlayer())?.destroy()
             activeCinematics[player.craftPlayer()] = Cinematic(player.craftPlayer(), cameraTracks)
+        }
+
+        fun getCinematicFor(player: CraftPlayer): Cinematic? {
+            return activeCinematics[player.craftPlayer()]
         }
     }
 

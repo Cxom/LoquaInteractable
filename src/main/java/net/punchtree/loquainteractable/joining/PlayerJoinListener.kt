@@ -12,21 +12,15 @@ import net.punchtree.loquainteractable.data.has
 import net.punchtree.loquainteractable.data.set
 import net.punchtree.loquainteractable.housing.Housings
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
-import net.punchtree.loquainteractable.ui.Fade
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 
 class PlayerJoinListener(
     private val playerInputsManager: PlayerInputsManager,
@@ -40,15 +34,11 @@ class PlayerJoinListener(
        // look ma, I discovered a new operator! ^
     }
 
-    // TODO we may be able to improve the quality of the opening cinematic by putting a
-    //  blackout overlay on their head as they're logging in (configuration) or before they log out
-
     @EventHandler
     fun onPlayerLogin(event: PlayerLoginEvent) {
 //        Bukkit.broadcastMessage("Player ${event.player.name} login event!")
     }
 
-    @Suppress("UnstableApiUsage")
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
@@ -69,26 +59,19 @@ class PlayerJoinListener(
 //        Bukkit.broadcastMessage("Player ${player.name} join event!")
         event.joinMessage(Component.empty())
 
-
         player.teleport(LoquaInteractablePlugin.world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_START, Housings.DEFAULT_HOUSING_SPAWN))
 
-        // TODO preprocessing on the player (blacking out their screen, teleporting them
-        //  somewhere inconspicuous, hiding them from other players, spectator mode, etc)
+        // TODO preprocessing on the player
+        //  teleporting them somewhere inconspicuous, but more likely simply hiding them from everyone
+        //  on join, put them in spectator mode, etc)
+        //  currently the player remains visible at the start of the first camera track of the splash
 
-        // TODO test if the player remains visible in their log-out location while in the splash screen
+
         player.gameMode = GameMode.SPECTATOR
+        player.isInvisible = true
 
-        onJoin(loquaPlayer)
-
-        // TODO make a convenience method for this
-        player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
-            it.editMeta { meta ->
-                val equippable = meta.equippable
-                equippable.slot = EquipmentSlot.HEAD
-                equippable.cameraOverlay = NamespacedKey("punchtree", "font/special/dark")
-                meta.setEquippable(equippable)
-            }
-        }
+        // Not a staff member
+        splashScreenManager.startSplashScreen(loquaPlayer)
     }
 
     @EventHandler
@@ -100,29 +83,11 @@ class PlayerJoinListener(
         }
 //        Bukkit.broadcastMessage("Player ${player.name} client loaded world event - Timeout: ${event.isTimeout}!")
 
-        // The cinematic has already started - do the fade in, and then set the helmet
-        Fade.fadeIn(player, 3000L)
-        // TODO if we go with this method, we will need to make sure that we don't call fadeIn
-        //  if the cinematic is actively fading out - instead, just wait to remove the helmet
-        //  until the end of the current track
-        player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
-            it.editMeta { meta ->
-                val equippable = meta.equippable
-                equippable.slot = EquipmentSlot.HEAD
-                equippable.cameraOverlay = NamespacedKey("punchtree", "font/special/loqua_splash")
-                meta.setEquippable(equippable)
-            }
-        }
-    }
-
-    private fun onJoin(loquaPlayer: LoquaPlayer) {
-
-        // Not a staff member
-        splashScreenManager.showSplashScreen(loquaPlayer)
+        splashScreenManager.fadeInOnClientLoadedWorld(player)
     }
 
     override fun onPacketReceive(event: PacketReceiveEvent) {
-        val player = event.user.profile.uuid?.let{ Bukkit.getPlayer(it) }
+        val player = event.user.profile.uuid?.let { Bukkit.getPlayer(it) }
         if (event.packetType == PacketType.Play.Client.PLAYER_LOADED) {
 //            val playerLoadedPacket = WrapperPlayClientPlayerLoaded(event)
             if (player != null) {
@@ -157,6 +122,7 @@ class PlayerJoinListener(
 
         loquaPlayer.teleport(Housings.DEFAULT_HOUSING_SPAWN)
         loquaPlayer.gameMode = GameMode.ADVENTURE
+        loquaPlayer.isInvisible = false
     }
 }
 

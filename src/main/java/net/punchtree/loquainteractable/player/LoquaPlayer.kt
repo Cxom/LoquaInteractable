@@ -5,7 +5,11 @@ import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.get
 import net.punchtree.loquainteractable.data.remove
 import net.punchtree.loquainteractable.data.set
+import net.punchtree.loquainteractable.ui.CameraOverlay
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
 
 class LoquaPlayer(player: Player) : PlayerDecorator(player) {
 
@@ -63,6 +67,18 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
             saveInventory()
         } else {
             LoquaInteractablePlugin.instance.logger.info("Not saving inventory for out-of-body player $name")
+        }
+    }
+
+    @Suppress("UnstableApiUsage")
+    fun setCameraOverlay(cameraOverlay: CameraOverlay) {
+        inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
+            it.editMeta { meta ->
+                val equippable = meta.equippable
+                equippable.slot = EquipmentSlot.HEAD
+                equippable.cameraOverlay = cameraOverlay.namespacedKey
+                meta.setEquippable(equippable)
+            }
         }
     }
 }

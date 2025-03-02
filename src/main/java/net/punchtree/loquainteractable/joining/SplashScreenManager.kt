@@ -11,15 +11,14 @@ import net.punchtree.loquainteractable.joining.splash.CameraTrack
 import net.punchtree.loquainteractable.joining.splash.Cinematic
 import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import net.punchtree.loquainteractable.ui.CameraOverlays
+import net.punchtree.loquainteractable.ui.Fade
+import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 import java.util.*
 
 class SplashScreenManager : Listener {
@@ -30,27 +29,40 @@ class SplashScreenManager : Listener {
 
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
-    @Suppress("UnstableApiUsage")
-    internal fun showSplashScreen(player: LoquaPlayer) {
+    internal fun startSplashScreen(player: LoquaPlayer) {
         require(!splashScreenPlayers.contains(player.uniqueId)) {
             "Player ${player.name} is already in the splash screen!"
         }
 
         splashScreenPlayers.add(player.uniqueId)
         player.isInSplashScreen = true
-        player.inventory.helmet = ItemStack(Material.BLACK_CONCRETE).also {
-            it.editMeta { meta ->
-                val equippable = meta.equippable
-                equippable.slot = EquipmentSlot.HEAD
-                equippable.cameraOverlay = NamespacedKey("punchtree", "font/special/loqua_splash")
-                meta.setEquippable(equippable)
-            }
-        }
         Cinematic.startCinematic(player, splashCameraTracks)
+        // TODO make a convenience method for this
+        player.setCameraOverlay(CameraOverlays.BLACK_OUT)
+
         // TODO write an action bar utility for sending long running action bars, flashing bars
         //  but before writing it, look into preexisting solutions
         // TODO make flashing text using subtitles and custom fonts for height offsetting
         player.sendActionBar(Component.text("Press Space to Play!"))
+    }
+
+    internal fun fadeInOnClientLoadedWorld(player: LoquaPlayer) {
+        // The cinematic has already started - do the fade in, and then set the helmet
+
+        // TODO make sure that we don't call fadeIn
+        //  if the cinematic is actively fading out - instead, just wait to remove the helmet
+        //  until the end of the current track
+        val splashCinematic = checkNotNull(Cinematic.getCinematicFor(player.craftPlayer())) {
+            "Player ${player.name} is in splash screen but has no cinematic!"
+        }
+        if (splashCinematic.isFadingOut) {
+            // TODO maybe we should just wait to set the overlay until the cinematic is done fading out
+            //  but then we need to make sure that we don't call fadeIn again
+            return
+        }
+
+        Fade.fadeIn(player, DebugVars.getInteger("splash-fade-in-millis", 3000).toLong())
+        player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
     }
 
     @Suppress("UnstableApiUsage")
@@ -87,6 +99,11 @@ class SplashScreenManager : Listener {
         if (splashScreenPlayers.contains(event.player.uniqueId)) {
             // TODO do we maybe need to handle this in the cinematic itself?????
             //  what if we forget somewhere else?????
+            //  maybe we should just have a single quit manager, that handles all possible player states???
+            //  but then something still ought to check on the cinematic manager
+            //  we should probably operate from the perspective of expecting everything that uses a cinematic to
+            //  clean up the cinematic, but then verify that cinematics and other global managers are actually cleaned up
+            //  trust, but verify
             cleanupSplashScreen(event.player)
         }
         // Don't reset loquaPlayer.isInSplashScreen,
