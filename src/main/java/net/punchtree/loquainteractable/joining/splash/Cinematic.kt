@@ -201,6 +201,10 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
         isDestroyed = true
     }
 
+    fun getMillisUntilEndOfTrack(): Long {
+        return endOfCurrentTrack - System.currentTimeMillis()
+    }
+
     companion object {
         private lateinit var cinematicTick: BukkitTask
 

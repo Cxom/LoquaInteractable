@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
 class SplashScreenManager : Listener {
@@ -47,22 +48,28 @@ class SplashScreenManager : Listener {
     }
 
     internal fun fadeInOnClientLoadedWorld(player: LoquaPlayer) {
-        // The cinematic has already started - do the fade in, and then set the helmet
+        // The cinematic has already started - do the fade in and set the overlay
 
-        // TODO make sure that we don't call fadeIn
-        //  if the cinematic is actively fading out - instead, just wait to remove the helmet
-        //  until the end of the current track
         val splashCinematic = checkNotNull(Cinematic.getCinematicFor(player.craftPlayer())) {
             "Player ${player.name} is in splash screen but has no cinematic!"
         }
         if (splashCinematic.isFadingOut) {
-            // TODO maybe we should just wait to set the overlay until the cinematic is done fading out
-            //  but then we need to make sure that we don't call fadeIn again
+            // wait to set the overlay until the current camera track is done fading out
+            // no need to call fadeIn, start of the next camera track will do that
+            object : BukkitRunnable() {
+                override fun run() {
+                    // isConnected references the same connection, so this won't cause a bug for players that have reconnected in the meantime
+                    // player.isOnline WOULD cause that bug
+                    if (player.isConnected && player.isInSplashScreen) {
+                        player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
+                    }
+                }
+            }.runTaskLater(LoquaInteractablePlugin.instance, splashCinematic.getMillisUntilEndOfTrack() / 50L)
+        } else {
+            Fade.fadeIn(player, DebugVars.getInteger("splash-fade-in-millis", 3000).toLong())
+            player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
             return
         }
-
-        Fade.fadeIn(player, DebugVars.getInteger("splash-fade-in-millis", 3000).toLong())
-        player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
     }
 
     @Suppress("UnstableApiUsage")
