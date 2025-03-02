@@ -5,6 +5,7 @@ import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.PdcCommand.toSimpleString
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Bukkit
+import org.bukkit.FluidCollisionMode
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -31,7 +32,8 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
         if (args.isEmpty()) return false
 
         when(val subcommand = args[0]) {
-            "scan" -> return scan(sender, args)
+            "scan" -> return scan(sender, args, scanUnloadedChunks = true)
+            "scan-loaded" -> return scan(sender, args, scanUnloadedChunks = false)
             else -> {
                 sender.sendMessage("Unknown subcommand: $subcommand")
             }
@@ -40,7 +42,7 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
         return true
     }
 
-    private fun scan(player: Player, args: Array<out String>): Boolean {
+    private fun scan(player: Player, args: Array<out String>, scanUnloadedChunks: Boolean): Boolean {
         if (args.size < 5) {
             return false
         }
@@ -95,13 +97,36 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
 
         val maxScanDepth = DebugVars.getInteger("side-profile-render-max-scan-depth", DEFAULT_MAX_SCAN_DEPTH)
 
+        if (scanUnloadedChunks) {
+            scanEverything(width, height, min, player, isOnXAxis, isOnZAxis, maxScanDepth)
+        } else {
+            scanLoaded(player, min, width, height, isOnXAxis, isOnZAxis, maxScanDepth)
+        }
+
+        return true
+    }
+
+    private fun scanEverything(
+        width: Int,
+        height: Int,
+        min: Vector,
+        player: Player,
+        isOnXAxis: Boolean,
+        isOnZAxis: Boolean,
+        maxScanDepth: Int
+    ) {
         object : BukkitRunnable() {
             var y = 0
             var x = 0
-            val RUNTIME_BUDGET_MILLIS = 10L
+            var RUNTIME_BUDGET_MILLIS = 10L
+            var MIN_TPS = 17
             val SECONDS_BETWEEN_DIGESTS = 5L
             val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
             var lastDigest = System.currentTimeMillis()
+            var rayStartLocation = min.clone().toLocation(player.world)
+            private val minX = min.x
+            private val minY = min.y
+            private val minZ = min.z
             override fun run() {
                 val frameStart = System.currentTimeMillis()
                 while (Bukkit.getServer().tps[0] >= 17 && System.currentTimeMillis() - frameStart < RUNTIME_BUDGET_MILLIS) {
@@ -113,13 +138,19 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
                             return
                         }
                     }
-                    val blockX = min.x + if (isOnXAxis) 0 else x
-                    val blockY = min.y + y
-                    val blockZ = min.z + if (isOnZAxis) 0 else x
-                    var startBlock = player.world.getBlockAt(blockX.toInt(), blockY.toInt(), blockZ.toInt())
+                    rayStartLocation.x = minX + if (isOnXAxis) 0 else x
+                    rayStartLocation.y = minY + y
+                    rayStartLocation.z = minZ + if (isOnZAxis) 0 else x
+                    if (!rayStartLocation.isChunkLoaded) {
+                        rayStartLocation.chunk.load(false)
+                    }
+                    var startBlock = rayStartLocation.block
                     var searchDepth = 0
                     while (startBlock.isEmpty && searchDepth++ < maxScanDepth) {
                         startBlock = startBlock.getRelative(player.facing)
+                        if (!startBlock.location.isChunkLoaded) {
+                            startBlock.chunk.load(false)
+                        }
                     }
                     val mapColor = if (startBlock.isEmpty) 0 else startBlock.blockData.mapColor.asARGB()
                     image.setRGB(x, (height - 1 - y), mapColor)
@@ -137,11 +168,15 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
                     }
                     LoquaInteractablePlugin.instance.logger.info("Scanning progress $scanned / $total ($formattedPercentage%)$pausedNotice")
                     lastDigest = System.currentTimeMillis()
+                    MIN_TPS = DebugVars.getInteger("side-profile-render-min-tps", 17)
+                    RUNTIME_BUDGET_MILLIS =
+                        DebugVars.getInteger("side-profile-render-runtime-budget-millis", 10).toLong()
                 }
             }
 
             override fun cancel() {
-                val outputDir = Paths.get(LoquaInteractablePlugin.instance.dataFolder.toString(), "side-profile-renders")
+                val outputDir =
+                    Paths.get(LoquaInteractablePlugin.instance.dataFolder.toString(), "side-profile-renders")
                 Files.createDirectories(outputDir)
                 val dateTime = System.currentTimeMillis()
                 val outputFile = outputDir.resolve("$dateTime.png").toFile()
@@ -153,9 +188,96 @@ object SideProfileRenderCommand : CommandExecutor, TabCompleter {
                 super.cancel()
             }
         }.runTaskTimer(LoquaInteractablePlugin.instance, 0, 1)
-
-        return true
     }
+
+    // Using raycastBlocks is incredibly fast, but only works against loaded chunks
+    private fun scanLoaded(
+        player: Player,
+        min: Vector,
+        width: Int,
+        height: Int,
+        isOnXAxis: Boolean,
+        isOnZAxis: Boolean,
+        maxScanDepth: Int
+    ) {
+        val world = player.world
+        val direction = player.facing.direction
+        val minX = min.x + 0.5
+        val minY = min.y + 0.5
+        val minZ = min.z + 0.5
+
+        object : BukkitRunnable() {
+            var y = 0
+            var x = 0
+            var RUNTIME_BUDGET_MILLIS = 10L
+            val SECONDS_BETWEEN_DIGESTS = 5L
+            val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+            var lastDigest = System.currentTimeMillis()
+            val rayStartLocation = min.clone().toLocation(world)
+            var MIN_TPS = 17
+            override fun run() {
+                val frameStart = System.currentTimeMillis()
+                while (Bukkit.getServer().tps[0] >= MIN_TPS && System.currentTimeMillis() - frameStart < RUNTIME_BUDGET_MILLIS) {
+                    if (x >= width) {
+                        x = 0
+                        y++
+                        if (y >= height) {
+                            cancel()
+                            return
+                        }
+                    }
+                    rayStartLocation.x = minX + if (isOnXAxis) 0 else x
+                    rayStartLocation.y = minY + y
+                    rayStartLocation.z = minZ + if (isOnZAxis) 0 else x
+                    val hitResult =
+                        world.rayTraceBlocks(
+                            rayStartLocation,
+                            direction,
+                            maxScanDepth.toDouble(),
+                            FluidCollisionMode.ALWAYS,
+                            false
+                        )
+                    hitResult?.hitBlock?.let { block ->
+                        image.setRGB(x, (height - 1 - y), block.blockData.mapColor.asARGB())
+                    } ?: {
+                        image.setRGB(x, (height - 1 - y), 0x00000000)
+                    }
+
+                    x++
+                }
+
+                if (lastDigest + (SECONDS_BETWEEN_DIGESTS * 1000) < System.currentTimeMillis()) {
+                    val scanned = y * width + x
+                    val total = width * height
+                    val formattedPercentage = String.format("%.1f", (scanned * 100.0 / total))
+                    val pausedNotice =
+                        if (Bukkit.getServer().tps[0] < MIN_TPS) " - paused because tps is below 17" else ""
+                    if (player.isConnected) {
+                        player.sendMessage(text("Scanning progress $scanned / $total ($formattedPercentage%)$pausedNotice"))
+                    }
+                    LoquaInteractablePlugin.instance.logger.info("Scanning progress $scanned / $total ($formattedPercentage%)$pausedNotice")
+                    lastDigest = System.currentTimeMillis()
+                    MIN_TPS = DebugVars.getInteger("side-profile-render-min-tps", 17)
+                    RUNTIME_BUDGET_MILLIS = DebugVars.getInteger("side-profile-render-runtime-budget-millis", 10).toLong()
+                }
+            }
+
+            override fun cancel() {
+                val outputDir =
+                    Paths.get(LoquaInteractablePlugin.instance.dataFolder.toString(), "side-profile-renders")
+                Files.createDirectories(outputDir)
+                val dateTime = System.currentTimeMillis()
+                val outputFile = outputDir.resolve("$dateTime.png").toFile()
+                ImageIO.write(image, "png", outputFile)
+                if (player.isConnected) {
+                    player.sendMessage("Done scanning!")
+                    player.sendMessage("Wrote image to $outputFile")
+                }
+                super.cancel()
+            }
+        }.runTaskTimer(LoquaInteractablePlugin.instance, 0, 1)
+    }
+
 
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String> {
         return listOf("scan")
