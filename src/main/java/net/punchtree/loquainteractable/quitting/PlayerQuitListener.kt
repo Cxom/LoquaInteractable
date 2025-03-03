@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.listeners
+package net.punchtree.loquainteractable.quitting
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputsManager
