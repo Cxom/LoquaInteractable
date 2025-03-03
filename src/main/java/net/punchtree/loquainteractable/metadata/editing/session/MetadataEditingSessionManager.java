@@ -1,13 +1,14 @@
 package net.punchtree.loquainteractable.metadata.editing.session;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
+@Deprecated
 public class MetadataEditingSessionManager implements Listener {
 
 	private MetadataEditingSessionManager() {

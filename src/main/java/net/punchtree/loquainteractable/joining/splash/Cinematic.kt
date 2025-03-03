@@ -238,7 +238,7 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
             activeCinematics[player.craftPlayer()] = Cinematic(player.craftPlayer(), cameraTracks)
         }
 
-        fun getCinematicFor(player: CraftPlayer): Cinematic? {
+        fun getCinematicFor(player: Player): Cinematic? {
             return activeCinematics[player.craftPlayer()]
         }
     }

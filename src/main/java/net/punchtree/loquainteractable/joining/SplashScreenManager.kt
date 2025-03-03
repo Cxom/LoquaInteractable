@@ -18,7 +18,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
@@ -31,14 +30,12 @@ class SplashScreenManager : Listener {
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
     internal fun startSplashScreen(player: LoquaPlayer) {
-        require(!splashScreenPlayers.contains(player.uniqueId)) {
+        require(!isInSplashScreen(player)) {
             "Player ${player.name} is already in the splash screen!"
         }
 
         splashScreenPlayers.add(player.uniqueId)
-        player.isInSplashScreen = true
         Cinematic.startCinematic(player, splashCameraTracks)
-        // TODO make a convenience method for this
         player.setCameraOverlay(CameraOverlays.BLACK_OUT)
 
         // TODO write an action bar utility for sending long running action bars, flashing bars
@@ -46,6 +43,8 @@ class SplashScreenManager : Listener {
         // TODO make flashing text using subtitles and custom fonts for height offsetting
         player.sendActionBar(Component.text("Press Space to Play!"))
     }
+
+    fun isInSplashScreen(player: LoquaPlayer) = splashScreenPlayers.contains(player.uniqueId)
 
     internal fun fadeInOnClientLoadedWorld(player: LoquaPlayer) {
         // The cinematic has already started - do the fade in and set the overlay
@@ -60,7 +59,7 @@ class SplashScreenManager : Listener {
                 override fun run() {
                     // isConnected references the same connection, so this won't cause a bug for players that have reconnected in the meantime
                     // player.isOnline WOULD cause that bug
-                    if (player.isConnected && player.isInSplashScreen) {
+                    if (player.isConnected && isInSplashScreen(player)) {
                         player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
                     }
                 }
@@ -90,7 +89,6 @@ class SplashScreenManager : Listener {
 //        }
         if (event.input.isJump && splashScreenPlayers.contains(event.player.uniqueId)) {
             cleanupSplashScreen(loquaPlayer)
-            loquaPlayer.isInSplashScreen = false
             onExitSplashScreen?.invoke(loquaPlayer)
         }
     }
@@ -101,20 +99,12 @@ class SplashScreenManager : Listener {
         splashScreenPlayers.remove(player.uniqueId)
     }
 
-    @EventHandler
-    fun onPlayerQuit(event: PlayerQuitEvent) {
-        if (splashScreenPlayers.contains(event.player.uniqueId)) {
-            // TODO do we maybe need to handle this in the cinematic itself?????
-            //  what if we forget somewhere else?????
-            //  maybe we should just have a single quit manager, that handles all possible player states???
-            //  but then something still ought to check on the cinematic manager
-            //  we should probably operate from the perspective of expecting everything that uses a cinematic to
-            //  clean up the cinematic, but then verify that cinematics and other global managers are actually cleaned up
-            //  trust, but verify
-            cleanupSplashScreen(event.player)
+    /* This is NOT an eventListener, so that we have a single quit listener, that can be referenced
+     * to understand the order in which cleanup happens. It calls this method (and others like it) */
+    fun onPlayerQuit(quitPlayer: LoquaPlayer) {
+        if (splashScreenPlayers.contains(quitPlayer.uniqueId)) {
+            cleanupSplashScreen(quitPlayer)
         }
-        // Don't reset loquaPlayer.isInSplashScreen,
-        // because we don't want other quit listeners to think they were actually playing
     }
 
     companion object {
@@ -122,7 +112,6 @@ class SplashScreenManager : Listener {
 
         // TODO make this private once done testing
         internal val splashCameraTracks by lazy {
-            // TODO replace this with data stored on the world PDC not in debugvars
             val world = LoquaInteractablePlugin.world
             val defaultLocation = Housings.DEFAULT_HOUSING_SPAWN
             val track1Start = world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_START, defaultLocation)

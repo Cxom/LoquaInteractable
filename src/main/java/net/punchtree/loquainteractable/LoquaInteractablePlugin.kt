@@ -51,7 +51,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
     private lateinit var protocolManager: ProtocolManager
     private lateinit var playerInputsManager: PlayerInputsManager
-    private lateinit var splashScreenManager: SplashScreenManager
+    internal lateinit var splashScreenManager: SplashScreenManager
+        private set
     private lateinit var vehicleInputPacketAdapter: SteerVehicleInputPacketAdapter
     private lateinit var heldItemInputPacketAdapter: ChangeHeldItemInputPacketAdapter
     lateinit var customItemRegistry: CustomItemRegistry

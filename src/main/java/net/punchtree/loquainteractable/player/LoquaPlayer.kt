@@ -17,9 +17,13 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     //  it may be a good idea to enforce this in the constructor, or better yet maybe even make the
     //  constructor private and move the player manager into the same file
 
-    internal var isInSplashScreen = false
-    private var isInCharacterSelect = false
+    // TODO have these be normalized by default, not denormalized
+    //  (i.e. have them be functions calling the underlying manager for a single source of truth,
+    //   and treat having redundant per-player fields (denormalization) as a performance optimization)
+    internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(this)
+    internal var isInCharacterSelect = false
 
+    // TODO remove the loqua.staff role and just check for an individual staff role permission - e.g., loqua.staff.administrator
     internal fun isStaffMember(): Boolean {
         return hasPermission(LoquaPermissions.STAFF)
     }
@@ -49,7 +53,7 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     }
 
     fun isPlaying(): Boolean {
-        return !isInStaffMode() && !isInSplashScreen && !isInCharacterSelect
+        return !isInStaffMode() && !isInSplashScreen() && !isInCharacterSelect
     }
 
     private fun isOutOfBody(): Boolean {
@@ -61,7 +65,7 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     }
 
     fun saveInventoryIfNotOutOfBody() {
-        LoquaInteractablePlugin.instance.logger.info("${name} staff mode: ${isInStaffMode()} isInSplashScreen: $isInSplashScreen isInCharacterSelect: $isInCharacterSelect isPlaying: ${isPlaying()} isOutOfBody: ${isOutOfBody()}")
+        LoquaInteractablePlugin.instance.logger.info("$name staff mode: ${isInStaffMode()} isInSplashScreen: ${isInSplashScreen()} isInCharacterSelect: $isInCharacterSelect isPlaying: ${isPlaying()} isOutOfBody: ${isOutOfBody()}")
         if (!isOutOfBody()) {
             LoquaInteractablePlugin.instance.logger.info("Saving inventory for not-out-of-body player $name")
             saveInventory()
