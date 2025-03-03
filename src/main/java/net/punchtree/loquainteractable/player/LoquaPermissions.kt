@@ -3,7 +3,6 @@ package net.punchtree.loquainteractable.player
 import net.punchtree.loquainteractable.staff.commands.LuckPermsNode
 
 data object LoquaPermissions {
-    internal const val STAFF = "loqua.staff"
 
     enum class StaffRole {
 
@@ -14,13 +13,13 @@ data object LoquaPermissions {
         EXPLORER;
 
         companion object {
-            fun getRoleFor(loquaPlayer: LoquaPlayer): StaffRole =
+            fun getRoleFor(loquaPlayer: LoquaPlayer): StaffRole? =
                 when {
-                    loquaPlayer.hasPermission("$STAFF.explorer") -> EXPLORER
-                    loquaPlayer.hasPermission("$STAFF.builder") -> BUILDER
-                    loquaPlayer.hasPermission("$STAFF.architect") -> ARCHITECT
-                    loquaPlayer.hasPermission("$STAFF.administrator") -> ADMINISTRATOR
-                    else -> throw IllegalStateException("Staff member ${loquaPlayer.name} has no staff role!")
+                    loquaPlayer.hasPermission("loqua.staff.explorer") -> EXPLORER
+                    loquaPlayer.hasPermission("loqua.staff.builder") -> BUILDER
+                    loquaPlayer.hasPermission("loqua.staff.architect") -> ARCHITECT
+                    loquaPlayer.hasPermission("loqua.staff.administrator") -> ADMINISTRATOR
+                    else -> null
                 }
         }
         fun getPermissionGroup(): LuckPermsNode {

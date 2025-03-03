@@ -23,13 +23,14 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(this)
     internal var isInCharacterSelect = false
 
-    // TODO remove the loqua.staff role and just check for an individual staff role permission - e.g., loqua.staff.administrator
     internal fun isStaffMember(): Boolean {
-        return hasPermission(LoquaPermissions.STAFF)
+        return LoquaPermissions.StaffRole.getRoleFor(this) != null
     }
 
     internal fun isInStaffMode(): Boolean {
         if (!isStaffMember()) return false
+        // If the player is in staff mode, they have a pdc key.
+        // If not, they don't. If the value is false (probably set manually), remove it.
         return persistentDataContainer.get(LoquaDataKeys.Player.IS_IN_STAFF_MODE)?.let { isInStaffMode ->
             if (!isInStaffMode) {
                 persistentDataContainer.remove(LoquaDataKeys.Player.IS_IN_STAFF_MODE)

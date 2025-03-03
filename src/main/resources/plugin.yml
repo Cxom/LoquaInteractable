@@ -13,16 +13,18 @@ commands:
 ################## NEW GTA COMMANDS #######################
 ## staff commands:
     staff-mode:
-        permission: loqua.staff
+        permission: loquainteractable.commands.staff-mode
     unstaff-mode:
-        permission: loqua.staff
+        permission: loquainteractable.commands.staff-mode
 
     persistent-data:
         aliases: [pdc]
-        permission: loqua.staff.administrator
+        permission: loquainteractable.commands.pdc
 
 
 ###########################################################
+
+    # TODO comb through and refine pre-gta/editing commands and their permissions
 
     metadatawand:
         aliases: [mw]
@@ -187,3 +189,33 @@ permissions:
             loquainteractable.commands.util: true
             loquainteractable.commands.killloquaarmorstand: true
             loquainteractable.garbagecans.purge: true
+
+    # STAFF
+    # NOTE THESE ARE JUST SIGNALS OF WHAT ROLE A PLAYER HAS
+    # ACTUAL STAFF PERMISSIONS ARE MANAGED IN GAME UNDER THE GROUP group.<staff-role>
+    # Therefore the only thing they can do is toggle staff mode
+    # TODO change to real staff roles in production/release (moderator instead of architect, builder, explorer)
+    loqua.staff.administator:
+        description: Administrator
+        default: false
+        children:
+            loquainteractable.commands.staff-mode: true
+            loquainteractable.commands.unstaff-mode: true
+    loqua.staff.architect:
+        description: Architect
+        default: false
+        children:
+            loquainteractable.commands.staff-mode: true
+            loquainteractable.commands.unstaff-mode: true
+    loqua.staff.builder:
+        description: Builder
+        default: false
+        children:
+            loquainteractable.commands.staff-mode: true
+            loquainteractable.commands.unstaff-mode: true
+    loqua.staff.explorer:
+        description: Explorer
+        default: false
+        children:
+            loquainteractable.commands.staff-mode: true
+            loquainteractable.commands.unstaff-mode: true

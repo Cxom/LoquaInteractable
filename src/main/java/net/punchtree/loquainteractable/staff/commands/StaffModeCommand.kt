@@ -31,8 +31,6 @@ object StaffModeCommand : CommandExecutor {
 
     // TODO store and offer an option for going back to the last STAFF MODE location
 
-    // TODO make isStaffMember just check all roles and not loqua.staff
-
     data object Messages {
         // staff mode messages
         val ALREADY_IN_STAFF_MODE = text("You are already in staff mode.").color(RED)
@@ -188,7 +186,9 @@ object StaffModeCommand : CommandExecutor {
         // When we give them staff permissions, we check for any such permission
         // and then give them the corresponding *group* permission group.<STAFF_ROLE>
         // inverse to remove
-        val staffRole = LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)
+        val staffRole = checkNotNull(LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)) {
+            "Staff member ${loquaPlayer.name} has no staff role!"
+        }
 
         val permsApi = LuckPermsProvider.get()
         val user = permsApi.getPlayerAdapter(Player::class.java).getUser(loquaPlayer)
@@ -200,7 +200,9 @@ object StaffModeCommand : CommandExecutor {
         val permsApi = LuckPermsProvider.get()
         val user = permsApi.getPlayerAdapter(Player::class.java).getUser(loquaPlayer)
 
-        val staffRole = LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)
+        val staffRole = checkNotNull(LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)) {
+            "Staff member ${loquaPlayer.name} has no staff role!"
+        }
         user.data().remove(staffRole.getPermissionGroup())
     }
 
