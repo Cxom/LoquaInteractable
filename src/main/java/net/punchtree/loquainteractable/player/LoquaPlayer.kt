@@ -20,7 +20,7 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     // TODO have these be normalized by default, not denormalized
     //  (i.e. have them be functions calling the underlying manager for a single source of truth,
     //   and treat having redundant per-player fields (denormalization) as a performance optimization)
-    internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(this)
+    internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(uniqueId)
     internal var isInCharacterSelect = false
 
     internal fun isStaffMember(): Boolean {

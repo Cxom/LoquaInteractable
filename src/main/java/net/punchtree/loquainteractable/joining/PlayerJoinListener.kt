@@ -1,31 +1,26 @@
 package net.punchtree.loquainteractable.joining
 
-import com.github.retrooper.packetevents.event.PacketListener
-import com.github.retrooper.packetevents.event.PacketReceiveEvent
-import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
 import net.kyori.adventure.text.Component
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.LoquaDataKeys
-import net.punchtree.loquainteractable.data.getOrDefault
 import net.punchtree.loquainteractable.data.has
 import net.punchtree.loquainteractable.data.set
 import net.punchtree.loquainteractable.housing.Housings
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
-import net.punchtree.util.debugvar.DebugVars
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
+import org.bukkit.scheduler.BukkitRunnable
 
 class PlayerJoinListener(
     private val playerInputsManager: PlayerInputsManager,
     private val splashScreenManager: SplashScreenManager
-) : Listener, PacketListener {
+) : Listener {
 
     init {
         // TODO this dependency is kind of ugly - any other ideas?
@@ -59,8 +54,6 @@ class PlayerJoinListener(
 //        Bukkit.broadcastMessage("Player ${player.name} join event!")
         event.joinMessage(Component.empty())
 
-        player.teleport(LoquaInteractablePlugin.world.persistentDataContainer.getOrDefault(LoquaDataKeys.World.SPLASH_CINEMATIC_TRACK_1_START, Housings.DEFAULT_HOUSING_SPAWN))
-
         // TODO preprocessing on the player
         //  teleporting them somewhere inconspicuous, but more likely simply hiding them from everyone
         //  on join, put them in spectator mode, etc)
@@ -86,20 +79,6 @@ class PlayerJoinListener(
         splashScreenManager.fadeInOnClientLoadedWorld(player)
     }
 
-    override fun onPacketReceive(event: PacketReceiveEvent) {
-        val player = event.user.profile.uuid?.let { Bukkit.getPlayer(it) }
-        if (event.packetType == PacketType.Play.Client.PLAYER_LOADED) {
-//            val playerLoadedPacket = WrapperPlayClientPlayerLoaded(event)
-            if (player != null) {
-//                Bukkit.broadcastMessage("Player ${player.name} loaded packet event!");
-            } else {
-//                Bukkit.broadcastMessage("Player ${event.user.profile.uuid} loaded packet event, but player is null!");
-            }
-        } else if (DebugVars.getBoolean("packet-debug", false) && player?.name == "Cxom" && event.packetType != PacketType.Play.Client.CLIENT_TICK_END) {
-            Bukkit.broadcastMessage("***Received from ${player.name} packet ${event.packetType}!")
-        }
-    }
-
     private fun onPlayerExitSplashScreen(player: Player) {
         require(player.isConnected)
         val loquaPlayer = LoquaPlayerManager[player]
@@ -120,7 +99,14 @@ class PlayerJoinListener(
          *
          */
 
-        loquaPlayer.teleport(Housings.DEFAULT_HOUSING_SPAWN)
+        // We're already on the main thread, so I'm not sure why this works/is necessary,
+        // but it prevents the "<Player> moved to quickly" warning in console
+        object : BukkitRunnable() {
+            override fun run() {
+                loquaPlayer.teleport(Housings.DEFAULT_HOUSING_SPAWN)
+            }
+        }.runTask(LoquaInteractablePlugin.instance)
+
         loquaPlayer.gameMode = GameMode.ADVENTURE
         loquaPlayer.isInvisible = false
     }

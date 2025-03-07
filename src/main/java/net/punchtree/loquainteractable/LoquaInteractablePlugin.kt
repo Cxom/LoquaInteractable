@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerPriority
+import net.punchtree.loquainteractable._unstable.debug.TempPacketListener
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.SideProfileRenderCommand
 import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
@@ -110,9 +111,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
-        val playerJoinListener = PlayerJoinListener(playerInputsManager, splashScreenManager)
-        pluginManager.registerEvents(playerJoinListener, this)
-        PacketEvents.getAPI().eventManager.registerListener(playerJoinListener, PacketListenerPriority.MONITOR)
+        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager), this)
+        PacketEvents.getAPI().eventManager.registerListener(TempPacketListener(), PacketListenerPriority.MONITOR)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables

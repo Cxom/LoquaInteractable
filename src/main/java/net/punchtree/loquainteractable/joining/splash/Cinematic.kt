@@ -32,19 +32,17 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
     // TODO maybe make the fading out and in (to/from black) based on a parameter in the camera tracks?
 
     private val fakeCameraEntityId = Entity.nextEntityId()
-    private val fakeAudioListenerEntityId =
-        if (DebugVars.getBoolean("player-is-audio-listener", false))
-            player.handle.id
-        else
-            Entity.nextEntityId()
+    // It is very tempting to try to make the player ride the camera entity and be the sound source as way to keep
+    // it continuous, but this is a bad idea - it is important that the emitter be the actually SPECTATED entity
+    // i.e., the camera itself
+    // it would be more appropriate to actually spectate the audio listener entity, and then call that the camera!
+    // the other one is just the interpolator!
+    // TODO this is not a listener! doofus! it's an emitter! the spectated entity (the camera) is the audio listener!
+    //  see above note about maybe ACTUALLY spectating this thing
+    private val fakeAudioListenerEntityId = Entity.nextEntityId()
 
-    private val fadeOutTimeMillis = DebugVars.getInteger("cinematic-fade-out-time", 500).toLong()
-
-    // TODO implement a full blackout buffer AFTER time, for chunk loading
-    /** How long after a full black out before teleporting the player (adjust to prevent visual hiccups where the teleport is visible) **/
-//    private val fullBlackOutBufferTime = DebugVars.getInteger("cinematic-full-black-out-buffer-time", 50).toLong()
-
-    private val fadeInTimeMillis = DebugVars.getInteger("cinematic-fade-in-time", 500).toLong()
+    private val fadeOutTimeMillis = DebugVars.getInteger("cinematic-fade-out-time", 750).toLong()
+    private val fadeInTimeMillis = DebugVars.getInteger("cinematic-fade-in-time", 750).toLong()
 
     private var currentTrackIndex = 0
 
@@ -59,17 +57,23 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
 
     private var isDestroyed = false
 
+    private var hasTeleportedInBlack = false
+    private val blackoutToLoadChunksMillis = DebugVars.getInteger("cinematic-load-chunks-buffer-millis", 600).toLong()
+
     private var startTime = System.currentTimeMillis()
     private fun runningTime() = System.currentTimeMillis() - startTime
 
     init {
+        // the passenger will load chunks on every teleport, but the initial camera and interpolator spawn
+        // don't seem to, so this makes sure chunks are loaded for the very first camera track, including
+        // when this runs for the splash screen immediately after joining
+        player.teleport(currentKeyframe.location)
+
         validateCameraTracks()
 
         blackOut(player)
 
-        if (!DebugVars.getBoolean("player-is-audio-listener", false)) {
-            spawnFakeAudioListener(fakeAudioListenerEntityId, player, currentKeyframe.location)
-        }
+        spawnFakeAudioListener(fakeAudioListenerEntityId, player, currentKeyframe.location)
 
         CameraUtils.spawnFakeCamera(fakeCameraEntityId, player, currentKeyframe.location, 0, fakeAudioListenerEntityId)
 
@@ -177,23 +181,32 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
 
     private fun update() {
         // TODO because we've modified the implementation to be packet based, we can do this all async, and via kotlin coroutines
+        // TODO check for isConnected?
 
         val currentTimeMillis = System.currentTimeMillis()
         if (currentTimeMillis >= endOfCurrentTrack) {
-            advanceToNextTrack()
-        }
+            if (!hasTeleportedInBlack) {
+                player.teleport(cameraTracks[nextTrackIndex()].keyframes.first().location)
+                hasTeleportedInBlack = true
+            }
 
-        if (currentTimeMillis >= endOfCurrentKeyframe) {
+            if (currentTimeMillis >= endOfCurrentTrack + blackoutToLoadChunksMillis) {
+                hasTeleportedInBlack = false
+                advanceToNextTrack()
+                startTrackToNextKeyframe()
+            }
+        } else if (currentTimeMillis >= endOfCurrentKeyframe) {
             startTrackToNextKeyframe()
-        }
-
-        if (!isFadingOut && currentTimeMillis + fadeOutTimeMillis /*+ fullBlackOutBufferTime*/ >= endOfCurrentTrack) {
+        } else if (!isFadingOut && currentTimeMillis + fadeOutTimeMillis >= endOfCurrentTrack) {
+            // TODO would it be a minor improvement to make the fadeOutTimeMillis the actual millis until the end of the track,
+            //  instead of the specified, to make the timing perfect to what's expected?
             fadeOut(player, fadeOutTimeMillis)
             isFadingOut = true
         }
     }
 
     private fun destroy() {
+        require(!isDestroyed) { "Cinematic already destroyed" }
         CameraUtils.removeCamera(fakeCameraEntityId, player)
         player.handle.connection.send(ClientboundRemoveEntitiesPacket(fakeAudioListenerEntityId))
 

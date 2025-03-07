@@ -30,7 +30,7 @@ class SplashScreenManager : Listener {
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
     internal fun startSplashScreen(player: LoquaPlayer) {
-        require(!isInSplashScreen(player)) {
+        require(!isInSplashScreen(player.uniqueId)) {
             "Player ${player.name} is already in the splash screen!"
         }
 
@@ -44,7 +44,7 @@ class SplashScreenManager : Listener {
         player.sendActionBar(Component.text("Press Space to Play!"))
     }
 
-    fun isInSplashScreen(player: LoquaPlayer) = splashScreenPlayers.contains(player.uniqueId)
+    fun isInSplashScreen(uniqueId: UUID) = splashScreenPlayers.contains(uniqueId)
 
     internal fun fadeInOnClientLoadedWorld(player: LoquaPlayer) {
         // The cinematic has already started - do the fade in and set the overlay
@@ -59,7 +59,7 @@ class SplashScreenManager : Listener {
                 override fun run() {
                     // isConnected references the same connection, so this won't cause a bug for players that have reconnected in the meantime
                     // player.isOnline WOULD cause that bug
-                    if (player.isConnected && isInSplashScreen(player)) {
+                    if (player.isConnected && isInSplashScreen(player.uniqueId)) {
                         player.setCameraOverlay(CameraOverlays.LOQUA_SPLASH)
                     }
                 }

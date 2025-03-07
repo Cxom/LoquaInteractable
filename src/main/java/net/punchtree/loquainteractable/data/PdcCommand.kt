@@ -31,6 +31,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO implement the ability to set locations with actual data
 
+    // TODO - exporting system
+    // TODO - backup system
+
     /** Certain third-party namespaces are data we're not interested in */
     private val defaultFilters = setOf("axiom")
 

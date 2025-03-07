@@ -44,6 +44,24 @@ object CameraUtils {
         durationTicks: Int,
         passengerEntityId: Int
     ) {
+        // TODO this might cause problems if called async?
+        // This is necessary as we don't want to teleport, we just want the server
+        // to think the player is nearby in order to send them the chunks they need
+        player.handle.setPos(location.x, location.y, location.z)
+
+        // This packet is necessary when teleporting across chunks so that the client knows that the audio listener is currently
+        // in the right chunk (and can be mounted on the other entity
+        val passengerTeleportPacket = ClientboundEntityPositionSyncPacket(
+            passengerEntityId,
+            PositionMoveRotation(
+                Vec3(location.x, location.y, location.z),
+                Vec3(0.0, 0.0, 0.0),
+                0f,
+                0f
+            ),
+            false
+        )
+
         val addPacket = ClientboundAddEntityPacket(
             cameraEntityId,
             UUID.randomUUID(),
@@ -97,7 +115,7 @@ object CameraUtils {
         player.handle.connection.send(passengersPacket)
 
         val packetBundle =
-            ClientboundBundlePacket(listOf(addPacket, metadataPacket, gameModeChangePacket, spectateTheCameraPacket, passengersPacket))
+            ClientboundBundlePacket(listOf(passengerTeleportPacket, addPacket, metadataPacket, gameModeChangePacket, spectateTheCameraPacket, passengersPacket))
 
         // TODO extensions for packets
         player.handle.connection.send(packetBundle)
