@@ -31,6 +31,10 @@ object StaffModeCommand : CommandExecutor {
 
     // TODO store and offer an option for going back to the last STAFF MODE location
 
+    // TODO foolproof staff role fetching, saving, and checking against changes to the underlying permissions
+    //  if a user lacks a staff role permission, or has a different one to the group they are in, their group
+    //  should be removed or updated to match. trust the loqua.staff.<STAFF_ROLE> permission as authoritative
+
     data object Messages {
         // staff mode messages
         val ALREADY_IN_STAFF_MODE = text("You are already in staff mode.").color(RED)

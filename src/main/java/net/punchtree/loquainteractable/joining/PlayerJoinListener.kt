@@ -2,12 +2,16 @@ package net.punchtree.loquainteractable.joining
 
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.has
 import net.punchtree.loquainteractable.data.set
 import net.punchtree.loquainteractable.housing.Housings
 import net.punchtree.loquainteractable.input.PlayerInputsManager
+import net.punchtree.loquainteractable.player.LoquaPermissions
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -40,18 +44,20 @@ class PlayerJoinListener(
         val loquaPlayer = LoquaPlayerManager.initializePlayer(player)
         playerInputsManager.initializeInputs(player.uniqueId)
 
-        if (!loquaPlayer.persistentDataContainer.has(LoquaDataKeys.Player.INVENTORY)) {
+        if (!loquaPlayer.persistentDataContainer.has(LoquaDataKeys.Player.INVENTORY) && loquaPlayer.isStaffMember()) {
             loquaPlayer.persistentDataContainer.set(LoquaDataKeys.Player.IS_IN_STAFF_MODE, true)
-            return
         }
 
         if (loquaPlayer.isInStaffMode()) {
             // TODO as we add characters, players in STAFF MODE should not have any character, just their skin
             //  we need to account for that
+
+            loquaPlayer.sendMessage(text("You are in staff mode (${LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)})!").decorate(TextDecoration.ITALIC).color(NamedTextColor.YELLOW))
             return
         }
 
 //        Bukkit.broadcastMessage("Player ${player.name} join event!")
+        // TODO eventually cancel joins for staff too, and decide on what to do for joining notices
         event.joinMessage(Component.empty())
 
         // TODO preprocessing on the player
