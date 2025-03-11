@@ -87,10 +87,13 @@ import java.util.stream.Collector;
 @SuppressWarnings({"deprecation", "UnstableApiUsage"})
 public class PlayerDecorator implements Player {
 
-    // TODO in order to prevent bugs, we need to check every default method in an interface
-    //  in the player hierarchy that might be overridden by CraftPlayer
-    //  and see if it is, and if so, delegate it
-    //  (e.g. every method in audience)
+    /* To update this class, do the following:
+     * - Go into the delegated methods region
+     * - In Intellij, right-click on an empty line, and click "Generate" -> "Delegate Methods"
+     * - Select player:Player
+     * - Select everything (every not-already-delegated method)
+     * - Click OK
+     */
 
     private final @NotNull Player player;
 
@@ -1701,6 +1704,16 @@ public class PlayerDecorator implements Player {
     @Override
     public @NotNull PlayerGiveResult give(@NotNull Collection<ItemStack> items, boolean dropIfFull) {
         return player.give(items, dropIfFull);
+    }
+
+    @Override
+    public int getDeathScreenScore() {
+        return player.getDeathScreenScore();
+    }
+
+    @Override
+    public void setDeathScreenScore(int i) {
+        player.setDeathScreenScore(i);
     }
 
     @Override
