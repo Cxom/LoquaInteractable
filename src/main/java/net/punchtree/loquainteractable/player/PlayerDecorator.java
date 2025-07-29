@@ -5,20 +5,25 @@ import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.block.TargetBlockInfo;
 import com.destroystokyo.paper.entity.TargetEntityInfo;
 import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.connection.PlayerGameConnection;
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.entity.LookAnchor;
 import io.papermc.paper.entity.PlayerGiveResult;
 import io.papermc.paper.entity.TeleportFlag;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
+import io.papermc.paper.world.damagesource.CombatTracker;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.chat.ChatType;
 import net.kyori.adventure.chat.SignedMessage;
+import net.kyori.adventure.dialog.DialogLike;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointer;
 import net.kyori.adventure.pointer.Pointers;
 import net.kyori.adventure.resource.ResourcePackInfoLike;
@@ -4393,6 +4398,88 @@ public class PlayerDecorator implements Player {
     @Nullable
     public InetSocketAddress getVirtualHost() {
         return player.getVirtualHost();
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    public void openVirtualSign(Position position, Side side) {
+        player.openVirtualSign(position, side);
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    public PlayerGameConnection getConnection() {
+        return player.getConnection();
+    }
+
+    @Override
+    public int getCooldown(Key key) {
+        return player.getCooldown(key);
+    }
+
+    @Override
+    public void setCooldown(Key key, int i) {
+        player.setCooldown(key, i);
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    public @NotNull CombatTracker getCombatTracker() {
+        return player.getCombatTracker();
+    }
+
+    @Override
+    public void setVisualFire(@NotNull TriState triState) {
+        player.setVisualFire(triState);
+    }
+
+    @Override
+    @NotNull
+    public TriState getVisualFire() {
+        return player.getVisualFire();
+    }
+
+    @Override
+    @NotNull
+    public ItemStack getPickItemStack() {
+        return player.getPickItemStack();
+    }
+
+    @Override
+    public boolean isTrackedBy(@NotNull Player player) {
+        return this.player.isTrackedBy(player);
+    }
+
+    @Override
+    public void showDialog(@NotNull DialogLike dialog) {
+        player.showDialog(dialog);
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    @Contract(pure = true)
+    public <T> @Nullable T getData(DataComponentType.Valued<T> valued) {
+        return player.getData(valued);
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    @Contract(value = "_, !null -> !null", pure = true)
+    public <T> @Nullable T getDataOrDefault(DataComponentType.Valued<? extends T> valued, @Nullable T t) {
+        return player.getDataOrDefault(valued, t);
+    }
+
+    @Override
+    @ApiStatus.Experimental
+    @Contract(pure = true)
+    public boolean hasData(DataComponentType dataComponentType) {
+        return player.hasData(dataComponentType);
+    }
+
+    @Override
+    @Nullable
+    public Location getRespawnLocation(boolean b) {
+        return player.getRespawnLocation(b);
     }
     //endregion
 }

@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     `java-library`
     `maven-publish`
-    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
 
     id("com.gradleup.shadow") version "8.3.5"
 }
@@ -42,7 +42,7 @@ val ftpAntTask by configurations.creating
 dependencies {
     compileOnly(kotlin("stdlib"))
 
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 
     compileOnly("net.punchtree:persistentmetadata:0.0.1-SNAPSHOT")
     compileOnly("net.punchtree:punchtree-util:1.7.0-SNAPSHOT")
