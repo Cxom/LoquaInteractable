@@ -1,6 +1,6 @@
 name: LoquaInteractable
 main: net.punchtree.loquainteractable.LoquaInteractablePlugin
-version: 1.2.1.1
+version: 1.2.1.2
 api-version: 1.21
 author: Cxom
 depend: [PersistentMetadata, PunchTree-Util, ProtocolLib, LuckPerms, Citizens, QualityArmory, packetevents]
@@ -158,6 +158,7 @@ commands:
     side-profile-render:
         usage: /side-profile-render scan <left> <up> <right> <down>
         permission: loquainteractable.commands.side-profile-render
+    worldedithugerotate:
 
 ############### PERMISSIONS ###############
 permissions:

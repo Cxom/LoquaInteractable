@@ -59,7 +59,11 @@ dependencies {
         exclude("*", "*")
     }
     compileOnly("me.zombie_striker:QualityArmory:2.0.17")
-    
+
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.52")) // Ref: https://github.com/IntellectualSites/bom
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 

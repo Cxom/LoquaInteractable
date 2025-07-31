@@ -192,6 +192,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // experimental
         getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
         getCommand("uitesting")!!.setExecutor(UiTestingCommand)
+        getCommand("worldedithugerotate")!!.setExecutor(WorldEditHugeRotate.WorldEditHugeRotateCommand)
     }
 
     override fun onDisable() {
@@ -208,6 +209,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
         MetadataEditingSessionManager.cleanupSessions()
 
         protocolManager.removePacketListeners(this)
+
+        WorldEditHugeRotate.onDisable()
     }
 
 
