@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/LoquaInteractable.loqua-interactable.main.iml" filepath="$PROJECT_DIR$/.idea/modules/LoquaInteractable.loqua-interactable.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/LoquaInteractable.loqua-interactable.test.iml" filepath="$PROJECT_DIR$/.idea/modules/LoquaInteractable.loqua-interactable.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/loqua-interactable.main.iml" filepath="$PROJECT_DIR$/.idea/modules/loqua-interactable.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/loqua-interactable.test.iml" filepath="$PROJECT_DIR$/.idea/modules/loqua-interactable.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.punchtree.loqua-interactable.main.iml" filepath="$PROJECT_DIR$/.idea/modules/net.punchtree.loqua-interactable.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.punchtree.loqua-interactable.test.iml" filepath="$PROJECT_DIR$/.idea/modules/net.punchtree.loqua-interactable.test.iml" />
     </modules>
   </component>
 </project>

@@ -9,7 +9,6 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.punchtree.loquainteractable.LoquaConstants
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -18,8 +17,10 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MenuType
+import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.persistence.PersistentDataType
+import java.util.concurrent.CompletableFuture
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -48,24 +49,31 @@ object PdcCommand : CommandExecutor, TabCompleter {
 
         if (args.size < 2) return false
 
-        val pdcHolderName = args[0]
-        val pdcHolder = getPdcHolderFromName(pdcHolderName) ?: run {
-            sender.sendMessage(Messages.PLAYER_NOT_FOUND(pdcHolderName))
+        try {
+
+            val pdcHolderName = args[0]
+            val pdcHolder = getPdcHolderFromName(pdcHolderName) ?: run {
+                sender.sendMessage(Messages.PLAYER_NOT_FOUND(pdcHolderName))
+                return true
+            }
+
+            when (val subcommand = args[1].lowercase()) {
+                "keys" -> showKeys(sender, pdcHolder, pdcHolderName, args)
+                "remove" -> removeData(sender, pdcHolder, pdcHolderName, args)
+                "view-items" -> viewItems(sender, pdcHolder, pdcHolderName, args)
+                "get" -> get(sender, pdcHolder, pdcHolderName, args)
+                "set" -> setSubcommand(sender, pdcHolder, pdcHolderName, args)
+                "get-unsafe" -> getUnsafe(sender, pdcHolder, pdcHolderName, args)
+                "set-unsafe" -> setUnsafe(sender, pdcHolder, pdcHolderName, args)
+                else -> sender.sendMessage("Unknown subcommand: $subcommand")
+            }
+
+        } catch (e: IllegalArgumentException) {
+            sender.sendMessage(checkNotNull(e.message))
             return true
         }
 
-        when (val subcommand = args[1].lowercase()) {
-            "keys" -> showKeys(sender, pdcHolder, pdcHolderName, args)
-            "remove" -> removeData(sender, pdcHolder, pdcHolderName, args)
-            "view-items" -> viewItems(sender, pdcHolder, pdcHolderName, args)
-            "get" -> get(sender, pdcHolder, pdcHolderName, args)
-            "set" -> set(sender, pdcHolder, pdcHolderName, args)
-            "get-unsafe" -> getUnsafe(sender, pdcHolder, pdcHolderName, args)
-            "set-unsafe" -> setUnsafe(sender, pdcHolder, pdcHolderName, args)
-            else -> sender.sendMessage("Unknown subcommand: $subcommand")
-        }
-
-        return true;
+        return true
     }
 
     private fun getPdcHolderFromName(pdcHolderName: String) : PersistentDataHolder? {
@@ -134,114 +142,86 @@ object PdcCommand : CommandExecutor, TabCompleter {
         sender.sendMessage(pdcSourceComponent.append(text(" ")).append(namespacedKeyComponent).append(text(" ")).append(valueComponent))
     }
 
-    private fun set(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
-        if (args.size < 4) {
-            sender.sendMessage("Usage: /pdc <player> set <namespacedKey> <value>")
-            return
-        }
+    private fun setSubcommand(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
+        val loquaDataKey = parseKeyFromUserInput(sender, pdcHolder, pdcHolderName, args)
+
         val pdc = pdcHolder.persistentDataContainer
-        val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
-            sender.sendMessage("Invalid namespacedKey '${args[2]}'")
-            return
+        editValueOfType(pdc, loquaDataKey, sender, args).thenApply { value ->
+            val setSuccessMessage =
+                text("Set ").color(SUCCESSFUL_MODIFICATION_COLOR)
+                    .append(pdcSourceComponent(pdcHolderName))
+                    .append(text(" "))
+                    .append(namespacedKeyComponent(loquaDataKey.namespacedKey))
+                    .append(text(" to ").color(SUCCESSFUL_MODIFICATION_COLOR))
+                    .append(getPdcValueString(value, loquaDataKey.persistentDataType, loquaDataKey.namespacedKey, pdcHolderName))
+            sender.sendMessage(setSuccessMessage)
         }
-        val loquaDataKey = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey] ?: run {
-            sender.sendMessage("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry - use 'set-unsafe' to access it anyway")
-            return
+    }
+
+    private fun parseKeyFromUserInput(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>): LoquaDataKey<out Any, out Any> {
+        if (args.size < 4) {
+            throw IllegalArgumentException("Usage: /pdc <player> set <namespacedKey> <value>")
         }
-        val setValue: Any = when (val dataType = loquaDataKey.persistentDataType) {
-            // We can't use the convenient extension functions here because of type erasure since thes sets are dynamic
-            // TODO really use more advanced brigadier commands to parse a bit better
-            DataType.STRING -> pdc.set(namespacedKey, DataType.STRING, args.sliceArray(3 until args.size).joinToString(" "))
-            DataType.BOOLEAN -> args[3].lowercase().toBooleanStrictOrNull()?.let {
-                pdc.set(namespacedKey, DataType.BOOLEAN, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a boolean")
-                return
-            }
 
-            DataType.INTEGER -> args[3].toIntOrNull()?.let {
-                pdc.set(namespacedKey, DataType.INTEGER, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not an integer")
-                return
-            }
+        val namespacedKey = NamespacedKey.fromString(args[2])
+            ?: throw IllegalArgumentException("Invalid namespacedKey '${args[2]}'")
 
-            DataType.LONG -> args[3].toLongOrNull()?.let {
-                pdc.set(namespacedKey, DataType.LONG, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a long")
-                return
-            }
+        val loquaDataKey = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]
+            ?: throw IllegalArgumentException("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry - use 'set-unsafe' to access it anyway")
 
-            DataType.DOUBLE -> args[3].toDoubleOrNull()?.let {
-                pdc.set(namespacedKey, DataType.DOUBLE, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a double")
-                return
-            }
+        return loquaDataKey
+    }
 
-            DataType.FLOAT -> args[3].toFloatOrNull()?.let {
-                pdc.set(namespacedKey, DataType.FLOAT, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a float")
-                return
-            }
+    private fun <P : Any, C : Any> editValueOfType(pdc: PersistentDataContainer, loquaDataKey: LoquaDataKey<P, C>, sender: Player, args: Array<out String>): CompletableFuture<C> {
+        // TODO replace InspectablePersistentDataType with a mapped dataHandler types specific to this command, as that's the only place they're used
 
-            DataType.BYTE -> args[3].toByteOrNull()?.let {
-                pdc.set(namespacedKey, DataType.BYTE, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a byte")
-                return
-            }
+        if (loquaDataKey.persistentDataType !is InspectablePersistentDataType<P, C>)
+            throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
 
-            DataType.SHORT -> args[3].toShortOrNull()?.let {
-                pdc.set(namespacedKey, DataType.SHORT, it)
-                it
-            } ?: run {
-                sender.sendMessage("Error: '${args[3]}' is not a short")
-                return
-            }
+        return loquaDataKey.persistentDataType.edit(pdc, loquaDataKey, sender, args.sliceArray(3 until args.size))
+    }
 
-            DataType.LOCATION -> {
-                if (!sender.location.world.equals(LoquaInteractablePlugin.world)) {
-                    sender.sendMessage("Error: '${sender.location.world.name}' is not the Loqua world")
-                    return
-                }
-                when {
-                    args[3] == "eye" -> {
-                        pdc.set(namespacedKey, DataType.LOCATION, sender.eyeLocation)
-                        sender.eyeLocation
-                    }
-                    args[3] == "feet" -> {
-                        pdc.set(namespacedKey, DataType.LOCATION, sender.location)
-                        sender.location
-                    }
-                    else -> {
-                        sender.sendMessage("Error: '${args[3]}' is not 'eye' or 'feet'")
-                        return
-                    }
-                }
+    private fun parseValueOfType(loquaDataKey: LoquaDataKey<out Any, out Any>, args: Array<out String>, sender: Player): Any = when (loquaDataKey.persistentDataType) {
+        DataType.STRING -> args.slice(3 until args.size).joinToString(" ")
+        DataType.BOOLEAN -> args[3].lowercase().toBooleanStrictOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a boolean")
+
+        DataType.BYTE -> args[3].toByteOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a byte")
+
+        DataType.SHORT -> args[3].toShortOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a short")
+
+        DataType.INTEGER -> args[3].toIntOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not an integer")
+
+        DataType.LONG -> args[3].toLongOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a long")
+
+        DataType.FLOAT -> args[3].toFloatOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a float")
+
+        DataType.DOUBLE -> args[3].toDoubleOrNull()
+            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a double")
+
+        DataType.LOCATION -> {
+            if (!sender.location.world.equals(LoquaInteractablePlugin.world)) {
+                throw IllegalArgumentException("Error: '${sender.location.world.name}' is not the Loqua world")
             }
-            else -> {
-                sender.sendMessage("Error: NamespacedKey '$namespacedKey' is not a supported type for setting (${dataType.complexType.simpleName})")
-                return
+            when {
+                args[0] == "eye" -> sender.eyeLocation
+                args[0] == "feet" -> sender.location
+                else -> throw IllegalArgumentException("Error: '${args[0]}' is not 'eye' or 'feet'")
             }
         }
 
-        val setDataMessage =
-            text("Set ").color(SUCCESSFUL_MODIFICATION_COLOR)
-            .append(pdcSourceComponent(pdcHolderName))
-            .append(text(" "))
-            .append(namespacedKeyComponent(namespacedKey))
-            .append(text(" to ").color(SUCCESSFUL_MODIFICATION_COLOR))
-            .append(getPdcValueString(setValue, loquaDataKey.persistentDataType, namespacedKey, pdcHolderName))
-        sender.sendMessage(setDataMessage)
+        else -> throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
+
+        //        if (loquaDataKey.persistentDataType !is InspectablePersistentDataType<*, *>)
+//            throw IllegalArgumentException("Error: NamespacedKey '$namespacedKey' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
+//
+//        val inspectableDataType = loquaDataKey.persistentDataType as InspectablePersistentDataType<*, *>
+//        val value = checkNotNull(inspectableDataType.parse(sender, args.sliceArray(3 until args.size)))
     }
 
     private fun pdcSourceComponent(pdcHolderName: String) =
@@ -332,20 +312,12 @@ object PdcCommand : CommandExecutor, TabCompleter {
         if (value == null) {
             return text("null (${dataType.complexType.simpleName})").color(DATA_VALUE_COLOR)
         }
+
+        if (dataType is InspectablePersistentDataType<P, C>) {
+            return dataType.display(value).color(DATA_VALUE_COLOR)
+        }
+
         return when (dataType) {
-            DataType.STRING,
-            DataType.BOOLEAN,
-            DataType.INTEGER,
-            DataType.LONG,
-            DataType.DOUBLE,
-            DataType.FLOAT,
-            DataType.BYTE,
-            DataType.SHORT -> text(value.toString()).color(DATA_VALUE_COLOR)
-            DataType.LOCATION -> {
-                value as Location
-                // TODO minimessage color (USE player::sendRichMessage)
-                value.toSimpleString().color(DATA_VALUE_COLOR)
-            }
             DataType.ITEM_STACK -> {
                 value as ItemStack
                 text("[${value.type}:${value.amount}]").decorate(TextDecoration.UNDERLINED).hoverEvent(value).color(
@@ -364,16 +336,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
         }
     }
 
-    // TODO move/organize into single location for pretty-printing utils
-    //  -- See: PrintingObjectUtils <- unify with that
-    // TODO rename this function to reflect that it is not a string
-    internal fun Location.toSimpleString(decimalPrecision: Int = 2): Component {
-        /** constrained decimal precision */
-        val cdp = decimalPrecision.coerceIn(0, 10)
-        val text = "[x:%.${cdp}f y:%.${cdp}f z:%.${cdp}f yaw:%.${cdp}f pitch:%.${cdp}f]".format(x, y, z, yaw, pitch)
-        val rawNumbers = "%.${cdp}f %.${cdp}f %.${cdp}f  %.${cdp}f %.${cdp}f".format(x, y, z, yaw, pitch)
-        return text(text).insertion(rawNumbers)
-    }
+
 
     private fun removeData(sender: Player, pdcHolder: PersistentDataHolder, pdcHolderName: String, args: Array<out String>) {
         // TODO this is kind of dangerous - should we do something to protect stuff? maybe an undo cache?

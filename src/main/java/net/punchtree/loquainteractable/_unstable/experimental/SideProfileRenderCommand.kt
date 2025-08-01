@@ -2,7 +2,7 @@ package net.punchtree.loquainteractable._unstable.experimental
 
 import net.kyori.adventure.text.Component.text
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
-import net.punchtree.loquainteractable.data.PdcCommand.toSimpleString
+import net.punchtree.loquainteractable.displayutil.toSimpleString
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
