@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.punchtree.loquainteractable.LoquaConstants
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
+import net.punchtree.loquainteractable.text.LoquaTextColors.failure
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
@@ -28,7 +29,7 @@ import kotlin.math.sign
 object PdcCommand : CommandExecutor, TabCompleter {
 
     // TODO go through all messaging and make sure it's got consistent styling
-    // TODO make sure keys are case-insensitive by forcing all input to be lowercase
+    // TODO replace all error messages accompanying early returns with thrown IllegalArgumentExceptions
 
     // TODO implement the ability to set locations with actual data
 
@@ -38,12 +39,6 @@ object PdcCommand : CommandExecutor, TabCompleter {
     /** Certain third-party namespaces are data we're not interested in */
     private val defaultFilters = setOf("axiom")
 
-    @Suppress("FunctionName")
-    private data object Messages {
-        fun PLAYER_NOT_FOUND(playerName: String) = text("Player $playerName not found").color(NamedTextColor.RED)
-        // TODO
-    }
-
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if ( sender !is Player) return false
 
@@ -52,10 +47,8 @@ object PdcCommand : CommandExecutor, TabCompleter {
         try {
 
             val pdcHolderName = args[0]
-            val pdcHolder = getPdcHolderFromName(pdcHolderName) ?: run {
-                sender.sendMessage(Messages.PLAYER_NOT_FOUND(pdcHolderName))
-                return true
-            }
+            val pdcHolder = getPdcHolderFromName(pdcHolderName) ?:
+                throw IllegalArgumentException("Player $pdcHolderName not found")
 
             when (val subcommand = args[1].lowercase()) {
                 "keys" -> showKeys(sender, pdcHolder, pdcHolderName, args)
@@ -69,7 +62,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             }
 
         } catch (e: IllegalArgumentException) {
-            sender.sendMessage(checkNotNull(e.message))
+            sender.sendMessage(failure(checkNotNull(e.message)))
             return true
         }
 
@@ -94,7 +87,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
         val pdc = pdcHolder.persistentDataContainer
         val filteredKeys = pdc.keys.filter {
             return@filter when {
-                args.size >= 3 && it.namespace != args[2] -> false
+                args.size >= 3 && it.namespace != args[2].lowercase() -> false
                 defaultFilters.contains(it.namespace) -> false
                 else -> true
             }
@@ -120,8 +113,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
             return
         }
         val pdc = pdcHolder.persistentDataContainer
-        val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
-            sender.sendMessage("Invalid namespacedKey '${args[2]}'")
+        val namespacedKeyRawString = args[2]
+        val namespacedKey = NamespacedKey.fromString(namespacedKeyRawString) ?: run {
+            sender.sendMessage("Invalid namespacedKey '$namespacedKeyRawString'")
             return
         }
         val dataType = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]?.persistentDataType ?: run {
@@ -163,8 +157,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
             throw IllegalArgumentException("Usage: /pdc <player> set <namespacedKey> <value>")
         }
 
-        val namespacedKey = NamespacedKey.fromString(args[2])
-            ?: throw IllegalArgumentException("Invalid namespacedKey '${args[2]}'")
+        val namespacedKeyRawString = args[2].lowercase()
+        val namespacedKey = NamespacedKey.fromString(namespacedKeyRawString)
+            ?: throw IllegalArgumentException("Invalid namespacedKey '$namespacedKeyRawString'")
 
         val loquaDataKey = LoquaDataKeys.registryForPdcTypeOf(pdcHolder)[namespacedKey]
             ?: throw IllegalArgumentException("Warning: NamespacedKey '$namespacedKey' is not in the Loqua registry - use 'set-unsafe' to access it anyway")
@@ -177,43 +172,6 @@ object PdcCommand : CommandExecutor, TabCompleter {
             ?: throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
 
         return handler.edit(pdc, loquaDataKey, sender, args.sliceArray(3 until args.size))
-    }
-
-    private fun parseValueOfType(loquaDataKey: LoquaDataKey<out Any, out Any>, args: Array<out String>, sender: Player): Any = when (loquaDataKey.persistentDataType) {
-        DataType.STRING -> args.slice(3 until args.size).joinToString(" ")
-        DataType.BOOLEAN -> args[3].lowercase().toBooleanStrictOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a boolean")
-
-        DataType.BYTE -> args[3].toByteOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a byte")
-
-        DataType.SHORT -> args[3].toShortOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a short")
-
-        DataType.INTEGER -> args[3].toIntOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not an integer")
-
-        DataType.LONG -> args[3].toLongOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a long")
-
-        DataType.FLOAT -> args[3].toFloatOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a float")
-
-        DataType.DOUBLE -> args[3].toDoubleOrNull()
-            ?: throw IllegalArgumentException("Error: '${args[3]}' is not a double")
-
-        DataType.LOCATION -> {
-            if (!sender.location.world.equals(LoquaInteractablePlugin.world)) {
-                throw IllegalArgumentException("Error: '${sender.location.world.name}' is not the Loqua world")
-            }
-            when {
-                args[0] == "eye" -> sender.eyeLocation
-                args[0] == "feet" -> sender.location
-                else -> throw IllegalArgumentException("Error: '${args[0]}' is not 'eye' or 'feet'")
-            }
-        }
-
-        else -> throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
     }
 
     private fun pdcSourceComponent(pdcHolderName: String) =
@@ -239,8 +197,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
             return
         }
         val pdc = pdcHolder.persistentDataContainer
-        val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
-            sender.sendMessage("Invalid namespacedKey '${args[2]}'")
+        val namespacedKeyRawString = args[2].lowercase()
+        val namespacedKey = NamespacedKey.fromString(namespacedKeyRawString) ?: run {
+            sender.sendMessage("Invalid namespacedKey '$namespacedKeyRawString'")
             return
         }
         when {
@@ -339,8 +298,9 @@ object PdcCommand : CommandExecutor, TabCompleter {
             return
         }
         val pdc = pdcHolder.persistentDataContainer
-        val namespacedKey = NamespacedKey.fromString(args[2]) ?: run {
-            sender.sendMessage("Invalid namespacedKey '${args[2]}'")
+        val namespacedKeyRawString = args[2].lowercase()
+        val namespacedKey = NamespacedKey.fromString(namespacedKeyRawString) ?: run {
+            sender.sendMessage("Invalid namespacedKey '$namespacedKeyRawString'")
             return
         }
         pdc.remove(namespacedKey)
