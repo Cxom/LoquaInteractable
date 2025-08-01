@@ -103,7 +103,7 @@ fun <P : Any, C : Any> PersistentDataContainer.getOrDefault(key: LoquaDataKey<P,
     return get(key.namespacedKey, key.persistentDataType) ?: default
 }
 
-fun <P : Any, C : Any> PersistentDataContainer.set(key: LoquaDataKey<P, C>, value: C) {
+fun <C : Any> PersistentDataContainer.set(key: LoquaDataKey<*, C>, value: C) {
     set(key.namespacedKey, key.persistentDataType, value)
 }
 

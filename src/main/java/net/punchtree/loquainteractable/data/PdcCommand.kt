@@ -173,7 +173,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
     }
 
     private fun <P : Any, C : Any> editValueOfType(pdc: PersistentDataContainer, loquaDataKey: LoquaDataKey<P, C>, sender: Player, args: Array<out String>): CompletableFuture<C> {
-        val handler = DataHandlerRegistry.getHandler(loquaDataKey.persistentDataType)
+        val handler = DataHandlerRegistry[loquaDataKey.persistentDataType]
             ?: throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
 
         return handler.edit(pdc, loquaDataKey, sender, args.sliceArray(3 until args.size))
@@ -305,7 +305,7 @@ object PdcCommand : CommandExecutor, TabCompleter {
             return text("null (${dataType.complexType.simpleName})").color(DATA_VALUE_COLOR)
         }
 
-        val handler = DataHandlerRegistry.getHandler(dataType)
+        val handler = DataHandlerRegistry[dataType]
         if (handler != null) {
             @Suppress("UNCHECKED_CAST")
             return (handler as DataHandler<C>).display(value).color(DATA_VALUE_COLOR)
