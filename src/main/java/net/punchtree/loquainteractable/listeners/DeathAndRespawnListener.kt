@@ -1,10 +1,10 @@
-package net.punchtree.loquainteractable.death
+package net.punchtree.loquainteractable.listeners
 
 import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.get
 import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
-import net.punchtree.loquainteractable.text.LoquaTextColors.warning
+import net.punchtree.loquainteractable.text.LoquaTextColors
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -12,14 +12,14 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 
 //TODO register
-class OnDeath : Listener {
+class DeathAndRespawnListener : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = LoquaPlayerManager[event.entity]
 
         if (player.isInStaffMode()) {
-            player.sendMessage(warning("Why are you dying in staff mode??"))
+            player.sendMessage(LoquaTextColors.warning("Why are you dying in staff mode??"))
         }
 
 
@@ -31,7 +31,7 @@ class OnDeath : Listener {
         val player = LoquaPlayerManager[event.player]
 
         if (player.isInStaffMode()) {
-            player.sendMessage(warning("Why are you respawning in staff mode??"))
+            player.sendMessage(LoquaTextColors.warning("Why are you respawning in staff mode??"))
             return
         }
 

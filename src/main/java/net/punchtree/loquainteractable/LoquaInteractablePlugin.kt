@@ -37,6 +37,7 @@ import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingS
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
+import net.punchtree.loquainteractable.player.character.select.CharacterSelectManager
 import net.punchtree.loquainteractable.quitting.PlayerQuitListener
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
