@@ -196,6 +196,12 @@ permissions:
     # ACTUAL STAFF PERMISSIONS ARE MANAGED IN GAME UNDER THE GROUP group.<staff-role>
     # Therefore the only thing they can do is toggle staff mode
     # TODO change to real staff roles in production/release (moderator instead of architect, builder, explorer)
+    loqua.staff.owner:
+        description: Owner
+        default: false
+        children:
+            loquainteractable.commands.staff-mode: true
+            loquainteractable.commands.unstaff-mode: true
     loqua.staff.administrator:
         description: Administrator
         default: false

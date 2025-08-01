@@ -6,6 +6,7 @@ data object LoquaPermissions {
 
     enum class StaffRole {
 
+        OWNER,
         ADMINISTRATOR,
         // WHILE INDEV ON BUILD SERVER - REPLACE WITH REAL STAFF ROLES IN PRODUCTION
         ARCHITECT,
@@ -19,6 +20,7 @@ data object LoquaPermissions {
                     loquaPlayer.hasPermission("loqua.staff.builder") -> BUILDER
                     loquaPlayer.hasPermission("loqua.staff.architect") -> ARCHITECT
                     loquaPlayer.hasPermission("loqua.staff.administrator") -> ADMINISTRATOR
+                    loquaPlayer.hasPermission("loqua.staff.owner") -> OWNER
                     else -> null
                 }
         }
