@@ -114,7 +114,7 @@ class PlayerInputs(val uuid: UUID) {
 
     internal fun notifyObservers(player: Player, inputs: PlayerInputs, updateType: PlayerInputsUpdateType) {
         observers.forEach {
-            it.onUpdate(player, inputs, updateType)
+            it.onInputsUpdate(player, inputs, updateType)
         }
     }
 
@@ -127,5 +127,5 @@ class PlayerInputs(val uuid: UUID) {
 }
 
 interface PlayerInputsObserver {
-    fun onUpdate(player: Player, inputs: PlayerInputs, updateType: PlayerInputs.PlayerInputsUpdateType)
+    fun onInputsUpdate(player: Player, inputs: PlayerInputs, updateType: PlayerInputs.PlayerInputsUpdateType)
 }

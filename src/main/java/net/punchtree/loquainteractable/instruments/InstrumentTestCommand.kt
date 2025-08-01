@@ -51,23 +51,12 @@ class InstrumentTestCommand(
         when (args[0].lowercase()) {
             "give" -> giveInstrument(sender, args)
             "basic-input-monitoring-test" -> doBasicInputMonitoringTest(sender)
-            "play-acoustic-guitar" -> startPlayingInstrument(sender, Instruments.AcousticGuitar)
-            "play-trumpet" -> startPlayingInstrument(sender, Instruments.LegatoTrumpet)
-            "stop-playing" -> stopPlaying(sender)
+            "play-acoustic-guitar" -> InstrumentManager.startPlayerPlaying(sender, Instruments.AcousticGuitar)
+            "play-trumpet" -> InstrumentManager.startPlayerPlaying(sender, Instruments.LegatoTrumpet)
+            "stop-playing" -> InstrumentManager.stopPlayerPlaying(sender)
         }
 
         return true
-    }
-
-    private fun stopPlaying(player: Player) {
-        InstrumentManager.stopPlayerPlaying(player)
-    }
-
-    private fun startPlayingInstrument(player: Player, instrument: Instruments.Instrument) {
-        // TODO maybe move lifecycle management of InstrumentPlayer classes exclusively to InstrumentManager
-        val playerInputs = playerInputsManager[player]
-        val instrumentPlayer = InstrumentPlayer(player, instrument, playerInputs)
-        InstrumentManager.startPlayerPlaying(player, instrumentPlayer)
     }
 
     private fun doBasicInputMonitoringTest(player: Player) {

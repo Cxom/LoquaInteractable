@@ -42,6 +42,12 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
             Cinematic.stopCinematic(loquaPlayer)
         }
 
+        // TODO is this necessary? Is instrument cleanup handled anywhere else?
+        //  moreover the oversight of having not implemented this in the first place highlights the need to
+        //  really carefully think through how to close out all the different possible alternate input situations
+        //  a player may be in the midst of when they quit
+        InstrumentManager.stopPlayerPlaying(event.player)
+
         loquaPlayer.saveInventoryIfNotOutOfBody()
         playerInputsManager.destroyInputs(event.player.uniqueId)
         LoquaPlayerManager.destroyPlayer(event.player)

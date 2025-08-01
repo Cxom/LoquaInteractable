@@ -63,7 +63,7 @@ class InstrumentPlayer(
         }
     }
 
-    override fun onUpdate(player: Player, inputs: PlayerInputs, updateType: PlayerInputs.PlayerInputsUpdateType) {
+    override fun onInputsUpdate(player: Player, inputs: PlayerInputs, updateType: PlayerInputs.PlayerInputsUpdateType) {
 //        doBasicBluesScaleWithHotbar(updateType, inputs)
 //        doFifthsWasdStringing(updateType, inputs)
         doFifthsNumberStringing(updateType, inputs)
