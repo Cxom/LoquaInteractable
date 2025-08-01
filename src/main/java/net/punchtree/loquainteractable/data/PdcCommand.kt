@@ -173,12 +173,10 @@ object PdcCommand : CommandExecutor, TabCompleter {
     }
 
     private fun <P : Any, C : Any> editValueOfType(pdc: PersistentDataContainer, loquaDataKey: LoquaDataKey<P, C>, sender: Player, args: Array<out String>): CompletableFuture<C> {
-        // TODO replace InspectablePersistentDataType with a mapped dataHandler types specific to this command, as that's the only place they're used
+        val handler = DataHandlerRegistry.getHandler(loquaDataKey.persistentDataType)
+            ?: throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
 
-        if (loquaDataKey.persistentDataType !is InspectablePersistentDataType<P, C>)
-            throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
-
-        return loquaDataKey.persistentDataType.edit(pdc, loquaDataKey, sender, args.sliceArray(3 until args.size))
+        return handler.edit(pdc, loquaDataKey, sender, args.sliceArray(3 until args.size))
     }
 
     private fun parseValueOfType(loquaDataKey: LoquaDataKey<out Any, out Any>, args: Array<out String>, sender: Player): Any = when (loquaDataKey.persistentDataType) {
@@ -216,12 +214,6 @@ object PdcCommand : CommandExecutor, TabCompleter {
         }
 
         else -> throw IllegalArgumentException("Error: NamespacedKey '${loquaDataKey.namespacedKey}' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
-
-        //        if (loquaDataKey.persistentDataType !is InspectablePersistentDataType<*, *>)
-//            throw IllegalArgumentException("Error: NamespacedKey '$namespacedKey' is not a supported type for setting (${loquaDataKey.persistentDataType.complexType.simpleName})")
-//
-//        val inspectableDataType = loquaDataKey.persistentDataType as InspectablePersistentDataType<*, *>
-//        val value = checkNotNull(inspectableDataType.parse(sender, args.sliceArray(3 until args.size)))
     }
 
     private fun pdcSourceComponent(pdcHolderName: String) =
@@ -313,8 +305,10 @@ object PdcCommand : CommandExecutor, TabCompleter {
             return text("null (${dataType.complexType.simpleName})").color(DATA_VALUE_COLOR)
         }
 
-        if (dataType is InspectablePersistentDataType<P, C>) {
-            return dataType.display(value).color(DATA_VALUE_COLOR)
+        val handler = DataHandlerRegistry.getHandler(dataType)
+        if (handler != null) {
+            @Suppress("UNCHECKED_CAST")
+            return (handler as DataHandler<C>).display(value).color(DATA_VALUE_COLOR)
         }
 
         return when (dataType) {
