@@ -1,5 +1,6 @@
 package net.punchtree.loquainteractable.input
 
+import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
@@ -45,4 +46,14 @@ class PlayerInputsManager {
         }
         return true
     }
+}
+
+internal fun Player.observeInputsWith(observer: PlayerInputsObserver) {
+    val input = LoquaInteractablePlugin.instance.playerInputsManager[this]
+    input.registerObserver(observer)
+}
+
+internal fun Player.unobserveInputsWith(observer: PlayerInputsObserver) {
+    val input = LoquaInteractablePlugin.instance.playerInputsManager[this]
+    input.unregisterObserver(observer)
 }

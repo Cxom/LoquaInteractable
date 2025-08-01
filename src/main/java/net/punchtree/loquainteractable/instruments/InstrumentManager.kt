@@ -1,6 +1,5 @@
 package net.punchtree.loquainteractable.instruments
 
-import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -14,8 +13,7 @@ object InstrumentManager {
 
     fun startPlayerPlaying(player: Player, instrument: Instruments.Instrument) {
         stopPlayerPlaying(player)
-        val playerInputs = LoquaInteractablePlugin.instance.playerInputsManager[player]
-        val instrumentPlayer = InstrumentPlayer(player, instrument, playerInputs)
+        val instrumentPlayer = InstrumentPlayer(player, instrument)
         playersPlayingInstruments[player.uniqueId] = instrumentPlayer
     }
 

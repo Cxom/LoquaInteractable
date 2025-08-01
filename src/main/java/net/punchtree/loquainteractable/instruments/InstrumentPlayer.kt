@@ -3,6 +3,8 @@ package net.punchtree.loquainteractable.instruments
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsObserver
+import net.punchtree.loquainteractable.input.observeInputsWith
+import net.punchtree.loquainteractable.input.unobserveInputsWith
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Material
 import org.bukkit.entity.Entity
@@ -20,8 +22,7 @@ import kotlin.math.min
 
 class InstrumentPlayer(
     val player: Player,
-    val instrument: Instruments.Instrument,
-    private val playerInputs: PlayerInputs
+    val instrument: Instruments.Instrument
 ) : PlayerInputsObserver {
 
     /* Next steps for instruments
@@ -57,7 +58,7 @@ class InstrumentPlayer(
             it.transformation = Transformation(Vector3f(0f, -.5f, 0f), Quaternionf(), Vector3f(1f, 1f, 1f), Quaternionf())
             it.setMetadata("instrument", FixedMetadataValue(LoquaInteractablePlugin.instance, "instrument_stool")) // the metadata value here is unused
         }
-        playerInputs.registerObserver(this)
+        player.observeInputsWith(this)
         if (!isJumpDoesRepeat) {
             player.inventory.heldItemSlot = 0
         }
@@ -201,6 +202,6 @@ class InstrumentPlayer(
 
     fun stopPlaying() {
         chair.remove()
-        playerInputs.unregisterObserver(this)
+        player.unobserveInputsWith(this)
     }
 }
