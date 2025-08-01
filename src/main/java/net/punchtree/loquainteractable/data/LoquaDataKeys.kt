@@ -79,12 +79,19 @@ internal data object InspectableDataType {
             return@createInspectableDataType CompletableFuture.completedFuture(value)
         }
     )
+    val BYTE = createInspectableDataType(DataType.BYTE,
+        edit = { pdc, loquaDataKey, sender, args ->
+            val value = args[0].toByteOrNull()
+                ?: throw IllegalArgumentException("Error: '${args[0]}' is not a byte")
+            pdc.set(loquaDataKey, value)
             return@createInspectableDataType CompletableFuture.completedFuture(value)
         }
     )
     val INTEGER = createInspectableDataType(DataType.INTEGER,
         edit = { pdc, loquaDataKey, sender, args ->
             val value = args[0].toIntOrNull()
+                ?: throw IllegalArgumentException("Error: '${args[0]}' is not an integer")
+            pdc.set(loquaDataKey, value)
             return@createInspectableDataType CompletableFuture.completedFuture(value)
         }
     )
