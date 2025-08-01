@@ -1,9 +1,10 @@
 package net.punchtree.loquainteractable.metadata.editing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import net.kyori.adventure.text.Component;
+import net.punchtree.loquainteractable.lighting.LightSwitchMetadataEditingMode;
+import net.punchtree.loquainteractable.lighting.ToggleMetadataEditingMode;
+import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
+import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,11 +16,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.kyori.adventure.text.Component;
-import net.punchtree.loquainteractable.lighting.LightSwitchMetadataEditingMode;
-import net.punchtree.loquainteractable.lighting.ToggleMetadataEditingMode;
-import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSession;
-import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // TODO is this more a session manager class?
 public class MetadataWand implements Listener {
@@ -58,10 +57,14 @@ public class MetadataWand implements Listener {
 	
 	@EventHandler
 	public void onInteractWithWand(PlayerInteractEvent event) {
+		handleMetadataWand(event);
+	}
+
+	private void handleMetadataWand(PlayerInteractEvent event) {
 		// TODO tie to sessions
 		if (event.getHand() != EquipmentSlot.HAND || !isMetadataWandItem(event.getItem())) return;
 		event.setCancelled(true);
-		
+
 		MetadataEditingSession session = MetadataEditingSessionManager.getSessionFor(event.getPlayer());
 		MetadataEditingMode editingMode = session.getEditingMode();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -75,12 +78,12 @@ public class MetadataWand implements Listener {
 		} else if (event.getAction() == OPEN_EDIT_MODE_MENU_ACTION) {
 			onOpenEditModeMenu(event.getPlayer());
 		}
-		
+
 //		else if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 //			onEdit(event);
 //		}
 	}
-	
+
 	private void onOpenEditModeMenu(Player player) {
 		if (editModeMenu == null) {
 			editModeMenu = new MetadataEditingModeMenu(editingModes);

@@ -8,6 +8,7 @@ import net.punchtree.loquainteractable._unstable.debug.TempPacketListener
 import net.punchtree.loquainteractable._unstable.experimental.PermissionTestingCommand
 import net.punchtree.loquainteractable._unstable.experimental.SideProfileRenderCommand
 import net.punchtree.loquainteractable._unstable.experimental.UiTestingCommand
+import net.punchtree.loquainteractable._unstable.experimental.WorldEditHugeRotate
 import net.punchtree.loquainteractable._unstable.experimental.testing.CircleGameTesting
 import net.punchtree.loquainteractable._unstable.experimental.testing.PlayerInputsTesting
 import net.punchtree.loquainteractable._unstable.experimental.testing.ToastTesting
@@ -16,7 +17,6 @@ import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
 import net.punchtree.loquainteractable.data.PdcCommand
-import net.punchtree.loquainteractable.displayutil.ArmorStandChunkLoadingReglow
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
 import net.punchtree.loquainteractable.heist.HeistTestCommand
@@ -31,6 +31,10 @@ import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
 import net.punchtree.loquainteractable.joining.PlayerJoinListener
 import net.punchtree.loquainteractable.joining.SplashScreenManager
+import net.punchtree.loquainteractable.listeners.ChunkLoadListener
+import net.punchtree.loquainteractable.listeners.DeathAndRespawnListener
+import net.punchtree.loquainteractable.listeners.FoodLevelChangeListener
+import net.punchtree.loquainteractable.listeners.ServerPingListener
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
@@ -52,7 +56,7 @@ internal const val LOQUA_NAMESPACE = "loqua"
 class LoquaInteractablePlugin : JavaPlugin() {
 
     private lateinit var protocolManager: ProtocolManager
-    private lateinit var playerInputsManager: PlayerInputsManager
+    internal lateinit var playerInputsManager: PlayerInputsManager
     internal lateinit var splashScreenManager: SplashScreenManager
         private set
     private lateinit var vehicleInputPacketAdapter: SteerVehicleInputPacketAdapter
@@ -68,6 +72,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         this.protocolManager = ProtocolLibrary.getProtocolManager()
         this.playerInputsManager = PlayerInputsManager()
         this.splashScreenManager = SplashScreenManager()
+        this.characterSelectManager = CharacterSelectManager()
 
 
         this.customItemRegistry = CustomItemRegistry.load()
@@ -95,20 +100,27 @@ class LoquaInteractablePlugin : JavaPlugin() {
     private fun registerEvents() {
         val pluginManager = Bukkit.getPluginManager()
 
-        pluginManager.registerEvents(MessageOfTheDay(), this)
+        // old shit/deprecated
+        pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this)
 
-        pluginManager.registerEvents(ArmorStandChunkLoadingReglow(), this)
+        // testing
+        pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
+
+        // properly single-function listeners in listeners package
+        pluginManager.registerEvents(ServerPingListener(), this)
+        pluginManager.registerEvents(ChunkLoadListener(), this)
+        pluginManager.registerEvents(FoodLevelChangeListener(), this)
+        pluginManager.registerEvents(DeathAndRespawnListener(), this)
+
+
+
+        // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
 
         pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
 
-
         // TODO per player instances for data accumulation?
         pluginManager.registerEvents(MetadataWand(), this)
-        pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this)
 
-
-        // Just for testing
-        pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
 
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)

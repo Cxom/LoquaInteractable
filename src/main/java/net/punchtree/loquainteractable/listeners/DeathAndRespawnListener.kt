@@ -22,7 +22,6 @@ class DeathAndRespawnListener : Listener {
             player.sendMessage(LoquaTextColors.warning("Why are you dying in staff mode??"))
         }
 
-
         event.setShouldDropExperience(false)
     }
 

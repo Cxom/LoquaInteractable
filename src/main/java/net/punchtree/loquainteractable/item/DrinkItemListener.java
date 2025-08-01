@@ -1,9 +1,14 @@
 package net.punchtree.loquainteractable.item;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import net.kyori.adventure.text.Component;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,16 +24,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-
-import net.kyori.adventure.text.Component;
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
-import net.punchtree.loquainteractable.LoquaInteractablePlugin;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class DrinkItemListener extends PacketAdapter implements Listener {
 
@@ -51,15 +49,19 @@ public class DrinkItemListener extends PacketAdapter implements Listener {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		attemptToStartDrinking(event);
+	}
+
+	private void attemptToStartDrinking(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		if (!isRightClick(event.getAction())) return;
 		if (!isDrink(item)) return;
 		if (!canEat(player, item)) return;
-		
+
 		onStartDrinking(player, item);
 	}
-	
+
 	public static boolean isRightClick(Action action) {
 		return action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
 	}
