@@ -1,18 +1,8 @@
 package net.punchtree.loquainteractable.city.garbagecans;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.*;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +19,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class GarbageCansService implements Listener {
@@ -181,38 +175,5 @@ public class GarbageCansService implements Listener {
 	public boolean isGarbageCan(Block block) {
 		return block.getType() == Material.CAULDRON;
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	private void loadGarbageCans() {
-//		File garbagecansf = new File(GarbageCans.plugin.getDataFolder() + File.separator + GARBAGE_CANS_FILENAME);
-//		if(garbagecansf.exists() && !garbagecansf.isDirectory()) { 
-//			try {
-//			     FileInputStream streamIn = new FileInputStream(garbagecansf);
-//			     ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-//			     garbageCans = (Map<Location, GarbageCanCollection>) objectinputstream.readObject();
-//			     streamIn.close();
-//			     objectinputstream.close();
-//			 } catch (ClassNotFoundException | IOException e) {
-//			     e.printStackTrace();
-//			 }
-//		}
-//	}
-//	
-//	private void persistGarbageCans() {
-//		File garbagecansf = new File(GarbageCans.plugin.getDataFolder() + File.separator + GARBAGE_CANS_FILENAME);
-//		if(!garbagecansf.exists()) {
-//			garbagecansf.getParentFile().mkdirs();
-//		}
-//		try {
-//			FileOutputStream fout = new FileOutputStream(garbagecansf);
-//			ObjectOutputStream oos = new ObjectOutputStream(fout);
-//			oos.writeObject(garbageCans);
-//			fout.close();
-//			oos.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
 
 }
