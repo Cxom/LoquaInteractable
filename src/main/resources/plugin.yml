@@ -76,6 +76,10 @@ commands:
         permission-message: You do not have permission to use this command!
     permtesting:
     uitesting:
+    # drone test command
+    dronetest:
+        permission: loquainteractable.commands.test
+        permission-message: You do not have permission to use this command!
 
 ## util commands
     cmd:

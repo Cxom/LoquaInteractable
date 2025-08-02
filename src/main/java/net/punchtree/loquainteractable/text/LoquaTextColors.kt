@@ -14,6 +14,7 @@ object LoquaTextColors {
     val DEBUG = NamedTextColor.GRAY
 
     // TODO evaluate if we should propagate this instead
+    //  maybe use minimessage?????????
     fun success(message: String): Component {
         return (text(message)).color(SUCCESS)
     }

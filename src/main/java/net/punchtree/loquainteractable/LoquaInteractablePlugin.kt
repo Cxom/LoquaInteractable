@@ -206,6 +206,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
         getCommand("permtesting")!!.setExecutor(PermissionTestingCommand)
         getCommand("uitesting")!!.setExecutor(UiTestingCommand)
         getCommand("worldedithugerotate")!!.setExecutor(WorldEditHugeRotate.WorldEditHugeRotateCommand)
+
+        getCommand("dronetest")!!.setExecutor(DroneTestCommand)
     }
 
     override fun onDisable() {
@@ -213,6 +215,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         garbageCansService.onDisable()
 
         InstrumentManager.onDisable()
+        DroneManager.onDisable()
 
         StreetcarTesting.onDisable()
         CitizensNPCManager.onDisable()
