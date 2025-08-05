@@ -15,15 +15,22 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor.*
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.util.color.PunchTreeColor
+import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.block.BlockFace
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import org.bukkit.entity.Player
+import org.bukkit.entity.*
+import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
+import org.bukkit.util.BoundingBox
+import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 // TODO delete this when it is no longer necessary!
 object WorldEditHugeRotate {
@@ -66,6 +73,21 @@ object WorldEditHugeRotate {
                     }
                     ongoingFlip = null
                 }
+
+                "rotateitemframes" -> {
+                    if (ongoingItemFrameRotate != null) {
+                        Bukkit.broadcast(text("An ongoing item frame rotate task is already running. Please cancel it first!").color(RED))
+                        return false
+                    }
+                    Bukkit.broadcast(text("Rotating item frames!"))
+                    rotateItemFrames()
+                }
+                "cancelitemframerotate" -> {
+                    ongoingItemFrameRotate?.cancel().also {
+                        Bukkit.broadcast(text("Cancelled ongoing item frame rotate task").color(RED))
+                    }
+                    ongoingItemFrameRotate = null
+                }
                 else -> {
                     sender.sendMessage("Unknown subcommand: $subcommand")
                     return false
@@ -76,7 +98,7 @@ object WorldEditHugeRotate {
         }
 
         override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): MutableList<String>? {
-            if (args.size <= 1) return mutableListOf("tryHugeRotate", "cancelRotate", "tryHugeFlip", "cancelFlip")
+            if (args.size <= 1) return mutableListOf("tryHugeRotate", "cancelRotate", "tryHugeFlip", "cancelFlip", "rotateItemFrames", "cancelItemFrameRotate")
             return mutableListOf()
         }
     }
@@ -88,8 +110,8 @@ object WorldEditHugeRotate {
     val zMin = -240
     val zMax = 2175
 
-    val min = BlockVector3.at(-992, 0, -240)
-    val max = BlockVector3.at(3551, 319, 2175)
+//    val min = BlockVector3.at(-992, 0, -240)
+//    val max = BlockVector3.at(3551, 319, 2175)
     val bukkitWorld = Bukkit.getWorld("GTA_City")
     val world = BukkitAdapter.adapt(bukkitWorld);
 
@@ -102,6 +124,7 @@ object WorldEditHugeRotate {
 
     var ongoingRotate: BukkitTask? = null
     var ongoingFlip: BukkitTask? = null
+    var ongoingItemFrameRotate: BukkitTask? = null
 
     fun tryHugeRotate(startIndex: Int = 0) {
 
@@ -264,14 +287,140 @@ object WorldEditHugeRotate {
         }.runTaskTimerAsynchronously(LoquaInteractablePlugin.instance, 0, 4 * 20)
     }
 
-//    fun rotateItemFrames() {
-//        val rotloquaXMin = -5551
-//        val rotloquaYMin = 0
-//        val rotloquaZMin = -2775
-//        val rotloquaXMax = -1008
-//        val rotloquaYMax = 319
-//        val rotloquaZMax = -360
-//    }
+    fun rotateItemFrames() {
+        val rotloquaXMin = -5551
+        val rotloquaYMin = 0
+        val rotloquaZMin = -2775
+        val rotloquaXMax = -1008
+        val rotloquaYMax = 319
+        val rotloquaZMax = -360
+
+        val rotloquaBB = BoundingBox(
+            rotloquaXMin.toDouble(),
+            rotloquaYMin.toDouble(),
+            rotloquaZMin.toDouble(),
+            rotloquaXMax.toDouble(),
+            rotloquaYMax.toDouble(),
+            rotloquaZMax.toDouble()
+        )
+
+        val rotloquaChunks = LoquaInteractablePlugin.world.getIntersectingChunks(rotloquaBB).toTypedArray()
+
+        var numHangings = 0
+        var numItemFrames = 0
+        var numNonGlowingItemFrames = 0
+        var numGlowingItemFrames = 0
+        var numPaintings = 0
+        var numAlreadyRotated = 0
+        var numActuallyRotated = 0
+        var numActuallyRotatedItemFrames = 0
+        var numActuallyRotatedPaintings = 0
+
+        var numTriedToScanTwice = 0
+
+        val scannedThisTime = mutableSetOf<UUID>()
+
+        ongoingItemFrameRotate = object : BukkitRunnable() {
+            var operationIndex = 0
+            var chunksToScanPerTick = 0.5
+            var chunksToHaveScanned = chunksToScanPerTick
+            val notificationThreshold = 8 * 1000
+            var lastNotificationTime = System.currentTimeMillis()
+            override fun run() {
+                if (operationIndex >= rotloquaChunks.size) {
+                    ongoingItemFrameRotate = null
+                    Bukkit.broadcast(text("Item frame rotate operation completed!").color(GREEN))
+                    cancel()
+                    return
+                }
+
+                val accelerateTps = DebugVars.getDecimalAsDouble("loquainteractable.rotloqua.accelerate-tps", 19.7)
+                val maintainTps = DebugVars.getDecimalAsDouble("loquainteractable.rotloqua.maintain-tps", 18.5)
+                val decelerateTps = DebugVars.getDecimalAsDouble("loquainteractable.rotloqua.decelerate-tps", 17.5)
+                chunksToScanPerTick = if (Bukkit.getServer().tps[0] > accelerateTps) {
+                    min(222.2,chunksToScanPerTick + 0.02)
+                } else if (Bukkit.getServer().tps[0] > maintainTps) {
+                    chunksToScanPerTick
+                } else if (Bukkit.getServer().tps[0] > decelerateTps) {
+                    max(0.0, chunksToScanPerTick - 0.05)
+                } else {
+                    0.0
+                }
+                chunksToHaveScanned += chunksToScanPerTick
+                while (operationIndex < min(chunksToHaveScanned, rotloquaChunks.size.toDouble())) {
+                    val chunk = rotloquaChunks[operationIndex]
+                    chunk.load(false)
+                    chunk.entities.forEach { entity ->
+                        if (entity !is Hanging) {
+                            return@forEach
+                        }
+
+                        if (scannedThisTime.contains(entity.uniqueId)) {
+                            numTriedToScanTwice++
+                            return@forEach
+                        } else {
+                            scannedThisTime.add(entity.uniqueId)
+                        }
+
+                        numHangings++
+                        if (entity is ItemFrame) {
+                            numItemFrames++
+                            if (entity !is GlowItemFrame) {
+                                numNonGlowingItemFrames++
+                            } else {
+                                numGlowingItemFrames++
+                            }
+                        } else if (entity is Painting) {
+                            numPaintings++
+                        }
+
+                        if (entity.hasMetadata("rotated-loqua-fix")) {
+                            numAlreadyRotated++
+                            return@forEach
+                        }
+
+                        if (DebugVars.getBoolean("loquainteractable.rotloqua.rotate", false)) {
+                            when (entity.facing) {
+                                BlockFace.NORTH -> entity.setFacingDirection(BlockFace.SOUTH, true)
+                                BlockFace.SOUTH -> entity.setFacingDirection(BlockFace.NORTH, true)
+                                BlockFace.EAST -> entity.setFacingDirection(BlockFace.WEST, true)
+                                BlockFace.WEST -> entity.setFacingDirection(BlockFace.EAST, true)
+                                BlockFace.UP, BlockFace.DOWN -> {
+                                    check(entity is ItemFrame) { "Non-item frame is facing up or down! What???" }
+                                    entity.rotation = entity.rotation.rotateClockwise().rotateClockwise().rotateClockwise().rotateClockwise()
+                                }
+                                else -> { throw IllegalStateException("Impossible hanging facing direction: ${entity.facing}") }
+                            }
+                            entity.setMetadata("rotated-loqua-fix", FixedMetadataValue(LoquaInteractablePlugin.instance, true))
+                            numActuallyRotated++
+                            if (entity is ItemFrame) {
+                                numActuallyRotatedItemFrames++
+                            } else if (entity is Painting) {
+                                numActuallyRotatedPaintings++
+                            }
+                        }
+                    }
+                    operationIndex++
+                }
+
+                if (System.currentTimeMillis() - lastNotificationTime > notificationThreshold) {
+                    lastNotificationTime = System.currentTimeMillis()
+                    Bukkit.broadcast(text("Scanned ${operationIndex + 1} / ${rotloquaChunks.size} (${"%.1f".format( (operationIndex + 1) * 100.0 / rotloquaChunks.size)}%) chunks for hanging entities at ${"%.1f".format(chunksToScanPerTick)} chunks per tick.").color(WHITE))
+                }
+            }
+
+            override fun cancel() {
+                Bukkit.broadcastMessage("There are $numHangings hanging entities in the rotloqua bounding box.")
+                Bukkit.broadcastMessage("There are $numItemFrames item frames in the rotloqua bounding box.")
+                Bukkit.broadcastMessage("There are $numNonGlowingItemFrames non-glowing and $numGlowingItemFrames glowing item frames in the rotloqua bounding box.")
+                Bukkit.broadcastMessage("There are $numPaintings paintings in the rotloqua bounding box.")
+                Bukkit.broadcastMessage("There are $numAlreadyRotated item frames that have already been rotated!.")
+                Bukkit.broadcastMessage("Actually rotated $numActuallyRotated hanging entities ($numActuallyRotatedItemFrames item frames and $numActuallyRotatedPaintings paintings).")
+                Bukkit.broadcastMessage("Tried to scan $numTriedToScanTwice entities twice.")
+                super.cancel()
+            }
+        }.runTaskTimer(LoquaInteractablePlugin.instance, 0, 1)
+    }
 
     fun onDisable() {
         ongoingRotate?.cancel()
@@ -279,6 +428,9 @@ object WorldEditHugeRotate {
 
         ongoingFlip?.cancel()
         ongoingFlip = null
+
+        ongoingItemFrameRotate?.cancel()
+        ongoingItemFrameRotate = null
     }
 
 }
