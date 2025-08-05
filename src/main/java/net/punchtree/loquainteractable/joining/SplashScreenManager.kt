@@ -25,7 +25,8 @@ class SplashScreenManager : Listener {
 
     // TODO block any commands and use of chat while in splash screen
 
-    internal var onExitSplashScreen : ((Player) -> Unit)? = null
+    // use lateinit to fail fast if this is not set
+    internal lateinit var onExitSplashScreen : ((Player) -> Unit)
 
     private val splashScreenPlayers = mutableSetOf<UUID>()
 
@@ -74,7 +75,6 @@ class SplashScreenManager : Listener {
     @Suppress("UnstableApiUsage")
     @EventHandler
     fun onPlayerInput(event: PlayerInputEvent) {
-        val loquaPlayer = LoquaPlayerManager[event.player]
         // TODO really REALLY be careful about player tracking and all the places it happens, and that we're not leaking memory
         //  really think about it, don't guess. I think we're on the right track with the player manager, the join and quit listeners,
         //  and the equality implementation on PlayerDecorator, but really think about it and make sure it all makes sense
@@ -88,23 +88,34 @@ class SplashScreenManager : Listener {
 //            return
 //        }
         if (event.input.isJump && splashScreenPlayers.contains(event.player.uniqueId)) {
+            val loquaPlayer = LoquaPlayerManager[event.player]
             cleanupSplashScreen(loquaPlayer)
             onExitSplashScreen?.invoke(loquaPlayer)
         }
     }
 
-    private fun cleanupSplashScreen(player: Player) {
+    private fun cleanupSplashScreen(player: LoquaPlayer) {
         Cinematic.stopCinematic(player)
         player.stopSound(SPLASH_SCREEN_MUSIC)
+        player.removeCameraOverlay()
         splashScreenPlayers.remove(player.uniqueId)
     }
 
     /* This is NOT an eventListener, so that we have a single quit listener, that can be referenced
      * to understand the order in which cleanup happens. It calls this method (and others like it) */
-    fun onPlayerQuit(quitPlayer: LoquaPlayer) {
+    fun handlePlayerQuit(quitPlayer: LoquaPlayer) {
         if (splashScreenPlayers.contains(quitPlayer.uniqueId)) {
             cleanupSplashScreen(quitPlayer)
         }
+    }
+
+    fun onDisable() {
+        splashScreenPlayers.forEach { uuid ->
+            LoquaPlayerManager.getSafe(uuid)?.let(::cleanupSplashScreen) ?: run {
+                LoquaInteractablePlugin.instance.logger.warning("Player with UUID $uuid was in the splash screen but not found in the player manager!")
+            }
+        }
+        splashScreenPlayers.clear()
     }
 
     companion object {

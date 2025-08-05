@@ -33,7 +33,7 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
         //  OR BETTER YET make these states impossible
         //  check things like: not in splash screen and also in character select at same time, extended to other cutscenes, etc
         if (loquaPlayer.isInSplashScreen()) {
-            LoquaInteractablePlugin.instance.splashScreenManager.onPlayerQuit(loquaPlayer)
+            LoquaInteractablePlugin.instance.splashScreenManager.handlePlayerQuit(loquaPlayer)
             check(Cinematic.getCinematicFor(loquaPlayer) == null) {
                 "Player ${event.player.name} still has a cinematic registered after splash screen clean up!"
                 Cinematic.stopCinematic(loquaPlayer)
