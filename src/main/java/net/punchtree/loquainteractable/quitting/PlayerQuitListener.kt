@@ -2,6 +2,7 @@ package net.punchtree.loquainteractable.quitting
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputsManager
+import net.punchtree.loquainteractable.instruments.InstrumentManager
 import net.punchtree.loquainteractable.joining.splash.Cinematic
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import org.bukkit.event.EventHandler
@@ -28,6 +29,9 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
             return
         }
 
+        // TODO call some sort of loqua player state validator
+        //  OR BETTER YET make these states impossible
+        //  check things like: not in splash screen and also in character select at same time, extended to other cutscenes, etc
         if (loquaPlayer.isInSplashScreen()) {
             LoquaInteractablePlugin.instance.splashScreenManager.onPlayerQuit(loquaPlayer)
             check(Cinematic.getCinematicFor(loquaPlayer) == null) {

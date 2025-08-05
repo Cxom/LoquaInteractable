@@ -68,6 +68,10 @@ object StaffModeCommand : CommandExecutor {
             return
         }
 
+        // TODO NEED TO HANDLE WHEN THE PLAYER IS IN THE SPLASH SCREEN
+        //  and also generally in any of a myriad of potential alternate input states
+        //  maybe move this logic to the player??????
+
         if (isInCombat(loquaPlayer)) {
             if (isWithoutConfirmation(args)) {
                 // TODO text styling utilities

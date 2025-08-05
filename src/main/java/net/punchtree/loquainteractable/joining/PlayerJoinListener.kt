@@ -52,6 +52,8 @@ class PlayerJoinListener(
             // TODO as we add characters, players in STAFF MODE should not have any character, just their skin
             //  we need to account for that
 
+            // TODO there seems to be a bug where a staff's permissions sometimes aren't usable until toggling staff mode off and back on if they join with it on
+
             loquaPlayer.sendMessage(text("You are in staff mode (${LoquaPermissions.StaffRole.getRoleFor(loquaPlayer)})!").decorate(TextDecoration.ITALIC).color(NamedTextColor.YELLOW))
             return
         }
@@ -76,6 +78,9 @@ class PlayerJoinListener(
     @EventHandler
     fun onPlayerClientLoadedWorldOrTimedOut(event: PlayerClientLoadedWorldEvent) {
         val player = LoquaPlayerManager[event.player]
+
+        // TODO eventually, the splash screen SHOULD be shown to staff members
+        //  but character select can be skipped
         if (player.isInStaffMode()) {
             // see note in onPlayerJoin
             return

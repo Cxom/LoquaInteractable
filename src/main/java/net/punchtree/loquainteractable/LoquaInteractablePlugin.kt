@@ -18,6 +18,8 @@ import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
 import net.punchtree.loquainteractable.data.PdcCommand
 import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
+import net.punchtree.loquainteractable.drone.DroneManager
+import net.punchtree.loquainteractable.drone.DroneTestCommand
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
 import net.punchtree.loquainteractable.heist.HeistTestCommand
 import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter
@@ -125,13 +127,14 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager), this)
-        PacketEvents.getAPI().eventManager.registerListener(TempPacketListener(), PacketListenerPriority.MONITOR)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)
-
         pluginManager.registerEvents(InstrumentListener(playerInputsManager), this)
+
+        // packet registration
+        PacketEvents.getAPI().eventManager.registerListener(TempPacketListener(), PacketListenerPriority.MONITOR)
     }
 
     private fun setCommandExecutors() {
@@ -211,6 +214,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
+        splashScreenManager.onDisable()
+
         customItemRegistry.save()
         garbageCansService.onDisable()
 
