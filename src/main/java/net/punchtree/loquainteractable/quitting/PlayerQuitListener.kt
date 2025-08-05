@@ -39,6 +39,9 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
                 Cinematic.stopCinematic(loquaPlayer)
             }
             return
+        } else if (loquaPlayer.isInCharacterSelect()) {
+            LoquaInteractablePlugin.instance.characterSelectManager.handlePlayerQuit(loquaPlayer)
+            return
         }
 
         check(Cinematic.getCinematicFor(loquaPlayer) == null) {

@@ -61,6 +61,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
     internal lateinit var playerInputsManager: PlayerInputsManager
     internal lateinit var splashScreenManager: SplashScreenManager
         private set
+    internal lateinit var characterSelectManager: CharacterSelectManager
+        private set
     private lateinit var vehicleInputPacketAdapter: SteerVehicleInputPacketAdapter
     private lateinit var heldItemInputPacketAdapter: ChangeHeldItemInputPacketAdapter
     lateinit var customItemRegistry: CustomItemRegistry
@@ -126,7 +128,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
-        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager), this)
+        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables
@@ -215,6 +217,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
     override fun onDisable() {
         splashScreenManager.onDisable()
+        characterSelectManager.onDisable()
 
         customItemRegistry.save()
         garbageCansService.onDisable()

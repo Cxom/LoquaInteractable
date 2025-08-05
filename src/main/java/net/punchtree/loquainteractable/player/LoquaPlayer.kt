@@ -21,7 +21,7 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     //  (i.e. have them be functions calling the underlying manager for a single source of truth,
     //   and treat having redundant per-player fields (denormalization) as a performance optimization)
     internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(uniqueId)
-    internal var isInCharacterSelect = false
+    internal fun isInCharacterSelect() = LoquaInteractablePlugin.instance.characterSelectManager.isInCharacterSelect(uniqueId)
 
     internal fun isStaffMember() = LoquaPermissions.StaffRole.getRoleFor(this) != null
 
