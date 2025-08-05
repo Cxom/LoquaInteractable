@@ -27,7 +27,11 @@ object LoquaPlayerManager {
     }
 
     fun getSafe(player: Player): LoquaPlayer? {
-        return playersToLoquaPlayers[player.uniqueId]
+        return getSafe(player.uniqueId)
+    }
+
+    fun getSafe(uuid: UUID): LoquaPlayer? {
+        return playersToLoquaPlayers[uuid]
     }
 
     operator fun get(player: Player): LoquaPlayer {

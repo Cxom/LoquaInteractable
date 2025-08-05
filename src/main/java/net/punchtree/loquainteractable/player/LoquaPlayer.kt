@@ -17,15 +17,13 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     //  it may be a good idea to enforce this in the constructor, or better yet maybe even make the
     //  constructor private and move the player manager into the same file
 
-    // TODO have these be normalized by default, not denormalized
+    // Have fields like these be normalized by default, not denormalized
     //  (i.e. have them be functions calling the underlying manager for a single source of truth,
     //   and treat having redundant per-player fields (denormalization) as a performance optimization)
     internal fun isInSplashScreen() = LoquaInteractablePlugin.instance.splashScreenManager.isInSplashScreen(uniqueId)
     internal var isInCharacterSelect = false
 
-    internal fun isStaffMember(): Boolean {
-        return LoquaPermissions.StaffRole.getRoleFor(this) != null
-    }
+    internal fun isStaffMember() = LoquaPermissions.StaffRole.getRoleFor(this) != null
 
     internal fun isInStaffMode(): Boolean {
         if (!isStaffMember()) return false
@@ -53,20 +51,16 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
         } ?: LoquaInteractablePlugin.instance.logger.severe("No saved inventory found when trying to restore inventory for $name.")
     }
 
-    fun isPlaying(): Boolean {
-        return !isInStaffMode() && !isInSplashScreen() && !isInCharacterSelect
-    }
-
     private fun isOutOfBody(): Boolean {
-        // TODO isPlaying is insufficient - there are instances where the user will not
+        // TODO there are instances where the user will not
         //  have their characters inventory and we need to not save what they do have
         //  examples: in-game cutscenes, minigames, jail, dead, flying drones, literally anything that takes them out-of-body
         //  we ought to have a general practice of saving their inventory before they enter any of these states
-        return !isPlaying()
+        return isInStaffMode() || isInSplashScreen() || isInCharacterSelect()
     }
 
     fun saveInventoryIfNotOutOfBody() {
-        LoquaInteractablePlugin.instance.logger.info("$name staff mode: ${isInStaffMode()} isInSplashScreen: ${isInSplashScreen()} isInCharacterSelect: $isInCharacterSelect isPlaying: ${isPlaying()} isOutOfBody: ${isOutOfBody()}")
+        LoquaInteractablePlugin.instance.logger.info("$name staff mode: ${isInStaffMode()} isInSplashScreen: ${isInSplashScreen()} isInCharacterSelect: ${isInCharacterSelect()} isOutOfBody: ${isOutOfBody()}")
         if (!isOutOfBody()) {
             LoquaInteractablePlugin.instance.logger.info("Saving inventory for not-out-of-body player $name")
             saveInventory()
@@ -85,5 +79,9 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
                 meta.setEquippable(equippable)
             }
         }
+    }
+
+    fun removeCameraOverlay() {
+        inventory.helmet = null
     }
 }
