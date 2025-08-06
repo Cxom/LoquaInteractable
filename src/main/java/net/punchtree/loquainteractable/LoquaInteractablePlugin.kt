@@ -33,7 +33,6 @@ import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
 import net.punchtree.loquainteractable.listeners.*
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
-import net.punchtree.loquainteractable.metadata.editing.MetadataWand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
@@ -112,6 +111,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(PlayerDeathAndRespawnListener(), this)
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
+        pluginManager.registerEvents(PlayerInteractListener(), this)
 
 
         // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
@@ -119,7 +119,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
 
         // TODO per player instances for data accumulation?
-        pluginManager.registerEvents(MetadataWand(), this)
 
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
@@ -140,7 +139,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
 
         // --------------------------------------------------
 
-        getCommand("metadatawand")!!.setExecutor(MetadataWandCommand())
+        getCommand("metadatawand")!!.setExecutor(MetadataWandCommand)
         getCommand("invtest")!!.setExecutor(InventoryMenuTesting())
         getCommand("circlegame")!!.setExecutor(CircleGameTesting())
         getCommand("toast")!!.setExecutor(ToastTesting())
