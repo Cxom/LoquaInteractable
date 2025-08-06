@@ -17,7 +17,6 @@ import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
 import net.punchtree.loquainteractable.data.PdcCommand
-import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
 import net.punchtree.loquainteractable.drone.DroneManager
 import net.punchtree.loquainteractable.drone.DroneTestCommand
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
@@ -98,7 +97,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
     private fun registerEvents() {
         val pluginManager = Bukkit.getPluginManager()
 
-        // properly single-function listeners in listeners package
+        // proper listeners in listeners package
         pluginManager.registerEvents(ChunkLoadListener(), this)
         pluginManager.registerEvents(FoodLevelChangeListener(), this)
         pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
@@ -109,23 +108,17 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
         pluginManager.registerEvents(ServerPingListener(), this)
+
         // TODO this needs to be incorporated with high intentionality into the input processing solution
         pluginManager.registerEvents(CapturableInputsWithDefaultActionListener(playerInputsManager), this)
 
-        // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
-
-
-        // TODO per player instances for data accumulation? (this was about the metadata wand)
-
         // Interactables/Consumables
+        // TODO this is complicated and best refactored as we figure out both the food system and the item systems
+        //  moreover, it's probably not necessary now that we can simply mark items as consumable with components
+        //  I think anything can be made drinkable (although maybe not with the coffee particles? idek)
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)
 
-        // testing
-        pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
-
-        // old shit/deprecated
-        pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this)
-
+        // TODO sort out all packet registration in one place with one api (PacketEvents)
         // packet registration
         PacketEvents.getAPI().eventManager.registerListener(TempPacketListener(), PacketListenerPriority.MONITOR)
     }

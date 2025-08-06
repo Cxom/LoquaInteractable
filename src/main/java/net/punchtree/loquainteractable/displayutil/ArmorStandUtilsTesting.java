@@ -3,9 +3,6 @@ package net.punchtree.loquainteractable.displayutil;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -15,9 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.punchtree.util.color.ColoredScoreboardTeams;
 
-public class ArmorStandUtilsTesting implements Listener {
+public class ArmorStandUtilsTesting {
 
-	@EventHandler(priority = EventPriority.LOW)
 	public static void onPlayerInteract(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked().getType() == EntityType.ARMOR_STAND 
 				&& event.getPlayer().isSneaking()

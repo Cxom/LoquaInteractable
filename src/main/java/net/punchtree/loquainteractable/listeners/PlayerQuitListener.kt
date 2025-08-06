@@ -3,6 +3,7 @@ package net.punchtree.loquainteractable.listeners
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.instruments.InstrumentManager
+import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.splash.Cinematic
 import org.bukkit.event.EventHandler
@@ -24,8 +25,9 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         // get the player safely in case they quit before fully connecting
-        val loquaPlayer = LoquaPlayerManager.getSafe(event.player) ?: run {
-            LoquaInteractablePlugin.Companion.instance.logger.info("Player ${event.player.name} quit without a LoquaPlayer object (before fully connecting??)")
+        val player = event.player
+        val loquaPlayer = LoquaPlayerManager.getSafe(player) ?: run {
+            LoquaInteractablePlugin.Companion.instance.logger.info("Player ${player.name} quit without a LoquaPlayer object (before fully connecting??)")
             return
         }
 
@@ -35,7 +37,7 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
         if (loquaPlayer.isInSplashScreen()) {
             LoquaInteractablePlugin.Companion.instance.splashScreenManager.handlePlayerQuit(loquaPlayer)
             check(Cinematic.Companion.getCinematicFor(loquaPlayer) == null) {
-                "Player ${event.player.name} still has a cinematic registered after splash screen clean up!"
+                "Player ${player.name} still has a cinematic registered after splash screen clean up!"
                 Cinematic.Companion.stopCinematic(loquaPlayer)
             }
             return
@@ -45,7 +47,7 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
         }
 
         check(Cinematic.Companion.getCinematicFor(loquaPlayer) == null) {
-            "Player ${event.player.name} has a cinematic registered but is not in the splash screen and there are no other cutscenes!"
+            "Player ${player.name} has a cinematic registered but is not in the splash screen and there are no other cutscenes!"
             Cinematic.Companion.stopCinematic(loquaPlayer)
         }
 
@@ -53,10 +55,13 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
         //  moreover the oversight of having not implemented this in the first place highlights the need to
         //  really carefully think through how to close out all the different possible alternate input situations
         //  a player may be in the midst of when they quit
-        InstrumentManager.stopPlayerPlaying(event.player)
+        InstrumentManager.stopPlayerPlaying(player)
+
+        // Similarly, is metadata wand even properly placed? It's a flippin' build tool, TODO put it in a different plugin
+        MetadataEditingSessionManager.getInstance().handlePlayerQuit(player)
 
         loquaPlayer.saveInventoryIfNotOutOfBody()
-        playerInputsManager.destroyInputs(event.player.uniqueId)
-        LoquaPlayerManager.destroyPlayer(event.player)
+        playerInputsManager.destroyInputs(player.uniqueId)
+        LoquaPlayerManager.destroyPlayer(player)
     }
 }

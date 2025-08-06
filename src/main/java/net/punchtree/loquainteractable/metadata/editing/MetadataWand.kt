@@ -14,6 +14,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 // TODO is this more a session manager class?
+// TODO per player instances for data accumulation? (this comment was next to event registration for the metadata wand)
 object MetadataWand {
     private val METADATA_WAND_ITEM = ItemStack(Material.BLAZE_ROD)
 

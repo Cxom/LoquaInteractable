@@ -2,6 +2,7 @@ package net.punchtree.loquainteractable.listeners
 
 import net.md_5.bungee.api.ChatColor
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
+import net.punchtree.loquainteractable.displayutil.ArmorStandUtilsTesting
 import org.bukkit.*
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
@@ -15,8 +16,12 @@ class PlayerInteractEntityListener : Listener {
     @EventHandler
     fun onPlayerInteractEntity(event: PlayerInteractEntityEvent) {
         onLightSwitchInteract(event)
+        if (event.isCancelled) return
+        // TODO delete this old testing util if no longer relevant
+        ArmorStandUtilsTesting.onPlayerInteract(event)
     }
 
+    // TODO move this function elsewhere
     fun onLightSwitchInteract(event: PlayerInteractEntityEvent) {
         if (event.rightClicked.type != EntityType.ITEM_FRAME) return
 

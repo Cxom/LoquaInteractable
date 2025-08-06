@@ -1,15 +1,13 @@
 package net.punchtree.loquainteractable.metadata.editing.session;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
 @Deprecated
-public class MetadataEditingSessionManager implements Listener {
+public class MetadataEditingSessionManager {
 
 	private MetadataEditingSessionManager() {
 	}
@@ -28,9 +26,8 @@ public class MetadataEditingSessionManager implements Listener {
 		return sessions.get(player);
 	}
 	
-	@EventHandler
-	public void onPlayerLeave(PlayerQuitEvent event) {
-		MetadataEditingSession session = sessions.remove(event.getPlayer());
+	public void handlePlayerQuit(@NotNull Player player) {
+		MetadataEditingSession session = sessions.remove(player);
 		if (session != null) {			
 			session.cleanupDisable();
 		}
