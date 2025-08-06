@@ -105,6 +105,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(PlayerDeathAndRespawnListener(), this)
         pluginManager.registerEvents(PlayerInputListener(splashScreenManager), this)
         pluginManager.registerEvents(PlayerInteractListener(), this)
+        pluginManager.registerEvents(PlayerInteractEntityListener(), this)
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
         pluginManager.registerEvents(ServerPingListener(), this)
