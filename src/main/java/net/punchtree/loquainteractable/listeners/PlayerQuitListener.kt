@@ -1,10 +1,10 @@
-package net.punchtree.loquainteractable.quitting
+package net.punchtree.loquainteractable.listeners
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.instruments.InstrumentManager
-import net.punchtree.loquainteractable.joining.splash.Cinematic
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
+import net.punchtree.loquainteractable.splash.Cinematic
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
@@ -25,7 +25,7 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
     fun onPlayerQuit(event: PlayerQuitEvent) {
         // get the player safely in case they quit before fully connecting
         val loquaPlayer = LoquaPlayerManager.getSafe(event.player) ?: run {
-            LoquaInteractablePlugin.instance.logger.info("Player ${event.player.name} quit without a LoquaPlayer object (before fully connecting??)")
+            LoquaInteractablePlugin.Companion.instance.logger.info("Player ${event.player.name} quit without a LoquaPlayer object (before fully connecting??)")
             return
         }
 
@@ -33,20 +33,20 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
         //  OR BETTER YET make these states impossible
         //  check things like: not in splash screen and also in character select at same time, extended to other cutscenes, etc
         if (loquaPlayer.isInSplashScreen()) {
-            LoquaInteractablePlugin.instance.splashScreenManager.handlePlayerQuit(loquaPlayer)
-            check(Cinematic.getCinematicFor(loquaPlayer) == null) {
+            LoquaInteractablePlugin.Companion.instance.splashScreenManager.handlePlayerQuit(loquaPlayer)
+            check(Cinematic.Companion.getCinematicFor(loquaPlayer) == null) {
                 "Player ${event.player.name} still has a cinematic registered after splash screen clean up!"
-                Cinematic.stopCinematic(loquaPlayer)
+                Cinematic.Companion.stopCinematic(loquaPlayer)
             }
             return
         } else if (loquaPlayer.isInCharacterSelect()) {
-            LoquaInteractablePlugin.instance.characterSelectManager.handlePlayerQuit(loquaPlayer)
+            LoquaInteractablePlugin.Companion.instance.characterSelectManager.handlePlayerQuit(loquaPlayer)
             return
         }
 
-        check(Cinematic.getCinematicFor(loquaPlayer) == null) {
+        check(Cinematic.Companion.getCinematicFor(loquaPlayer) == null) {
             "Player ${event.player.name} has a cinematic registered but is not in the splash screen and there are no other cutscenes!"
-            Cinematic.stopCinematic(loquaPlayer)
+            Cinematic.Companion.stopCinematic(loquaPlayer)
         }
 
         // TODO is this necessary? Is instrument cleanup handled anywhere else?

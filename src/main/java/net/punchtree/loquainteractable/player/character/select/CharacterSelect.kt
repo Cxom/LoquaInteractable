@@ -6,7 +6,7 @@ import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.getOrDefault
 import net.punchtree.loquainteractable.housing.Housings
-import net.punchtree.loquainteractable.joining.splash.CameraUtils.spawnFakeCamera
+import net.punchtree.loquainteractable.splash.CameraUtils.spawnFakeCamera
 import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.character.BodyPart
 import net.punchtree.loquainteractable.player.character.LayerResolvedVisualCharacter

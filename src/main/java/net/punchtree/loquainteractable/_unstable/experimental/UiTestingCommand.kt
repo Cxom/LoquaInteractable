@@ -2,8 +2,8 @@ package net.punchtree.loquainteractable._unstable.experimental
 
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.sound.Sound
-import net.punchtree.loquainteractable.joining.SplashScreenManager
-import net.punchtree.loquainteractable.joining.splash.Cinematic
+import net.punchtree.loquainteractable.splash.SplashScreenManager
+import net.punchtree.loquainteractable.splash.Cinematic
 import net.punchtree.loquainteractable.player.craftPlayer
 import net.punchtree.loquainteractable.ui.Fade.fadeIn
 import net.punchtree.loquainteractable.ui.Fade.fadeOut

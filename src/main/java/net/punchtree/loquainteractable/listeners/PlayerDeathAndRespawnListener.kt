@@ -12,7 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 
 //TODO register
-class DeathAndRespawnListener : Listener {
+class PlayerDeathAndRespawnListener : Listener {
 
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent) {

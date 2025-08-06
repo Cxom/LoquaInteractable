@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.joining.splash
+package net.punchtree.loquainteractable.splash
 
 import io.papermc.paper.adventure.PaperAdventure
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
@@ -6,6 +6,8 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.phys.Vec3
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.player.craftPlayer
 import net.punchtree.loquainteractable.ui.Fade
@@ -115,9 +117,9 @@ class Cinematic private constructor(val player: CraftPlayer, private val cameraT
             location.z,
             location.pitch,
             location.yaw,
-            net.minecraft.world.entity.EntityType.ITEM_DISPLAY,
+            EntityType.ITEM_DISPLAY,
             0,
-            net.minecraft.world.phys.Vec3.ZERO,
+            Vec3.ZERO,
             0.0
         )
         player.handle.connection.send(addPacket)

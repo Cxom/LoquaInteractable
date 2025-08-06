@@ -31,12 +31,7 @@ import net.punchtree.loquainteractable.instruments.InstrumentTestCommand
 import net.punchtree.loquainteractable.item.CustomItemRegistry
 import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
-import net.punchtree.loquainteractable.joining.PlayerJoinListener
-import net.punchtree.loquainteractable.joining.SplashScreenManager
-import net.punchtree.loquainteractable.listeners.ChunkLoadListener
-import net.punchtree.loquainteractable.listeners.DeathAndRespawnListener
-import net.punchtree.loquainteractable.listeners.FoodLevelChangeListener
-import net.punchtree.loquainteractable.listeners.ServerPingListener
+import net.punchtree.loquainteractable.listeners.*
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.MetadataWand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
@@ -44,7 +39,7 @@ import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
 import net.punchtree.loquainteractable.player.character.select.CharacterSelectManager
-import net.punchtree.loquainteractable.quitting.PlayerQuitListener
+import net.punchtree.loquainteractable.splash.SplashScreenManager
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
@@ -114,8 +109,9 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(ServerPingListener(), this)
         pluginManager.registerEvents(ChunkLoadListener(), this)
         pluginManager.registerEvents(FoodLevelChangeListener(), this)
-        pluginManager.registerEvents(DeathAndRespawnListener(), this)
-
+        pluginManager.registerEvents(PlayerDeathAndRespawnListener(), this)
+        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
+        pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
 
         // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
@@ -125,11 +121,8 @@ class LoquaInteractablePlugin : JavaPlugin() {
         // TODO per player instances for data accumulation?
         pluginManager.registerEvents(MetadataWand(), this)
 
-
         // Player Join/Quit
         pluginManager.registerEvents(splashScreenManager, this)
-        pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
-        pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
 
         // Interactables/Consumables
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)

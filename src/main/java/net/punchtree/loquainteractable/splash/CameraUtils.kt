@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.joining.splash
+package net.punchtree.loquainteractable.splash
 
 import io.papermc.paper.adventure.PaperAdventure
 import net.minecraft.network.protocol.game.*

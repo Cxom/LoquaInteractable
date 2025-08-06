@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.joining
+package net.punchtree.loquainteractable.splash
 
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
@@ -6,9 +6,6 @@ import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.getOrDefault
 import net.punchtree.loquainteractable.housing.Housings
-import net.punchtree.loquainteractable.joining.splash.CameraKeyframe
-import net.punchtree.loquainteractable.joining.splash.CameraTrack
-import net.punchtree.loquainteractable.joining.splash.Cinematic
 import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.ui.CameraOverlays

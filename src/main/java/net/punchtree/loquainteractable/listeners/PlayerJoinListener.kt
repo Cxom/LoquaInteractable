@@ -1,5 +1,6 @@
-package net.punchtree.loquainteractable.joining
+package net.punchtree.loquainteractable.listeners
 
+import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -15,13 +16,13 @@ import net.punchtree.loquainteractable.player.LoquaPermissions
 import net.punchtree.loquainteractable.player.LoquaPlayer
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.player.character.select.CharacterSelectManager
+import net.punchtree.loquainteractable.splash.SplashScreenManager
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.scheduler.BukkitRunnable
 
 class PlayerJoinListener(
@@ -39,7 +40,7 @@ class PlayerJoinListener(
     }
 
     @EventHandler
-    fun onPlayerLogin(event: PlayerLoginEvent) {
+    fun onPlayerConnectionValidateLogin(event: PlayerConnectionValidateLoginEvent) {
 //        Bukkit.broadcastMessage("Player ${event.player.name} login event!")
     }
 
@@ -130,10 +131,9 @@ class PlayerJoinListener(
             override fun run() {
                 loquaPlayer.teleport(Housings.DEFAULT_HOUSING_SPAWN)
             }
-        }.runTask(LoquaInteractablePlugin.instance)
+        }.runTask(LoquaInteractablePlugin.Companion.instance)
 
         loquaPlayer.gameMode = GameMode.ADVENTURE
         loquaPlayer.isInvisible = false
     }
 }
-
