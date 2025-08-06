@@ -32,6 +32,7 @@ import net.punchtree.loquainteractable.item.CustomItemRegistry
 import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
 import net.punchtree.loquainteractable.listeners.*
+import net.punchtree.loquainteractable.listeners.input.PlayerInputListener
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
@@ -105,13 +106,14 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
 
         // properly single-function listeners in listeners package
-        pluginManager.registerEvents(ServerPingListener(), this)
         pluginManager.registerEvents(ChunkLoadListener(), this)
         pluginManager.registerEvents(FoodLevelChangeListener(), this)
         pluginManager.registerEvents(PlayerDeathAndRespawnListener(), this)
+        pluginManager.registerEvents(PlayerInputListener(splashScreenManager), this)
+        pluginManager.registerEvents(PlayerInteractListener(), this)
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
-        pluginManager.registerEvents(PlayerInteractListener(), this)
+        pluginManager.registerEvents(ServerPingListener(), this)
 
 
         // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
@@ -119,9 +121,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
         pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
 
         // TODO per player instances for data accumulation?
-
-        // Player Join/Quit
-        pluginManager.registerEvents(splashScreenManager, this)
 
         // Interactables/Consumables
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)

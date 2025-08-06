@@ -12,13 +12,11 @@ import net.punchtree.loquainteractable.ui.CameraOverlays
 import net.punchtree.loquainteractable.ui.Fade
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
-class SplashScreenManager : Listener {
+class SplashScreenManager {
 
     // TODO block any commands and use of chat while in splash screen
 
@@ -69,9 +67,7 @@ class SplashScreenManager : Listener {
         }
     }
 
-    @Suppress("UnstableApiUsage")
-    @EventHandler
-    fun onPlayerInput(event: PlayerInputEvent) {
+    internal fun handlePlayerInput(event: PlayerInputEvent) {
         // TODO really REALLY be careful about player tracking and all the places it happens, and that we're not leaking memory
         //  really think about it, don't guess. I think we're on the right track with the player manager, the join and quit listeners,
         //  and the equality implementation on PlayerDecorator, but really think about it and make sure it all makes sense
