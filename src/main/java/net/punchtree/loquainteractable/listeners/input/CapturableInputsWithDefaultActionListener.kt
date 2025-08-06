@@ -1,7 +1,7 @@
-package net.punchtree.loquainteractable.instruments
+package net.punchtree.loquainteractable.listeners.input
 
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.loquainteractable.instruments.Instruments.isInstrument
+import net.punchtree.loquainteractable.instruments.InstrumentManager
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 
-class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listener {
+class CapturableInputsWithDefaultActionListener(val playerInputsManager: PlayerInputsManager) : Listener {
 
     @EventHandler
     fun onSwapHand(event: PlayerSwapHandItemsEvent) {
@@ -22,11 +22,6 @@ class InstrumentListener(val playerInputsManager: PlayerInputsManager) : Listene
             event.isCancelled = true
         }
     }
-
-//    @EventHandler
-//    fun onInput(event: PlayerInputEvent) {
-//        playerInputsManager.getInputsForPlayer(event.player)?.updateVehicleInput(event.player, event.input)
-//    }
 
     @EventHandler
     fun onDismount(event: EntityDismountEvent) {

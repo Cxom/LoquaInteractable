@@ -1,12 +1,7 @@
 package net.punchtree.loquainteractable.ui.inventory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
+import net.md_5.bungee.api.ChatColor;
+import net.punchtree.loquainteractable.listeners.InventoryMenuListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -19,7 +14,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Menu implements IMenu {
 

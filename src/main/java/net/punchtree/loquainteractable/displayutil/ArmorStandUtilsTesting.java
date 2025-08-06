@@ -18,7 +18,7 @@ import net.punchtree.util.color.ColoredScoreboardTeams;
 public class ArmorStandUtilsTesting implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void onPlayerInteract(PlayerInteractEntityEvent event) {
+	public static void onPlayerInteract(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked().getType() == EntityType.ARMOR_STAND 
 				&& event.getPlayer().isSneaking()
 				&& event.getPlayer().getInventory().getItemInMainHand().getType() == Material.WARPED_FUNGUS) {
@@ -38,8 +38,7 @@ public class ArmorStandUtilsTesting implements Listener {
 		ROAD_TEST_BLOCK.setItemMeta(im);
 	}
 	
-	@EventHandler
-	public void onPlayerStaticPlace(PlayerInteractEvent event) {
+	public static void onPlayerStaticPlace(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK 
 				&& (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.WARPED_FUNGUS
 						|| event.getPlayer().getInventory().getItemInMainHand().getType() == Material.NETHERITE_SCRAP)) {

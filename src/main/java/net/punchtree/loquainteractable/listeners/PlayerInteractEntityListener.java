@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.punchtree.loquainteractable.LoquaInteractablePlugin;
 
+// TODO this was never registered or even implements listener!
 public class PlayerInteractEntityListener {
 
 	@EventHandler

@@ -25,13 +25,13 @@ import net.punchtree.loquainteractable.heist.HeistTestCommand
 import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.input.SteerVehicleInputPacketAdapter
-import net.punchtree.loquainteractable.instruments.InstrumentListener
 import net.punchtree.loquainteractable.instruments.InstrumentManager
 import net.punchtree.loquainteractable.instruments.InstrumentTestCommand
 import net.punchtree.loquainteractable.item.CustomItemRegistry
 import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
 import net.punchtree.loquainteractable.listeners.*
+import net.punchtree.loquainteractable.listeners.input.CapturableInputsWithDefaultActionListener
 import net.punchtree.loquainteractable.listeners.input.PlayerInputListener
 import net.punchtree.loquainteractable.metadata.commands.MetadataWandCommand
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
@@ -43,7 +43,6 @@ import net.punchtree.loquainteractable.splash.SplashScreenManager
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTesting
 import net.punchtree.loquainteractable.transit.streetcar.StreetcarTestingCommand
-import net.punchtree.loquainteractable.ui.inventory.InventoryMenuListener
 import net.punchtree.loquainteractable.ui.inventory.InventoryMenuTesting
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -99,32 +98,32 @@ class LoquaInteractablePlugin : JavaPlugin() {
     private fun registerEvents() {
         val pluginManager = Bukkit.getPluginManager()
 
-        // old shit/deprecated
-        pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this)
-
-        // testing
-        pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
-
         // properly single-function listeners in listeners package
         pluginManager.registerEvents(ChunkLoadListener(), this)
         pluginManager.registerEvents(FoodLevelChangeListener(), this)
+        pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
         pluginManager.registerEvents(PlayerDeathAndRespawnListener(), this)
         pluginManager.registerEvents(PlayerInputListener(splashScreenManager), this)
         pluginManager.registerEvents(PlayerInteractListener(), this)
         pluginManager.registerEvents(PlayerJoinListener(playerInputsManager, splashScreenManager, characterSelectManager), this)
         pluginManager.registerEvents(PlayerQuitListener(playerInputsManager), this)
         pluginManager.registerEvents(ServerPingListener(), this)
-
+        // TODO this needs to be incorporated with high intentionality into the input processing solution
+        pluginManager.registerEvents(CapturableInputsWithDefaultActionListener(playerInputsManager), this)
 
         // TODO MOVE ALL LISTENERS INTO LISTENERS PACKAGE
 
-        pluginManager.registerEvents(InventoryMenuListener.getInstance(), this)
 
-        // TODO per player instances for data accumulation?
+        // TODO per player instances for data accumulation? (this was about the metadata wand)
 
         // Interactables/Consumables
         pluginManager.registerEvents(DrinkItemListener(this, protocolManager), this)
-        pluginManager.registerEvents(InstrumentListener(playerInputsManager), this)
+
+        // testing
+        pluginManager.registerEvents(ArmorStandUtilsTesting(), this)
+
+        // old shit/deprecated
+        pluginManager.registerEvents(MetadataEditingSessionManager.getInstance(), this)
 
         // packet registration
         PacketEvents.getAPI().eventManager.registerListener(TempPacketListener(), PacketListenerPriority.MONITOR)
