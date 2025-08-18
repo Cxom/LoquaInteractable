@@ -1,7 +1,7 @@
 package net.punchtree.loquainteractable.listeners.input
 
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.loquainteractable.instruments.InstrumentManager
+import net.punchtree.loquainteractable.outofbody.instruments.InstrumentManager
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

@@ -5,6 +5,7 @@ import net.punchtree.loquainteractable.data.LoquaDataKeys
 import net.punchtree.loquainteractable.data.get
 import net.punchtree.loquainteractable.data.remove
 import net.punchtree.loquainteractable.data.set
+import net.punchtree.loquainteractable.outofbody.OutOfBodyState
 import net.punchtree.loquainteractable.ui.CameraOverlay
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -40,6 +41,8 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     // TODO we have a very strong expectation that there is exactly one LoquaPlayer per CraftPlayer
     //  it may be a good idea to enforce this in the constructor, or better yet maybe even make the
     //  constructor private and move the player manager into the same file
+
+    private var outOfBodyState: OutOfBodyState? = null
 
     // Have fields like these be normalized by default, not denormalized
     //  (i.e. have them be functions calling the underlying manager for a single source of truth,
@@ -107,5 +110,13 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
 
     fun removeCameraOverlay() {
         inventory.helmet = null
+    }
+
+    fun enterOutOfBodyState(outOfBodyState: OutOfBodyState) {
+        this.outOfBodyState?.exit()
+        this.outOfBodyState = outOfBodyState
+        // TODO determine how we want the lifecycle of this api to work
+        //  should we need to call enter on it? if not, we need to take a supplier,
+        //  not an assembled state (that presumably already affected the client)
     }
 }

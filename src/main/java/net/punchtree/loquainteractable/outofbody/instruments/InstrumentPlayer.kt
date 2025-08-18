@@ -1,10 +1,11 @@
-package net.punchtree.loquainteractable.instruments
+package net.punchtree.loquainteractable.outofbody.instruments
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsObserver
 import net.punchtree.loquainteractable.input.observeInputsWith
 import net.punchtree.loquainteractable.input.unobserveInputsWith
+import net.punchtree.loquainteractable.outofbody.OutOfBodyState
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.Material
 import org.bukkit.entity.Entity
@@ -23,7 +24,7 @@ import kotlin.math.min
 class InstrumentPlayer(
     val player: Player,
     val instrument: Instruments.Instrument
-) : PlayerInputsObserver {
+) : OutOfBodyState, PlayerInputsObserver {
 
     /* Next steps for instruments
      * - Make playingSound happen on the world, and stop playing happen for all nearby entities
@@ -42,6 +43,7 @@ class InstrumentPlayer(
 
     private lateinit var chair: Entity
 
+    // TODO make this a private constructor and make startPlaying a static factory method
     init {
         startPlaying()
     }
@@ -204,4 +206,9 @@ class InstrumentPlayer(
         chair.remove()
         player.unobserveInputsWith(this)
     }
+
+    override fun exit() {
+        stopPlaying()
+    }
+
 }

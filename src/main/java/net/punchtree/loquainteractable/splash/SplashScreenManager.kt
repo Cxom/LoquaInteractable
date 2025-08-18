@@ -16,6 +16,8 @@ import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
+// This may be separable into a state and a system, ECS style
+
 class SplashScreenManager {
 
     // TODO block any commands and use of chat while in splash screen

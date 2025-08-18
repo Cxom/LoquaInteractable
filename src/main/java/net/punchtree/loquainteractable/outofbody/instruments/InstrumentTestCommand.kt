@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.instruments
+package net.punchtree.loquainteractable.outofbody.instruments
 
 import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component

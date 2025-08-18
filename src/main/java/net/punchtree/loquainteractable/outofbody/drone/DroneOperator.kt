@@ -1,10 +1,11 @@
-package net.punchtree.loquainteractable.drone
+package net.punchtree.loquainteractable.outofbody.drone
 
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsObserver
 import net.punchtree.loquainteractable.input.observeInputsWith
 import net.punchtree.loquainteractable.input.unobserveInputsWith
+import net.punchtree.loquainteractable.outofbody.OutOfBodyState
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.GameMode
 import org.bukkit.entity.Entity
@@ -16,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import org.bukkit.util.Vector
 
-class DroneOperator(val player: Player, val drone: Drone) : PlayerInputsObserver {
+class DroneOperator(val player: Player, val drone: Drone) : OutOfBodyState, PlayerInputsObserver {
 
     // TODO cancel dismounting!!!!!!
     // TODO block interactions - make the ridden entity a flying slime and use velocity?
@@ -39,6 +40,7 @@ class DroneOperator(val player: Player, val drone: Drone) : PlayerInputsObserver
 
     private var velocity = Vector(0.0, 0.0, 0.0)
 
+    // TODO make this a private constructor and make startFlying a static factory method
     init {
         startFlying()
     }
@@ -116,6 +118,10 @@ class DroneOperator(val player: Player, val drone: Drone) : PlayerInputsObserver
         right = inputs.right
         jump = inputs.jump
         sprint = inputs.sprint
+    }
+
+    override fun exit() {
+        stopFlying()
     }
 
 }

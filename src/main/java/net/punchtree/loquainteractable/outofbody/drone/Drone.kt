@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.drone
+package net.punchtree.loquainteractable.outofbody.drone
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack

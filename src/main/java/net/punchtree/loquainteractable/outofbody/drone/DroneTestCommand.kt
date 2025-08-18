@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.drone
+package net.punchtree.loquainteractable.outofbody.drone
 
 import net.punchtree.loquainteractable.text.LoquaTextColors.failure
 import net.punchtree.loquainteractable.text.LoquaTextColors.success

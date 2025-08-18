@@ -17,15 +17,11 @@ import net.punchtree.loquainteractable.clothing.SkinGrabberTestCommand
 import net.punchtree.loquainteractable.commands.item.NbtUtilCommands
 import net.punchtree.loquainteractable.commands.item.SetLeatherColorCommand
 import net.punchtree.loquainteractable.data.PdcCommand
-import net.punchtree.loquainteractable.drone.DroneManager
-import net.punchtree.loquainteractable.drone.DroneTestCommand
 import net.punchtree.loquainteractable.guns.qualityarmory.QualityArmoryTestCommand
 import net.punchtree.loquainteractable.heist.HeistTestCommand
 import net.punchtree.loquainteractable.input.ChangeHeldItemInputPacketAdapter
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.input.SteerVehicleInputPacketAdapter
-import net.punchtree.loquainteractable.instruments.InstrumentManager
-import net.punchtree.loquainteractable.instruments.InstrumentTestCommand
 import net.punchtree.loquainteractable.item.CustomItemRegistry
 import net.punchtree.loquainteractable.item.DrinkItemListener
 import net.punchtree.loquainteractable.item.command.*
@@ -37,6 +33,10 @@ import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingS
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
+import net.punchtree.loquainteractable.outofbody.drone.DroneManager
+import net.punchtree.loquainteractable.outofbody.drone.DroneTestCommand
+import net.punchtree.loquainteractable.outofbody.instruments.InstrumentManager
+import net.punchtree.loquainteractable.outofbody.instruments.InstrumentTestCommand
 import net.punchtree.loquainteractable.player.character.select.CharacterSelectManager
 import net.punchtree.loquainteractable.splash.SplashScreenManager
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
@@ -206,8 +206,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         customItemRegistry.save()
         garbageCansService.onDisable()
 
-        InstrumentManager.onDisable()
-        DroneManager.onDisable()
+        disableOutOfBodyState()
 
         StreetcarTesting.onDisable()
         CitizensNPCManager.onDisable()
@@ -221,6 +220,10 @@ class LoquaInteractablePlugin : JavaPlugin() {
         WorldEditHugeRotate.onDisable()
     }
 
+    private fun disableOutOfBodyState() {
+        InstrumentManager.onDisable()
+        DroneManager.onDisable()
+    }
 
     companion object {
         @JvmStatic

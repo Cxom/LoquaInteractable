@@ -1,4 +1,4 @@
-package net.punchtree.loquainteractable.instruments
+package net.punchtree.loquainteractable.outofbody.instruments
 
 import org.bukkit.entity.Player
 import java.util.*
@@ -19,6 +19,20 @@ object InstrumentManager {
     //  *conceptually* not a play state, but the limitations it has around what the player can do
     //  while it's happening (nothing) are pretty similar to the limitations of some other
     //  out-of-body states, like drone-flying, watching a cinematic, being dead (corpse), etc
+
+
+    /*
+     * Instrument Manager lets forward:
+     * - Swap, Dismount, and Drop Item events (for cancelling)
+     * - Quit event (for stopping)
+     * - Server shutdown (for stopping)
+     *
+     * Drone lets forward the same
+     *
+     * Splash Screen Manager:
+     *  -
+     *
+     */
 
     private val playersPlayingInstruments = mutableMapOf<UUID, InstrumentPlayer>()
 

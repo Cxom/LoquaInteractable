@@ -1,5 +1,6 @@
-package net.punchtree.loquainteractable.drone
+package net.punchtree.loquainteractable.outofbody.drone
 
+import net.punchtree.loquainteractable.player.LoquaPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -11,12 +12,15 @@ object DroneManager {
         return playersFlyingDrones.containsKey(player.uniqueId)
     }
 
-    fun startFlyingDrone(player: Player) {
-        stopFlyingDrone(player)
-        playersFlyingDrones[player.uniqueId] = DroneOperator(player, Drone())
+    fun startFlyingDrone(player: LoquaPlayer) {
+
+        player.enterOutOfBodyState(DroneOperator(player, Drone()))
+
+//        stopFlyingDrone(player)
+//        playersFlyingDrones[player.uniqueId] = DroneOperator(player, Drone())
     }
 
-    fun stopFlyingDrone(player: Player) {
+    fun stopFlyingDrone(player: LoquaPlayer) {
         playersFlyingDrones.remove(player.uniqueId)?.stopFlying()
     }
 
