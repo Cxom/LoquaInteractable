@@ -34,6 +34,9 @@ class PlayerJoinListener(
     init {
         // TODO this dependency is kind of ugly - any other ideas?
         //  maybe an event (either bukkit, or our own basic observable) ?
+        //  update: better idea, move this member to a different file. there is no class state that isn't just DI'd managers
+        //  then take this as a constructor parameter
+        //  better yet maybe just use objects. who even cares.
         splashScreenManager.onExitSplashScreen =:: onPlayerExitSplashScreen
        // look ma, I discovered a new operator! ^
         characterSelectManager.onSelectCharacter =:: doEnterGame

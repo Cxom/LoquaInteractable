@@ -10,7 +10,15 @@ object InstrumentManager {
     //  that one single manager, or an object instance attached to the LoquaPlayer
     //  is a much better way to handle it than a bunch of different managers
     //  build drones, and then try abstracting the two different options
-
+    //  also singleton bad
+    //  .
+    //  moreover, this idea of out-of-body state can be applied to splash screen manager????????
+    //  maybe not, only because that is a very special case of a non-gameplay state
+    //  BUT, the idea of dispatching to it through the LoquaClient class is not a bad idea
+    //  or, we can just treat it as a play state. that might be better, it is really only
+    //  *conceptually* not a play state, but the limitations it has around what the player can do
+    //  while it's happening (nothing) are pretty similar to the limitations of some other
+    //  out-of-body states, like drone-flying, watching a cinematic, being dead (corpse), etc
 
     private val playersPlayingInstruments = mutableMapOf<UUID, InstrumentPlayer>()
 

@@ -11,6 +11,30 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
+// In most multiplayer games, there are different "scenes".
+// The game itself runs a game client, and that handles the rendering and logic of most of the world
+// Then the actual networked "player" object really only cares about the state that needs to be synchronized
+// across the network.
+//
+// In our game, things are more complicated. ALL logic is serverside except that built into and understood by
+// the base game of Minecraft. This means a lot of custom behavior crosses the network boundary. The challenge
+// becomes answering the question of how we segregate the idea of the Minecraft player, which is in effect the Loqua
+// client, from the Loqua player, who has an inventory even when the Minecraft player is spectating an entity,
+// invisible, disconnected from the "body" of the loqua player, etc.
+//
+// examples:
+// when the loqua player is "dead", it will be a corpse on the ground. It still conceptually has it's inventory.
+// meanwhile the minecraft player is a spectator, near the corpse, with no inventory except those items acting as
+// buttons for respawning.
+//
+// when the loqua player is flying a drone, they are sitting somewhere with goggles on
+// meanwhile the minecraft player is spectating the flying drone camera entity
+//
+// we have made things more difficult for ourselves by turning the LoquaPlayer into a decorator of the underlying
+// player, instead of just a composed wrapper. there is some power in this, in that the loqua player can override
+// anything and everything that passed through to the regular player, SO LONG AS THE LOQUA PLAYER IS USED EVERYWHERE
+// (THAT'S NOT GUARANTEED AT ALL)
+
 class LoquaPlayer(player: Player) : PlayerDecorator(player) {
 
     // TODO we have a very strong expectation that there is exactly one LoquaPlayer per CraftPlayer
