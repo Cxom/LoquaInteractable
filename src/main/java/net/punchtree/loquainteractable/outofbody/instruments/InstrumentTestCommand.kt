@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor.GREEN
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputs
 import net.punchtree.loquainteractable.input.PlayerInputsManager
+import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.util.debugvar.DebugVars
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -48,12 +49,25 @@ class InstrumentTestCommand(
         if ( sender !is Player ) return false
         if (args.isEmpty()) return false
 
+        val loquaPlayer = LoquaPlayerManager[sender]
+
         when (args[0].lowercase()) {
             "give" -> giveInstrument(sender, args)
             "basic-input-monitoring-test" -> doBasicInputMonitoringTest(sender)
-            "play-acoustic-guitar" -> InstrumentManager.startPlayerPlaying(sender, Instruments.AcousticGuitar)
-            "play-trumpet" -> InstrumentManager.startPlayerPlaying(sender, Instruments.LegatoTrumpet)
-            "stop-playing" -> InstrumentManager.stopPlayerPlaying(sender)
+            "play-acoustic-guitar" -> {
+                loquaPlayer.enterOutOfBodyState(InstrumentPlayer(loquaPlayer, Instruments.AcousticGuitar))
+            }
+            "play-trumpet" -> {
+                loquaPlayer.enterOutOfBodyState(InstrumentPlayer(loquaPlayer, Instruments.LegatoTrumpet))
+            }
+            "stop-playing" -> {
+                if (loquaPlayer.outOfBodyState is InstrumentPlayer) {
+                    loquaPlayer.exitOutOfBodyState()
+                    sender.sendMessage(text("Stopped playing instrument.").color(GREEN))
+                } else {
+                    sender.sendMessage(text("You are not playing an instrument.").color(GRAY))
+                }
+            }
         }
 
         return true

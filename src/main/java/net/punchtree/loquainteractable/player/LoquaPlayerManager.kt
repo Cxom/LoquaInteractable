@@ -51,6 +51,14 @@ object LoquaPlayerManager {
             "Tried fetching LoquaPlayer for player [$playerName:${uuid}] and it didn't work! Are they not online?"
         }
     }
+
+    // TODO correct the name of this
+    internal fun cleanupAllPlayers() {
+        playersToLoquaPlayers.values.forEach {
+            it.exitOutOfBodyState()
+            // TODO save inventory? other stuff?
+        }
+    }
 }
 
 fun Player.toLoquaPlayer(): LoquaPlayer? {

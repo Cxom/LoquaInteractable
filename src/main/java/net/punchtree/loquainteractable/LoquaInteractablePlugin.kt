@@ -33,10 +33,9 @@ import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingS
 import net.punchtree.loquainteractable.npc.citizens.CitizensNPCManager
 import net.punchtree.loquainteractable.npc.citizens.CitizensTestCommand
 import net.punchtree.loquainteractable.npc.citizens.heist.GuardTesting
-import net.punchtree.loquainteractable.outofbody.drone.DroneManager
 import net.punchtree.loquainteractable.outofbody.drone.DroneTestCommand
-import net.punchtree.loquainteractable.outofbody.instruments.InstrumentManager
 import net.punchtree.loquainteractable.outofbody.instruments.InstrumentTestCommand
+import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.player.character.select.CharacterSelectManager
 import net.punchtree.loquainteractable.splash.SplashScreenManager
 import net.punchtree.loquainteractable.staff.commands.StaffModeCommand
@@ -206,7 +205,7 @@ class LoquaInteractablePlugin : JavaPlugin() {
         customItemRegistry.save()
         garbageCansService.onDisable()
 
-        disableOutOfBodyState()
+        LoquaPlayerManager.cleanupAllPlayers()
 
         StreetcarTesting.onDisable()
         CitizensNPCManager.onDisable()
@@ -218,11 +217,6 @@ class LoquaInteractablePlugin : JavaPlugin() {
         protocolManager.removePacketListeners(this)
 
         WorldEditHugeRotate.onDisable()
-    }
-
-    private fun disableOutOfBodyState() {
-        InstrumentManager.onDisable()
-        DroneManager.onDisable()
     }
 
     companion object {

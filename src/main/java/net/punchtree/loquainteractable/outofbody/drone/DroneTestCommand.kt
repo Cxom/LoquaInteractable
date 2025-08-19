@@ -1,5 +1,6 @@
 package net.punchtree.loquainteractable.outofbody.drone
 
+import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.text.LoquaTextColors.failure
 import net.punchtree.loquainteractable.text.LoquaTextColors.success
 import org.bukkit.command.Command
@@ -21,14 +22,20 @@ object DroneTestCommand : CommandExecutor, TabCompleter {
         if (sender !is Player) return false
         if (args.isEmpty()) return false
 
+        val loquaPlayer = LoquaPlayerManager[sender]
+
         when (args[0].lowercase()) {
             "start" -> {
-                DroneManager.startFlyingDrone(sender)
+                loquaPlayer.enterOutOfBodyState(DroneOperator(loquaPlayer, Drone()))
                 sender.sendMessage(success("Flying drone started."))
             }
             "stop" -> {
-                DroneManager.stopFlyingDrone(sender)
-                sender.sendMessage(failure("Flying drone stopped."))
+                if (loquaPlayer.outOfBodyState is DroneOperator) {
+                    loquaPlayer.exitOutOfBodyState()
+                    sender.sendMessage(failure("Flying drone stopped."))
+                } else {
+                    sender.sendMessage(failure("You are not flying a drone."))
+                }
             }
         }
 

@@ -16,7 +16,12 @@ import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
-// This may be separable into a state and a system, ECS style
+// TODO refactor this to an out-of-body state. it is really only
+//  *conceptually* not a play state, but the limitations it has around what the player can do
+//  while it's happening (nothing) are pretty similar to the limitations of some other
+//  out-of-body states, like drone-flying, watching a cinematic, being dead (corpse), etc
+//  The ticking and processing can be separated into another file. is should be separable into
+//  a state and a system, ECS style
 
 class SplashScreenManager {
 

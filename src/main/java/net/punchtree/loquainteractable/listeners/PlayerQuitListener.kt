@@ -3,8 +3,6 @@ package net.punchtree.loquainteractable.listeners
 import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import net.punchtree.loquainteractable.input.PlayerInputsManager
 import net.punchtree.loquainteractable.metadata.editing.session.MetadataEditingSessionManager
-import net.punchtree.loquainteractable.outofbody.drone.DroneManager
-import net.punchtree.loquainteractable.outofbody.instruments.InstrumentManager
 import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import net.punchtree.loquainteractable.splash.Cinematic
 import org.bukkit.event.EventHandler
@@ -52,12 +50,7 @@ class PlayerQuitListener(private val playerInputsManager: PlayerInputsManager) :
             Cinematic.Companion.stopCinematic(loquaPlayer)
         }
 
-        // TODO is this necessary? Is instrument cleanup handled anywhere else?
-        //  moreover the oversight of having not implemented this in the first place highlights the need to
-        //  really carefully think through how to close out all the different possible alternate input situations
-        //  a player may be in the midst of when they quit
-        InstrumentManager.stopPlayerPlaying(player)
-        DroneManager.stopFlyingDrone(player)
+        loquaPlayer.exitOutOfBodyState()
 
         // Similarly, is metadata wand even properly placed? It's a flippin' build tool, TODO put it in a different plugin
         MetadataEditingSessionManager.getInstance().handlePlayerQuit(player)

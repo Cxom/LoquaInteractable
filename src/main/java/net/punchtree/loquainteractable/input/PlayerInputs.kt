@@ -1,6 +1,7 @@
 package net.punchtree.loquainteractable.input
 
 import net.minecraft.world.entity.player.Input
+import net.punchtree.loquainteractable.LoquaInteractablePlugin
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
@@ -107,8 +108,12 @@ class PlayerInputs(val uuid: UUID) {
 //        notifyObservers(player, this, PlayerInputsUpdateType.GENERAL_INPUT)
 //    }
 
-    val observers: MutableList<PlayerInputsObserver> = mutableListOf()
+    val observers: MutableSet<PlayerInputsObserver> = mutableSetOf()
     fun registerObserver(observer: PlayerInputsObserver) {
+        if (observers.contains(observer)) {
+            LoquaInteractablePlugin.instance.logger.warning("Tried to register observer $observer for player $uuid, but it was already registered!")
+            return
+        }
         observers.add(observer)
     }
 

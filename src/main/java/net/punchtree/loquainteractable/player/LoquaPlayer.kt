@@ -42,7 +42,8 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     //  it may be a good idea to enforce this in the constructor, or better yet maybe even make the
     //  constructor private and move the player manager into the same file
 
-    private var outOfBodyState: OutOfBodyState? = null
+    internal var outOfBodyState: OutOfBodyState? = null
+        private set
 
     // Have fields like these be normalized by default, not denormalized
     //  (i.e. have them be functions calling the underlying manager for a single source of truth,
@@ -113,10 +114,17 @@ class LoquaPlayer(player: Player) : PlayerDecorator(player) {
     }
 
     fun enterOutOfBodyState(outOfBodyState: OutOfBodyState) {
-        this.outOfBodyState?.exit()
+        this.outOfBodyState?.let {
+            it.exit()
+            LoquaInteractablePlugin.instance.logger.warning("Exiting previous out-of-body state ${it::class.simpleName} for player $name before entering new out-of-body state ${outOfBodyState::class.simpleName}.")
+        }
         this.outOfBodyState = outOfBodyState
-        // TODO determine how we want the lifecycle of this api to work
-        //  should we need to call enter on it? if not, we need to take a supplier,
-        //  not an assembled state (that presumably already affected the client)
+        // TODO is there any verification or validation we can do on the state of activation of the outOfBodyState (throw an error if it's entered?)?
+        this.outOfBodyState!!.enter()
+    }
+
+    fun exitOutOfBodyState() {
+        // TODO how do self-ending states work? when the player exits the state, how should that cleanup happen?
+        this.outOfBodyState?.exit()
     }
 }

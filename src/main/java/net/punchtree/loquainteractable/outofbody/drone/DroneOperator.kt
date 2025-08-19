@@ -40,11 +40,6 @@ class DroneOperator(val player: Player, val drone: Drone) : OutOfBodyState, Play
 
     private var velocity = Vector(0.0, 0.0, 0.0)
 
-    // TODO make this a private constructor and make startFlying a static factory method
-    init {
-        startFlying()
-    }
-
     private fun startFlying() {
         this.displayToRide = player.world.spawnEntity(
             player.location.clone().add(0.0, 1.0, 0.0),
@@ -118,6 +113,10 @@ class DroneOperator(val player: Player, val drone: Drone) : OutOfBodyState, Play
         right = inputs.right
         jump = inputs.jump
         sprint = inputs.sprint
+    }
+
+    override fun enter() {
+        startFlying()
     }
 
     override fun exit() {

@@ -43,11 +43,6 @@ class InstrumentPlayer(
 
     private lateinit var chair: Entity
 
-    // TODO make this a private constructor and make startPlaying a static factory method
-    init {
-        startPlaying()
-    }
-
     private fun startPlaying() {
         this.chair = player.world.spawnEntity(player.location.clone().also {
             it.yaw = 0f
@@ -205,6 +200,10 @@ class InstrumentPlayer(
     fun stopPlaying() {
         chair.remove()
         player.unobserveInputsWith(this)
+    }
+
+    override fun enter() {
+        startPlaying()
     }
 
     override fun exit() {

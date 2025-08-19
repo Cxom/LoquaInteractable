@@ -1,7 +1,8 @@
 package net.punchtree.loquainteractable.listeners.input
 
 import net.punchtree.loquainteractable.input.PlayerInputsManager
-import net.punchtree.loquainteractable.outofbody.instruments.InstrumentManager
+import net.punchtree.loquainteractable.outofbody.instruments.InstrumentPlayer
+import net.punchtree.loquainteractable.player.LoquaPlayerManager
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +19,8 @@ class CapturableInputsWithDefaultActionListener(val playerInputsManager: PlayerI
         // TODO we need to resolve the conflict between routing the swap event to the player inputs
         //  and the ability/fact of the event being cancelled
         //  detecting the input and deciding whether or not to let the swap proceed are two different things
-        if (InstrumentManager.isPlayingInstrument(event.player)) {
+        //  Update: we still want to remove the coupling to Instruments, it should be handled generically for OutOfBody here, but that's part of input processing refactor
+        if (LoquaPlayerManager[event.player].outOfBodyState is InstrumentPlayer) {
             event.isCancelled = true
         }
     }
@@ -34,7 +36,8 @@ class CapturableInputsWithDefaultActionListener(val playerInputsManager: PlayerI
 
     @EventHandler
     fun onDropItem(event: PlayerDropItemEvent) {
-        if (InstrumentManager.isPlayingInstrument(event.player)) {
+        // TODO see above
+        if (LoquaPlayerManager[event.player].outOfBodyState is InstrumentPlayer) {
             event.isCancelled = true
         }
     }
